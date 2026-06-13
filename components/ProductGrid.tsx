@@ -12,6 +12,7 @@ interface ProductGridProps {
   initialCategory?: string;
   initialSearch?: string;
   initialPrice?: string;
+  initialDiscount?: number | null;
 }
 
 export function ProductGrid({
@@ -20,6 +21,7 @@ export function ProductGrid({
   initialCategory = "All",
   initialSearch = "",
   initialPrice = "All",
+  initialDiscount = null,
 }: ProductGridProps) {
   // State for all filters
   const [search, setSearch] = useState(initialSearch);
@@ -35,7 +37,7 @@ export function ProductGrid({
   const [customMinPrice, setCustomMinPrice] = useState<string>("");
   const [customMaxPrice, setCustomMaxPrice] = useState<string>("");
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [selectedDiscount, setSelectedDiscount] = useState<number | null>(null);
+  const [selectedDiscount, setSelectedDiscount] = useState<number | null>(initialDiscount);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [waterproofOnly, setWaterproofOnly] = useState<boolean>(false);

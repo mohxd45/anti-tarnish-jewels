@@ -1,38 +1,22 @@
-"use client";
-
 import { ProductGrid } from "@/components/ProductGrid";
 import { getProducts } from "@/lib/firestore";
-import { Product } from "@/types";
-import { useEffect, useState } from "react";
+import { Metadata } from "next";
 
-export default function SalePage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+export const metadata: Metadata = {
+  title: "Sale | Anti Tarnish Jewels",
+  description: "Shop our latest discounts and offers on premium anti-tarnish jewelry.",
+};
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const all = await getProducts();
-        setProducts(all.filter((p) => p.discountPercentage >= 50));
-      } catch (err) {
-        console.error("Error loading sale products:", err);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+export const dynamic = "force-dynamic";
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-ivory flex items-center justify-center">
-        <span className="animate-pulse tracking-widest text-lg font-serif text-champagne">
-          Loading Sale Items...
-        </span>
-      </div>
-    );
-  }
+export default async function SalePage() {
+  const all = await getProducts();
+  const active = Array.isArray(all) ? all.filter((p) => p.isActive !== false) : [];
+  
+  // Apply the exact same logic that the shop uses for "Sale" category and "Discount 50%+" filters
+  const saleProducts = active.filter(
+    (p) => p.category === "Sale" || p.discountPercentage >= 50
+  );
 
-  return <ProductGrid products={products} title="Sale" />;
+  return <ProductGrid products={saleProducts} title="Sale" />;
 }

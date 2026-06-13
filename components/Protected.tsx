@@ -19,7 +19,6 @@ export function Protected({ children, adminOnly = false }: { children: React.Rea
   }, [loading]);
 
   if (loading) {
-    if (!showSpinner) return null; // Brief loading — show nothing
     return (
       <div className="mx-auto max-w-7xl px-4 py-24 flex items-center justify-center">
         <div className="text-center">
@@ -39,10 +38,19 @@ export function Protected({ children, adminOnly = false }: { children: React.Rea
           </svg>
         </div>
         <h1 className="text-2xl font-serif font-semibold text-champagne tracking-wide">Please Login</h1>
-        <p className="mt-3 text-stoneGray text-sm leading-relaxed">You need an account to access this page.</p>
-        <Link href="/login" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-jewel">
-          Login to Continue
-        </Link>
+        <p className="mt-3 text-stoneGray text-sm leading-relaxed mb-8">You need an account to access this page.</p>
+        
+        <div className="flex flex-col gap-3 max-w-sm mx-auto">
+          <Link href="/login" className="flex items-center justify-center gap-2 rounded-full border border-champagne bg-champagne/10 px-6 py-3 font-semibold text-champagne hover:bg-champagne/20 transition-colors">
+            Continue with Google
+          </Link>
+          <Link href="/login" className="flex items-center justify-center gap-2 rounded-full bg-champagne px-6 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors">
+            Login with Email
+          </Link>
+          <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-goldBeige/60 bg-warmwhite px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
+            Create Account
+          </Link>
+        </div>
       </div>
     );
   }

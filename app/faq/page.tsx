@@ -21,11 +21,9 @@ function FAQAccordionItem({ question, answer }: FAQItemProps) {
         <span>{question}</span>
         {isOpen ? <ChevronUp className="text-gold shrink-0 ml-4" size={18} /> : <ChevronDown className="text-gold shrink-0 ml-4" size={18} />}
       </button>
-      {isOpen && (
-        <div className="mt-3 text-sm md:text-base leading-7 text-cream/70 font-sans pb-2">
-          {answer}
-        </div>
-      )}
+      <div className={`mt-3 text-sm md:text-base leading-7 text-cream/70 font-sans pb-2 ${isOpen ? "block" : "hidden"}`}>
+        {answer}
+      </div>
     </div>
   );
 }
