@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  
+  /* Soft Girly Luxury Design System Tokens */
+  --color-main-bg: #FFF0F5;         /* Site Background */
+  --color-section-bg: #FFE6EE;      /* Section Background */
+  --color-card-bg: #FFF9FB;         /* Card Background */
+  --color-gold: #B8955E;            /* Champagne Gold (Accent) */
+  --color-gold-deep: #A98245;       /* Deep Champagne Gold */
+  --color-taupe: #D8A7B1;           /* Secondary Color */
+  --color-espresso: #3A2428;        /* Primary Text */
+  --color-muted-text: #8A626B;      /* Muted Text */
+  --color-border: #F2C8D3;          /* Pale Champagne / Border */
+  --color-sale: #E89AAA;            /* Primary Theme / Sale */
+  --color-success: #4F8F73;         /* Soft Emerald */
+  --color-warning: #D6A84F;         /* Warm Amber */
+
+  /* Map compatibility variables for existing classes */
+  --color-gold-old: #C9A96B;
+  --color-noir: #FFF0F5;
+  --color-noir-text: #3A2428;
+  --color-mutedGold: #D8A7B1;
+  --color-rose: #E89AAA;
+  --color-cream: #3A2428;
+  --color-charcoal: #FFF9FB;
+  
+  --border-radius: 1.5rem;
+  --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, Cambria, 'Times New Roman', serif;
+  --font-sans: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-noir, #F7ECE9);
+  color: var(--color-cream, #2E2823);
+  font-family: var(--font-sans);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+p, span, h1, h2, h3, h4, h5, h6, a {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Luxury font hierarchy */
+h1, h2, h3, .font-serif {
+  font-family: var(--font-serif);
+}
+
+button, a {
+  transition: all 180ms ease;
+}
+
+/* Ensure form elements are fully legible */
+input, select, textarea {
+  color: var(--color-cream, #2E2823);
+  background-color: var(--color-charcoal, #FFFDFC);
+  border-color: #E7D8C3;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #7C6F64;
+  opacity: 0.8;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-gold, #B8955E) !important;
+  outline: none;
+}
+
+/* Decouple noir bg/text classes for seamless light theme migration */
+.bg-noir {
+  background-color: var(--color-noir, #F7ECE9) !important;
+}
+
+.text-noir {
+  color: var(--color-noir-text, #2E2823) !important;
+}
+
+.border-noir {
+  border-color: var(--color-noir-text, #2E2823) !important;
+}
+
+.hover\:text-noir:hover {
+  color: var(--color-noir-text, #2E2823) !important;
+}
+
+.hover\:bg-noir:hover {
+  background-color: var(--color-noir, #F7ECE9) !important;
+}
+
+/* Opacity utilities for decoupled text-noir */
+.text-noir\/65 {
+  color: rgba(46, 40, 35, 0.65) !important;
+}
+.text-noir\/45 {
+  color: rgba(46, 40, 35, 0.45) !important;
+}
+.text-noir\/50 {
+  color: rgba(46, 40, 35, 0.5) !important;
+}
+.text-noir\/40 {
+  color: rgba(46, 40, 35, 0.4) !important;
+}
+
+/* Selection highlight */
+::selection {
+  background: #B8955E;
+  color: #2E2823;
+}
+
+/* Minimalist luxury scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F7ECE9;
+}
+::-webkit-scrollbar-thumb {
+  background: #E7D8C3;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B8955E;
+}
+
+/* Premium micro-animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Luxury card hover lift effect */
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px -10px rgba(184, 149, 94, 0.15), 0 6px 20px -5px rgba(46, 40, 35, 0.05);
+}
+
+/* Shimmer loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #FAF4F0 25%, #F7ECE9 50%, #FAF4F0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Mobile-first utilities ───────────────────────────── */
+
+/* Prevent horizontal overflow on all content elements */
+main, section, article, aside {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Mobile tap target minimum sizes + instant tap response */
+button, a {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent layout shift from hover effects on touch screens */
+@media (hover: none) {
+  .card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Safe area padding helper */
+.mobile-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Mobile bottom nav — account for home-bar on iOS */
+nav.fixed {
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Performance hint for slider/carousel elements */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* ── Phone Smoothness & Layout Protections ── */
+
+/* Prevent iOS input auto-zoom on focus by ensuring font-size is at least 16px */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Native inertial momentum scrolling for all scrollable containers */
+.overflow-y-auto, .overflow-x-auto, select, textarea, aside {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar safety check for horizontal scroll tables */
+.overflow-x-auto {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
