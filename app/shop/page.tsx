@@ -71,7 +71,7 @@ function ShopContent() {
 
 const ShopFallback = () => (
   <ProductGrid
-    products={sampleProducts}
+    products={[]}
     title="All Products"
     initialCategory="All"
     initialSearch=""
