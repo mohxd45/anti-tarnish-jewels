@@ -1,6 +1,6 @@
 "use client";
 
-import { auth, googleProvider, hasRealFirebase } from "@/lib/firebase";
+import { auth, googleProvider } from "@/lib/firebase";
 import { saveUserProfile, getUserProfile } from "@/lib/firestore";
 import {
   User,
@@ -37,7 +37,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 // Use the reliable hasRealFirebase flag from firebase.ts
 // isMock = true means: use localStorage mock fallback, never call Firebase
-const isMock = !hasRealFirebase;
+const isMock = false;
 
 const ADMIN_EMAIL = "admin@antitarnishjewel.com";
 const ADMIN_ENV_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || ADMIN_EMAIL;

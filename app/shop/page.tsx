@@ -4,7 +4,6 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { getProducts } from "@/lib/firestore";
 import { Product } from "@/types";
 import { useEffect, useState, Suspense } from "react";
-import { sampleProducts } from "@/data/products";
 import { useSearchParams } from "next/navigation";
 
 function ShopContent() {
@@ -13,17 +12,15 @@ function ShopContent() {
   const search = searchParams.get("search") || "";
   const price = searchParams.get("price") || "All";
 
-  const [products, setProducts] = useState<Product[]>(sampleProducts);
-  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
         const all = await getProducts();
         const active = Array.isArray(all) ? all.filter(p => p.isActive !== false) : [];
-        if (active.length > 0) {
-          setProducts(active);
-        }
+        setProducts(active);
       } catch (err) {
         console.error("Error loading shop products:", err);
       } finally {

@@ -1,4 +1,4 @@
-import { db, storage, auth, hasRealFirebase } from "@/lib/firebase";
+import { db, storage, auth } from "@/lib/firebase";
 import {
   Product,
   Order,
@@ -34,7 +34,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage
 import { sampleProducts } from "@/data/products";
 
 // Consistent mock mode detection
-const isMock = !hasRealFirebase;
+const isMock = false;
 
 // Session storage cache helpers
 function safeParseJSON<T>(jsonStr: string | null, fallback: T): T {
