@@ -328,7 +328,7 @@ export async function addProduct(product: Omit<Product, "id">) {
       if (v !== undefined) cleanProduct[k] = v;
     });
 
-    const ref = await addDoc(collection(db, "products"), cleanProduct);
+    const ref = await withTimeout(addDoc(collection(db, "products"), cleanProduct), 5000);
     return { id: ref.id };
   } catch (err) {
     console.error("Firestore addProduct failed:", err);
@@ -398,11 +398,11 @@ export async function saveUserProfile(uid: string, data: Record<string, unknown>
     }
     return;
   }
-  try {
-    await setDoc(doc(db, "users", uid), data, { merge: true });
-  } catch (err) {
-    console.error("Error saving user profile to database:", err);
-  }
+    try {
+      await withTimeout(setDoc(doc(db, "users", uid), cleanData(data), { merge: true }), 5000);
+    } catch (err) {
+      console.error("Error saving user profile to database:", err);
+    }
 }
 
 export async function getUserProfile(uid: string): Promise<any | null> {
@@ -1119,17 +1119,25 @@ export async function cancelOrder(orderId: string) {
 export async function updateOrder(orderId: string, data: Partial<Order>) {
   clearAllCaches(); // Invalidate cache
 
+  // Clean data of undefined values before saving to Firestore
+  const cleanData: any = {};
+  Object.entries(data).forEach(([k, v]) => {
+    if (v !== undefined) {
+      cleanData[k] = v;
+    }
+  });
+
   const publicFields: any = {};
-  if (data.status !== undefined) publicFields.status = data.status;
-  if (data.orderStatus !== undefined) publicFields.orderStatus = data.orderStatus;
-  if (data.paymentStatus !== undefined) publicFields.paymentStatus = data.paymentStatus;
-  if (data.courierName !== undefined) publicFields.courierName = data.courierName;
-  if (data.trackingNumber !== undefined) publicFields.trackingNumber = data.trackingNumber;
-  if (data.trackingUrl !== undefined) publicFields.trackingUrl = data.trackingUrl;
-  if (data.timeline !== undefined) publicFields.timeline = data.timeline;
-  if (data.updatedAt !== undefined) publicFields.updatedAt = data.updatedAt;
-  if (data.items !== undefined) {
-    publicFields.items = data.items.map(item => ({
+  if (cleanData.status !== undefined) publicFields.status = cleanData.status;
+  if (cleanData.orderStatus !== undefined) publicFields.orderStatus = cleanData.orderStatus;
+  if (cleanData.paymentStatus !== undefined) publicFields.paymentStatus = cleanData.paymentStatus;
+  if (cleanData.courierName !== undefined) publicFields.courierName = cleanData.courierName;
+  if (cleanData.trackingNumber !== undefined) publicFields.trackingNumber = cleanData.trackingNumber;
+  if (cleanData.trackingUrl !== undefined) publicFields.trackingUrl = cleanData.trackingUrl;
+  if (cleanData.timeline !== undefined) publicFields.timeline = cleanData.timeline;
+  if (cleanData.updatedAt !== undefined) publicFields.updatedAt = cleanData.updatedAt;
+  if (cleanData.items !== undefined) {
+    publicFields.items = cleanData.items.map((item: any) => ({
       product: {
         id: item.product.id,
         name: item.product.name,
@@ -1140,13 +1148,13 @@ export async function updateOrder(orderId: string, data: Partial<Order>) {
       quantity: item.quantity
     }));
   }
-  if (data.shippingAddress !== undefined) {
+  if (cleanData.shippingAddress !== undefined) {
     publicFields.shippingAddress = {
       fullName: "",
       phone: "",
       line1: "",
-      city: data.shippingAddress.city,
-      state: data.shippingAddress.state,
+      city: cleanData.shippingAddress.city,
+      state: cleanData.shippingAddress.state,
       pincode: ""
     };
     publicFields.address = publicFields.shippingAddress;
@@ -1154,7 +1162,7 @@ export async function updateOrder(orderId: string, data: Partial<Order>) {
 
   if (isMock) {
     const orders = await getAllOrders();
-    const updated = orders.map((o) => (o.id === orderId ? { ...o, ...data } : o));
+    const updated = orders.map((o) => (o.id === orderId ? { ...o, ...cleanData } : o));
     if (typeof window !== "undefined") {
       localStorage.setItem("mock_orders", JSON.stringify(updated));
 
@@ -1167,14 +1175,14 @@ export async function updateOrder(orderId: string, data: Partial<Order>) {
   }
 
   try {
-    await updateDoc(doc(db, "orders", orderId), data);
+    await updateDoc(doc(db, "orders", orderId), cleanData);
     if (Object.keys(publicFields).length > 0) {
       await setDoc(doc(db, "publicTrackingOrders", orderId), publicFields, { merge: true });
     }
   } catch (err) {
     console.warn("Firestore updateOrder failed, falling back to localStorage:", err);
     const orders = await getAllOrders();
-    const updated = orders.map((o) => (o.id === orderId ? { ...o, ...data } : o));
+    const updated = orders.map((o) => (o.id === orderId ? { ...o, ...cleanData } : o));
     if (typeof window !== "undefined") {
       localStorage.setItem("mock_orders", JSON.stringify(updated));
 
