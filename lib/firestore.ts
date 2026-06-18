@@ -32,6 +32,8 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { sampleProducts } from "@/data/products";
+
 // Consistent mock mode detection
 // Session storage cache helpers
 function safeParseJSON<T>(jsonStr: string | null, fallback: T): T {
@@ -159,18 +161,23 @@ export async function getProducts(forceRefresh = false): Promise<Product[]> {
     }
   }
 
-  if (!hasFirebaseConfig || !db) return [];
+  if (!hasFirebaseConfig || !db) return sampleProducts;
 
-  
   try {
-    const snap = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
-    const products = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
-    cachedProducts = products.length ? products : [];
+    const snap = await withTimeout(getDocs(query(collection(db, "products"), orderBy("createdAt", "desc"))));
+    let products = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+    
+    // Fallback: If Firestore is empty (not yet populated), use sampleProducts
+    if (products.length === 0) {
+      products = sampleProducts;
+    }
+    
+    cachedProducts = products;
     setSessionCache("atj_cache_products", cachedProducts);
     return cachedProducts;
   } catch (err) {
-    console.error("Firestore operation failed:", err);
-    throw err;
+    console.warn("Firestore getProducts failed, falling back to static sample data:", err);
+    return sampleProducts; // Static fallback
   }
 }
 
@@ -181,7 +188,10 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     cachedProductBySlug[slug] = sessionCached;
     return sessionCached;
   }
-  if (!hasFirebaseConfig || !db) return null;
+  
+  if (!hasFirebaseConfig || !db) {
+    return sampleProducts.find((p) => p.slug === slug) ?? null;
+  }
   
   try {
     const q = query(collection(db, "products"), where("slug", "==", slug), limit(1));
@@ -193,16 +203,22 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       setSessionCache(`atj_cache_product_slug_${slug}`, found);
       return found;
     }
-    return null;
-  } catch (err) {
-    console.warn("Firestore getProductBySlug failed, falling back to cache:", err);
-    const products = await getProducts();
-    const found = products.find((p) => p.slug === slug) ?? null;
-    if (found) {
-      cachedProductBySlug[slug] = found;
-      setSessionCache(`atj_cache_product_slug_${slug}`, found);
+    
+    // Fallback: Product not found in Firestore, try static data
+    const fallback = sampleProducts.find((p) => p.slug === slug) ?? null;
+    if (fallback) {
+      cachedProductBySlug[slug] = fallback;
+      setSessionCache(`atj_cache_product_slug_${slug}`, fallback);
     }
-    return found;
+    return fallback;
+  } catch (err) {
+    console.warn("Firestore getProductBySlug failed, falling back to static sample data:", err);
+    const fallback = sampleProducts.find((p) => p.slug === slug) ?? null;
+    if (fallback) {
+      cachedProductBySlug[slug] = fallback;
+      setSessionCache(`atj_cache_product_slug_${slug}`, fallback);
+    }
+    return fallback;
   }
 }
 
@@ -272,10 +288,13 @@ export async function addProduct(product: Omit<Product, "id">) {
   clearAllCaches(); // Invalidate cache
   
   try {
-    // Prevent undefined values from crashing Firestore
+    // Deep sanitize and prevent undefined/NaN from crashing Firestore
     const cleanProduct: any = {};
     Object.entries(product).forEach(([k, v]) => {
-      if (v !== undefined) cleanProduct[k] = v;
+      if (v === undefined) return;
+      if (typeof v === "number" && isNaN(v)) return; // Do not allow NaN
+      if (typeof v === "string" && v === "") return; // Optional empty string check (business logic handles required fields)
+      cleanProduct[k] = v;
     });
 
     const ref = await addDoc(collection(db, "products"), cleanProduct);
