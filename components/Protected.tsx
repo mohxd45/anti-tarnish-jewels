@@ -41,15 +41,23 @@ export function Protected({ children, adminOnly = false }: { children: React.Rea
         <p className="mt-3 text-stoneGray text-sm leading-relaxed mb-8">You need an account to access this page.</p>
         
         <div className="flex flex-col gap-3 max-w-sm mx-auto">
-          <Link href="/login" className="flex items-center justify-center gap-2 rounded-full border border-champagne bg-champagne/10 px-6 py-3 font-semibold text-champagne hover:bg-champagne/20 transition-colors">
-            Continue with Google
-          </Link>
-          <Link href="/login" className="flex items-center justify-center gap-2 rounded-full bg-champagne px-6 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors">
-            Login with Email
-          </Link>
-          <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-goldBeige/60 bg-warmwhite px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
-            Create Account
-          </Link>
+          {adminOnly ? (
+            <Link href="/admin/login" className="flex items-center justify-center gap-2 rounded-full bg-champagne px-6 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors">
+              Go to Admin Login
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="flex items-center justify-center gap-2 rounded-full border border-champagne bg-champagne/10 px-6 py-3 font-semibold text-champagne hover:bg-champagne/20 transition-colors">
+                Continue with Google
+              </Link>
+              <Link href="/login" className="flex items-center justify-center gap-2 rounded-full bg-champagne px-6 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors">
+                Login with Email
+              </Link>
+              <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-goldBeige/60 bg-warmwhite px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
+                Create Account
+              </Link>
+            </>
+          )}
         </div>
       </div>
     );

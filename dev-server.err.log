@@ -1,0 +1,46 @@
+ ⨯ [Error: Cannot find module './vendor-chunks/@swc.js'
+Require stack:
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\.next\server\webpack-runtime.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\.next\server\app\product\[slug]\page.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\require.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\load-components.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\build\utils.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/product/anti-tarnish-pearl-drop-earrings'
+}
+ ⨯ [Error: Cannot find module './vendor-chunks/@swc.js'
+Require stack:
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\.next\server\webpack-runtime.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\.next\server\app\product\[slug]\page.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\require.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\load-components.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\build\utils.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/product/anti-tarnish-pearl-drop-earrings'
+}
+ ⨯ [Error: Cannot find module './vendor-chunks/@swc.js'
+Require stack:
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\.next\server\webpack-runtime.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\.next\server\app\product\[slug]\page.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\require.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\load-components.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\build\utils.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\LG GRAM\Downloads\noore-jewels\noore-jewels\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/product/anti-tarnish-pearl-drop-earrings'
+}
+ ⨯ A conflicting public file and page file was found for path /favicon.ico https://nextjs.org/docs/messages/conflicting-public-file-page
+ ⨯ A conflicting public file and page file was found for path /favicon.ico https://nextjs.org/docs/messages/conflicting-public-file-page
+ ⨯ A conflicting public file and page file was found for path /favicon.ico https://nextjs.org/docs/messages/conflicting-public-file-page
+ ⨯ A conflicting public file and page file was found for path /favicon.ico https://nextjs.org/docs/messages/conflicting-public-file-page

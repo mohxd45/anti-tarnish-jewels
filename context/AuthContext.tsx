@@ -1,6 +1,6 @@
 "use client";
 
-import { auth, googleProvider } from "@/lib/firebase";
+import { auth, googleProvider, hasFirebaseConfig } from "@/lib/firebase";
 import { saveUserProfile, getUserProfile } from "@/lib/firestore";
 import {
   User,
@@ -37,10 +37,9 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 // Use the reliable hasRealFirebase flag from firebase.ts
 // isMock = true means: use localStorage mock fallback, never call Firebase
-const isMock = false;
-
 const ADMIN_EMAIL = "admin@antitarnishjewel.com";
 const ADMIN_ENV_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || ADMIN_EMAIL;
+const ADDITIONAL_ADMIN = "anti.tarnish.jewel@gmail.com";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -49,81 +48,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isAdmin = !!user?.email && (
     user.email === ADMIN_EMAIL ||
-    user.email === ADMIN_ENV_EMAIL
+    user.email === ADMIN_ENV_EMAIL ||
+    user.email === ADDITIONAL_ADMIN ||
+    profile?.role === "admin"
   );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    // Helper: try to restore a mock/admin user from localStorage
-    function tryRestoreMockUser(): boolean {
-      try {
-        const stored = localStorage.getItem("mock_user");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed && typeof parsed === "object" && parsed.uid) {
-            setUser(parsed as User);
-            getUserProfile(parsed.uid).then(setProfile);
-            return true;
-          }
-        }
-      } catch {
-        try { localStorage.removeItem("mock_user"); } catch {}
-      }
-      return false;
-    }
-
-    // Helper: try to restore a cached real user from localStorage
-    function tryRestoreCachedUser(): boolean {
-      try {
-        const stored = localStorage.getItem("atj_cached_user");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed && typeof parsed === "object" && parsed.uid) {
-            setUser(parsed as User);
-            getUserProfile(parsed.uid).then(setProfile);
-            return true;
-          }
-        }
-      } catch {
-        try { localStorage.removeItem("atj_cached_user"); } catch {}
-      }
-      return false;
-    }
-
-    // MOCK MODE: only use localStorage
-    if (isMock) {
-      tryRestoreMockUser() || tryRestoreCachedUser();
+    if (!hasFirebaseConfig || !auth) {
       setLoading(false);
       return;
     }
 
     // REAL FIREBASE MODE
-    // First check if there's a cached session in localStorage.
-    // If so, use it immediately to prevent blocking blank loaders.
-    if (tryRestoreMockUser() || tryRestoreCachedUser()) {
-      setLoading(false);
-    }
 
     let unsubscribed = false;
     const unsubscribe = onAuthStateChanged(auth, async (current) => {
       if (unsubscribed) return;
       if (current) {
-        // Real Firebase user — override mock session
-        try { localStorage.removeItem("mock_user"); } catch {}
         setUser(current);
         
-        // Cache user details to avoid async loading state next time
-        try {
-          const coreUser = {
-            uid: current.uid,
-            email: current.email,
-            displayName: current.displayName,
-            emailVerified: current.emailVerified,
-            photoURL: current.photoURL
-          };
-          localStorage.setItem("atj_cached_user", JSON.stringify(coreUser));
-        } catch {}
+        // Removed local caching
 
         try {
           const existingProfile = await getUserProfile(current.uid);
@@ -134,13 +79,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: current.uid,
             email: current.email,
             name: current.displayName || existingProfile?.name || current.email?.split("@")[0],
-            role: current.email === ADMIN_ENV_EMAIL ? "admin" : (existingProfile?.role || "customer"),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            lastLoginAt: new Date().toISOString()
           };
+          
+          const isAdminEmail = 
+            current.email === ADMIN_ENV_EMAIL || 
+            current.email === ADDITIONAL_ADMIN;
+
+          if (!existingProfile) {
+            profileData.role = isAdminEmail ? "admin" : "customer";
+            profileData.createdAt = new Date().toISOString();
+          } else if (isAdminEmail && existingProfile.role !== "admin") {
+            // Force upgrade to admin if they are on the hardcoded list but saved as customer
+            profileData.role = "admin";
+          }
           
           if (providerName && !existingProfile?.provider) {
             profileData.provider = providerName;
           }
+          if (providerName && !existingProfile?.loginMethod) {
+            profileData.loginMethod = providerName === "google" ? "Google" : "Email";
+          }
+          
+          // Carry over existing phone if present
+          if (existingProfile?.phone) profileData.phone = existingProfile.phone;
+          if (existingProfile?.phoneE164) profileData.phoneE164 = existingProfile.phoneE164;
+          
           if (!existingProfile) {
             profileData.createdAt = new Date().toISOString();
           }
@@ -153,13 +118,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         setLoading(false);
       } else {
-        // No real Firebase user — check for mock admin in localStorage
-        const hasMock = tryRestoreMockUser();
-        if (!hasMock) {
-          setUser(null);
-          setProfile(null);
-          try { localStorage.removeItem("atj_cached_user"); } catch {}
-        }
+        setUser(null);
+        setProfile(null);
+        try {
+          localStorage.removeItem("atj_cached_user");
+          localStorage.removeItem("mock_user");
+        } catch {}
         setLoading(false);
       }
     });
@@ -170,42 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []); // empty deps — runs once on mount only
 
-  function persistMockUser(mockUser: User | null) {
-    if (typeof window !== "undefined") {
-      try {
-        if (mockUser) {
-          localStorage.setItem("mock_user", JSON.stringify(mockUser));
-        } else {
-          localStorage.removeItem("mock_user");
-        }
-      } catch {
-        // Storage quota exceeded — ignore
-      }
-    }
-    setUser(mockUser);
-    if (mockUser) {
-      getUserProfile(mockUser.uid).then((prof) => {
-        if (prof) {
-          setProfile(prof);
-        } else {
-          const defProf = {
-            uid: mockUser.uid,
-            email: mockUser.email || "",
-            name: mockUser.displayName || mockUser.email?.split("@")[0] || "",
-            role: mockUser.email === ADMIN_EMAIL ? "admin" : "customer",
-            provider: "email",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          saveUserProfile(mockUser.uid, defProf).then(() => {
-            setProfile(defProf);
-          });
-        }
-      });
-    } else {
-      setProfile(null);
-    }
-  }
+
 
   const updateProfile = async (data: Record<string, any>) => {
     if (!user) return;
@@ -223,37 +152,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const phoneClean = (phoneCountryCode + phoneNumber).replace(/[^0-9]/g, "");
       const phoneE164 = phoneCountryCode + phoneNumber;
 
-      if (isMock) {
-        const uid = "mock-user-" + Math.random().toString(36).substring(2, 11);
-        const mockUser = {
-          uid,
-          email,
-          displayName: name,
-          emailVerified: false,
-          phoneNumber: phoneE164,
-          photoURL: null,
-          providerData: [{ providerId: "password" }]
-        } as unknown as User;
+      
 
-        const profileData = {
-          uid,
-          email,
-          name,
-          role: "customer",
-          phoneCountryCode,
-          phoneNumber,
-          phoneE164,
-          phoneClean,
-          provider: "email",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-
-        await saveUserProfile(uid, profileData);
-        persistMockUser(mockUser);
-        return;
-      }
-
+      if (!auth) throw new Error("Firebase is not configured.");
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       const profileData = {
         uid: cred.user.uid,
@@ -264,90 +165,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         phoneNumber,
         phoneE164,
         phoneClean,
+        phone: phoneE164, // explicitly save for admin users table
         provider: "email",
+        loginMethod: "Email",
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString()
       };
       await saveUserProfile(cred.user.uid, profileData);
     },
 
     login: async (email, password) => {
-      const trimmedEmail = email.trim();
-      const trimmedPass = password.trim();
-
-      // ── Admin shortcut ─────────────────────────────────────────────────────
-      // Always intercept known admin credentials BEFORE touching Firebase.
-      // This works in both mock mode and real-Firebase mode.
-      const isAdminCredential =
-        (
-          trimmedEmail === "admin123" ||
-          trimmedEmail === "admin124" ||
-          trimmedEmail === "admin@antitarnishjewel.com" ||
-          trimmedEmail === "admin124@antitarnishjewel.com"
-        ) && trimmedPass === "admin_4042";
-
-      if (isAdminCredential) {
-        if (!isMock) {
-          try {
-            // Attempt to sign in to real Firebase so request.auth is populated
-            // If they haven't created this user in Firebase, it will fail gracefully and fall back to mock admin
-            await signInWithEmailAndPassword(auth, "admin@antitarnishjewel.com", "admin_4042");
-            return;
-          } catch (err) {
-            console.warn("Real Firebase admin login failed (account might not exist). Falling back to mock admin session.", err);
-          }
-        }
-        const adminUser = {
-          uid: "mock-admin-uid",
-          email: ADMIN_EMAIL,
-          displayName: "Store Admin",
-          emailVerified: true,
-          phoneNumber: null,
-          photoURL: null,
-          providerData: []
-        } as unknown as User;
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.removeItem("atj_cached_user");
-          } catch {}
-        }
-        persistMockUser(adminUser);
-        return;
-      }
-      // ── End admin shortcut ─────────────────────────────────────────────────
-
-      if (isMock) {
-        // Regular customer mock login (any email/pass)
-        const mockUser = {
-          uid: "mock-user-" + Math.random().toString(36).substring(2, 9),
-          email: trimmedEmail.includes("@") ? trimmedEmail : `${trimmedEmail}@antitarnishjewel.com`,
-          displayName: trimmedEmail.split("@")[0],
-          emailVerified: false,
-          phoneNumber: null,
-          photoURL: null,
-          providerData: [{ providerId: "password" }]
-        } as unknown as User;
-        persistMockUser(mockUser);
-        return;
-      }
-
-      await signInWithEmailAndPassword(auth, email, password);
+      if (!auth) throw new Error("Firebase is not configured.");
+      await signInWithEmailAndPassword(auth, email.trim(), password.trim());
     },
 
     loginWithGoogle: async () => {
-      if (isMock) {
-        const mockUser = {
-          uid: "mock-google-" + Math.random().toString(36).substring(2, 9),
-          email: "google-user@gmail.com",
-          displayName: "Google User",
-          emailVerified: true,
-          phoneNumber: null,
-          photoURL: null,
-          providerData: [{ providerId: "google.com" }]
-        } as unknown as User;
-        persistMockUser(mockUser);
-        return;
-      }
+      if (!auth) throw new Error("Firebase is not configured.");
+      
       try {
         await signInWithPopup(auth, googleProvider);
       } catch (err: any) {
@@ -367,16 +202,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setProfile(null);
       // Also sign out of real Firebase if applicable
-      if (!isMock) {
-        try { await signOut(auth); } catch {}
-      }
+      
+        if (auth) {
+          try { await signOut(auth); } catch {}
+        }
+      
     },
 
     forgotPassword: async (email) => {
-      if (isMock) {
-        console.log("[Mock] Password reset for:", email);
-        return;
-      }
+      if (!auth) throw new Error("Firebase is not configured.");
+      
       await sendPasswordResetEmail(auth, email);
     },
 

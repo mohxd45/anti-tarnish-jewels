@@ -1,0 +1,58 @@
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.214:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 1398ms (925 modules)
+ GET / 200 in 2060ms
+ ○ Compiling /admin/login ...
+ ✓ Compiled /admin/login in 3.9s (1002 modules)
+ GET /login 200 in 4620ms
+ GET /shop 200 in 4812ms
+ GET /admin/login 200 in 4999ms
+ ✓ Compiled in 845ms (1016 modules)
+ GET / 200 in 372ms
+ GET /admin/login 200 in 421ms
+ GET /shop 200 in 87ms
+ GET / 200 in 62ms
+ GET / 200 in 201ms
+ GET /shop 200 in 34ms
+ ○ Compiling /account ...
+ ✓ Compiled /account in 881ms (1026 modules)
+ GET /account 200 in 1012ms
+ GET /cart 200 in 1015ms
+ GET /wishlist 200 in 1016ms
+ ○ Compiling /product/[slug] ...
+ ✓ Compiled /product/[slug] in 1154ms (1171 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 931ms (1518 modules)
+ GET /product/waterproof-gold-hoop-earrings 500 in 3202ms
+ GET /product/tarnish-free-layered-necklace 500 in 3222ms
+ GET /product/anti-tarnish-pearl-drop-earrings 500 in 3225ms
+ GET /account 200 in 441ms
+ GET /account 200 in 146ms
+ GET /favicon.ico 500 in 380ms
+ ○ Compiling /icon.png ...
+ ✓ Compiled /icon.png in 731ms (1023 modules)
+ ✓ Compiled (1025 modules)
+ GET /icon.png?470426078dc78d4a 200 in 1035ms
+ GET /apple-icon.png?17ab37c2779172c4 200 in 1441ms
+ GET / 200 in 700ms
+ GET /favicon.ico 500 in 284ms
+ GET / 200 in 154ms
+ GET / 200 in 171ms
+ GET / 200 in 317ms
+ GET / 200 in 210ms
+ GET / 200 in 386ms
+ GET / 200 in 301ms
+ GET / 200 in 316ms
+ GET / 200 in 360ms
+ GET / 200 in 404ms
+ GET /account 200 in 129ms
+ GET /favicon.ico 500 in 235ms
+ GET /icon.png?470426078dc78d4a 200 in 24ms
+ GET /account 200 in 131ms
+ GET /favicon.ico 500 in 229ms

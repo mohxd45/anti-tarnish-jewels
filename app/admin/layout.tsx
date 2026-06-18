@@ -89,6 +89,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 
+  const isLoginPage = pathname === "/admin/login";
+
+  if (isLoginPage) {
+    return (
+      <div className="min-h-screen bg-ivory text-charcoalBrown flex flex-col items-center justify-center">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <Protected adminOnly>
       <div className="min-h-screen bg-ivory text-charcoalBrown flex flex-col lg:flex-row">

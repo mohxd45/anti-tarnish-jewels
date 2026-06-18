@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllOrders, updateOrder, updateOrderStatus, updateOrderTracking } from "@/lib/firestore";
+import { getAllOrders, listenToAllOrders, updateOrder, updateOrderStatus, updateOrderTracking } from "@/lib/firestore";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { ShoppingBag, Eye, Calendar, User, Truck, Search, CreditCard, Loader } from "lucide-react";
@@ -39,7 +39,19 @@ export default function ManageOrdersPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
-    loadOrders();
+    setLoading(true);
+    const unsubscribe = listenToAllOrders((data) => {
+      setOrders(data);
+      setLoading(false);
+      
+      // Update selected order if it was modified
+      setSelectedOrder(prev => {
+        if (!prev) return null;
+        return data.find(o => o.id === prev.id) || prev;
+      });
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -56,24 +68,12 @@ export default function ManageOrdersPage() {
     }
   }, [selectedOrder]);
 
-  async function loadOrders() {
-    setLoading(true);
-    const data = await getAllOrders();
-    setOrders(data);
-    setLoading(false);
-  }
-
   async function handleStatusChange(orderId: string, status: OrderStatus) {
     setUpdatingStatus(true);
     try {
       await updateOrderStatus(orderId, status);
-      const data = await getAllOrders();
-      setOrders(data);
-      
-      const found = data.find((o) => o.id === orderId);
-      if (found) {
-        setSelectedOrder(found);
-      }
+      await updateOrderStatus(orderId, status);
+      // Removed manual reload since onSnapshot handles it automatically
     } catch (err) {
       console.error(err);
       alert("Failed to update order status.");
@@ -97,12 +97,7 @@ export default function ManageOrdersPage() {
         adminNote
       );
 
-      const data = await getAllOrders();
-      setOrders(data);
-      const found = data.find((o) => o.id === selectedOrder.id);
-      if (found) {
-        setSelectedOrder(found);
-      }
+      // Removed manual reload since onSnapshot handles it automatically
       alert("Order details and shipment tracking saved successfully.");
     } catch (err) {
       console.error(err);

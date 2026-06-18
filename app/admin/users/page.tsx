@@ -14,6 +14,10 @@ interface UserProfile {
   totalSpent?: number;
   blocked?: boolean;
   createdAt?: string;
+  phone?: string;
+  loginMethod?: string;
+  lastLoginAt?: string;
+  photoURL?: string;
 }
 
 export default function ManageUsersPage() {
@@ -169,6 +173,7 @@ export default function ManageUsersPage() {
                 <tr>
                   <th className="p-5 font-semibold">User Info</th>
                   <th className="p-5 font-semibold">Joined At</th>
+                  <th className="p-5 font-semibold">Last Login</th>
                   <th className="p-5 font-semibold">Account Role</th>
                   <th className="p-5 font-semibold text-center">Orders Count</th>
                   <th className="p-5 font-semibold text-right">Total Spent</th>
@@ -182,13 +187,31 @@ export default function ManageUsersPage() {
                     <tr key={user.uid} className="hover:bg-white/[0.02] transition-colors">
                       {/* Name & Email */}
                       <td className="p-5">
-                        <div className="font-semibold text-cream">{user.displayName || "Anonymous User"}</div>
-                        <div className="text-xs text-cream/50 mt-0.5">{user.email}</div>
+                        <div className="flex items-center gap-3">
+                          {user.photoURL ? (
+                            <img src={user.photoURL} alt={user.displayName || "User"} className="w-8 h-8 rounded-full border border-gold/20" />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center text-gold font-semibold border border-gold/20">
+                              {(user.displayName || "A")[0].toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-semibold text-cream">{user.displayName || "Anonymous User"}</div>
+                            <div className="text-xs text-cream/50 mt-0.5">{user.email}</div>
+                            {user.phone && <div className="text-xs text-cream/40 mt-0.5">{user.phone}</div>}
+                            <div className="text-[10px] text-gold/60 mt-1 uppercase tracking-wider">Method: {user.loginMethod || "Email"}</div>
+                          </div>
+                        </div>
                       </td>
 
                       {/* Created At */}
                       <td className="p-5 text-cream/70">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "N/A"}
+                      </td>
+
+                      {/* Last Login */}
+                      <td className="p-5 text-cream/70 text-xs">
+                        {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "N/A"}
                       </td>
 
                       {/* Account Role */}
