@@ -45,7 +45,7 @@ function ShopContent() {
           <div className="flex-1 space-y-8">
             <div className="grid gap-3 sm:gap-5 [grid-template-columns:repeat(auto-fill,minmax(160px,1fr))]">
               {[...Array(8)].map((_, idx) => (
-                <div key={idx} className="border border-goldBeige/60 bg-warmwhite rounded-[1.5rem] p-3 space-y-3 shadow-sm">
+                <div key={idx} className="border border-goldBeige/60 bg-white/70 backdrop-blur-md rounded-[1.5rem] p-3 space-y-3 shadow-sm">
                   <div className="aspect-[4/5] w-full skeleton rounded-xl" />
                   <div className="h-4 w-3/4 skeleton rounded" />
                   <div className="h-4 w-1/2 skeleton rounded" />

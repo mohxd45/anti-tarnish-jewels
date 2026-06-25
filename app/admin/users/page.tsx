@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
 import { getUsers, updateUser, getAllOrders } from "@/lib/firestore";
 import { formatPrice } from "@/lib/utils";
-import { Search, ShieldAlert, UserCheck, Shield, ShoppingBag, Loader } from "lucide-react";
+import { Search, ShieldAlert, UserCheck, Shield, ShoppingBag, Users } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 
 interface UserProfile {
   uid: string;
@@ -164,9 +167,13 @@ export default function ManageUsersPage() {
         {/* Users Table */}
         <div className="overflow-x-auto rounded-[2rem] border border-gold/15 bg-white/[0.03]">
           {loading ? (
-            <div className="p-12 text-center text-cream/60">Retrieving customer records...</div>
+            <div className="p-12"><PageLoader text="Retrieving customer records..." /></div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-12 text-center text-cream/60">No users found matching query.</div>
+            <EmptyStateCard 
+              icon={Users} 
+              text="No users found" 
+              subtext="No customers match your query." 
+            />
           ) : (
             <table className="w-full min-w-[900px] text-left text-sm text-cream/80">
               <thead className="bg-noir text-gold uppercase tracking-wider text-xs border-b border-gold/10">
@@ -226,7 +233,7 @@ export default function ManageUsersPage() {
                           } transition-all`}
                         >
                           {roleLoadingId === user.uid ? (
-                            <Loader className="animate-spin h-3 w-3" />
+                            <HeartLoader size="sm" text="" />
                           ) : (
                             <Shield size={12} />
                           )}
@@ -263,7 +270,7 @@ export default function ManageUsersPage() {
                             }`}
                           >
                             {restrictLoadingId === user.uid ? (
-                              <Loader className="animate-spin h-3 w-3 text-noir" />
+                              <HeartLoader size="sm" text="" />
                             ) : user.blocked ? (
                               <>
                                 <ShieldAlert size={12} /> Blocked

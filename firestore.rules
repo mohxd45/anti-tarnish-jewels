@@ -2,70 +2,151 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Admin check helper. If the doc doesn't exist, this evaluates to false.
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // Products — anyone can read, only admin can write
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && isAdmin();
     }
 
-    // Orders — users can create and read their own, admin can read/write all
+    // Orders — customers can create/read their own, admin can read/write all
     match /orders/{orderId} {
-      allow create: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow read: if request.auth != null && 
-        (resource.data.userId == request.auth.uid || 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
-      allow update: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-      allow delete: if false;
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if request.auth != null && isAdmin();
+    }
+
+    // Public Tracking Orders
+    // - Public can only GET by specific ID
+    // - Authenticated customers can create strictly matching safe structures during checkout
+    match /publicTrackingOrders/{docId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null && 
+        request.resource.data.keys().hasAll([
+          'orderId', 'orderNumber', 'orderStatus', 'status', 'paymentMethod', 'paymentStatus', 
+          'courierName', 'trackingNumber', 'trackingUrl', 'customerPhoneLast4', 'timeline', 'createdAt', 'updatedAt'
+        ]) &&
+        request.resource.data.keys().hasOnly([
+          'orderId', 'orderNumber', 'orderStatus', 'status', 'paymentMethod', 'paymentStatus', 
+          'courierName', 'trackingNumber', 'trackingUrl', 'customerPhoneLast4', 'timeline', 'createdAt', 'updatedAt'
+        ]) &&
+        request.resource.data.customerPhoneLast4.size() <= 4;
+      allow update, delete: if request.auth != null && isAdmin();
+    }
+
+    // Order Lookups
+    // - Public can only GET by specific ID
+    // - Authenticated customers can create strictly matching safe lookup structures
+    match /orderLookups/{docId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null && 
+        request.resource.data.keys().hasAll(['orderId', 'orderNumber', 'customerPhoneLast4', 'createdAt']) &&
+        request.resource.data.keys().hasOnly(['orderId', 'orderNumber', 'customerPhoneLast4', 'createdAt']) &&
+        request.resource.data.customerPhoneLast4.size() <= 4;
+      allow update, delete: if request.auth != null && isAdmin();
     }
 
     // Users — users can read/write their own, admin can read/write all
     match /users/{userId} {
       allow read, write: if request.auth != null && 
-        (userId == request.auth.uid || 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+        (userId == request.auth.uid || isAdmin());
     }
 
     // Settings — public read, admin write
     match /siteSettings/{document} {
       allow read: if true;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && isAdmin();
     }
 
     // Categories — public read, admin write
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && isAdmin();
+    }
+
+    // Banners — public read, admin write
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
     }
 
     // Announcements — public read, admin write
     match /announcements/{announcementId} {
       allow read: if true;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && isAdmin();
     }
 
     // Site Content — public read, admin write
     match /siteContent/{document} {
       allow read: if true;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && isAdmin();
     }
 
     // Settings — only admin can read/write
     match /settings/{document} {
-      allow read, write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, write: if request.auth != null && isAdmin();
     }
 
-    // Coupons — anyone can read, only admin can write
+    // Coupons — customers can ONLY increment usage counts by exactly 1
     match /coupons/{couponId} {
       allow read: if true;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow create, delete: if request.auth != null && isAdmin();
+      allow update: if request.auth != null && 
+        (
+          isAdmin() ||
+          (
+            // Ensure no other fields are being altered
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedCount', 'usageCount']) &&
+            // If usedCount is being altered, it MUST be exactly old + 1
+            (
+              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['usedCount']) ||
+              request.resource.data.usedCount == (('usedCount' in resource.data) ? resource.data.usedCount : 0) + 1
+            ) &&
+            // If usageCount is being altered, it MUST be exactly old + 1
+            (
+              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['usageCount']) ||
+              request.resource.data.usageCount == (('usageCount' in resource.data) ? resource.data.usageCount : 0) + 1
+            )
+          )
+        );
+    }
+
+    // Contact Messages — public create, admin read/write
+    match /contactMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && isAdmin();
+    }
+
+    match /homepageSections/{sectionId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && isAdmin();
+    }
+
+    match /homepageLayout/{document} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && isAdmin();
+    }
+
+    match /seoSettings/{document} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && isAdmin();
+    }
+
+    match /seo/{document} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && isAdmin();
+    }
+
+    match /pageSeo/{document} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && isAdmin();
     }
 
     // Block everything else

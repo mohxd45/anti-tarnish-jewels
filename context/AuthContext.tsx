@@ -183,8 +183,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loginWithGoogle: async () => {
       if (!auth) throw new Error("Firebase is not configured.");
       
+      const isNative = typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform();
+      
       try {
-        await signInWithPopup(auth, googleProvider);
+        if (isNative) {
+          await signInWithRedirect(auth, googleProvider);
+        } else {
+          await signInWithPopup(auth, googleProvider);
+        }
       } catch (err: any) {
         console.warn("Google signInWithPopup failed, attempting redirect fallback:", err);
         await signInWithRedirect(auth, googleProvider);
@@ -202,11 +208,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setProfile(null);
       // Also sign out of real Firebase if applicable
-      
-        if (auth) {
-          try { await signOut(auth); } catch {}
-        }
-      
+      if (auth) {
+        try { await signOut(auth); } catch {}
+      }
     },
 
     forgotPassword: async (email) => {

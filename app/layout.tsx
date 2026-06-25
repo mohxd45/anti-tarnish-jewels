@@ -6,6 +6,8 @@ import { Footer } from "@/components/Footer";
 import { MobileNav } from "@/components/MobileNav";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { CapacitorListener } from "@/components/CapacitorListener";
+import { GlobalJewelryBackground } from "@/components/ui/GlobalJewelryBackground";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://anti-tarnish-jewels-livid.vercel.app/"),
@@ -39,6 +41,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning>
       <body className="bg-ivory bg-gold-radial pb-24 lg:pb-0" suppressHydrationWarning>
         <Providers>
+          <GlobalJewelryBackground />
+          <CapacitorListener />
           <AnnouncementBar />
           <Header />
           <main>{children}</main>

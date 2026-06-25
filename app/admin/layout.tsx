@@ -16,7 +16,6 @@ const menuItems = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "Website Text", href: "/admin/site-content", icon: FileText },
   { label: "Banners & Ads", href: "/admin/banners", icon: ImageIcon },
-  { label: "Theme Settings", href: "/admin/theme", icon: Palette },
   { label: "Homepage Layout", href: "/admin/homepage-sections", icon: Layers },
   { label: "Products Catalog", href: "/admin/products", icon: ShoppingBag },
   { label: "Add Product", href: "/admin/add-product", icon: PlusCircle },

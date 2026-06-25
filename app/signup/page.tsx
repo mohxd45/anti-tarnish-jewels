@@ -104,7 +104,7 @@ export default function SignupPage() {
 
   return (
     <section className="mx-auto max-w-md px-4 py-16">
-      <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-5 sm:p-8 shadow-jewel flex flex-col items-stretch text-center">
+      <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-5 sm:p-8 shadow-jewel flex flex-col items-stretch text-center">
         <BrandLogo size={64} className="mb-4 mx-auto" />
         <h1 className="text-3xl font-serif font-semibold text-champagne tracking-wide">Create Account</h1>
         <form onSubmit={submit} className="mt-6 grid gap-4 text-left">
@@ -118,7 +118,7 @@ export default function SignupPage() {
               onChange={(e) => setForm({ ...form, name: e.target.value })} 
               required 
               placeholder="e.g. Aarav Sharma" 
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
 
@@ -132,7 +132,7 @@ export default function SignupPage() {
               type="email" 
               required 
               placeholder="e.g. aarav@example.com" 
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
 
@@ -144,7 +144,7 @@ export default function SignupPage() {
                 disabled={loading}
                 value={phoneCountryCode}
                 onChange={(e) => setPhoneCountryCode(e.target.value)}
-                className="rounded-full border border-goldBeige bg-warmwhite px-3 py-3 outline-none text-charcoalBrown focus:border-champagne text-xs w-28 shrink-0 cursor-pointer"
+                className="rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-3 py-3 outline-none text-charcoalBrown focus:border-champagne text-xs w-28 shrink-0 cursor-pointer"
               >
                 {countries.map((c) => (
                   <option key={c.code} value={c.code}>
@@ -159,7 +159,7 @@ export default function SignupPage() {
                 type="tel"
                 required 
                 placeholder={phoneCountryCode === "+91" ? "10-digit number" : "Phone number"} 
-                className="flex-1 rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm font-mono" 
+                className="flex-1 rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm font-mono" 
               />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function SignupPage() {
               type="password" 
               required 
               placeholder="Password (min 6 chars)" 
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
 
@@ -188,7 +188,7 @@ export default function SignupPage() {
               type="password" 
               required 
               placeholder="Confirm Password" 
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
 
@@ -203,7 +203,7 @@ export default function SignupPage() {
 
         <div className="relative my-6 flex items-center justify-center">
           <div className="absolute inset-0 border-t border-goldBeige/30" />
-          <span className="relative bg-warmwhite px-4 text-xs text-stoneGray uppercase tracking-wider">Or</span>
+          <span className="relative bg-white/70 backdrop-blur-md px-4 text-xs text-stoneGray uppercase tracking-wider">Or</span>
         </div>
 
         <button 

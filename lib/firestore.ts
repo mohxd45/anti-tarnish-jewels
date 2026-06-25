@@ -32,7 +32,6 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { sampleProducts } from "@/data/products";
 
 // Consistent mock mode detection
 // Session storage cache helpers
@@ -77,7 +76,7 @@ function setSessionCache<T>(key: string, value: T, ttlMs = 5 * 60 * 1000): void 
   }
 }
 
-export function withTimeout<T>(promise: Promise<T>, timeoutMs = 2500): Promise<T> {
+export function withTimeout<T>(promise: Promise<T>, timeoutMs = 15000): Promise<T> {
   return Promise.race([
     promise,
     new Promise<never>((_, reject) =>
@@ -161,23 +160,18 @@ export async function getProducts(forceRefresh = false): Promise<Product[]> {
     }
   }
 
-  if (!hasFirebaseConfig || !db) return sampleProducts;
+  if (!hasFirebaseConfig || !db) return [];
 
   try {
     const snap = await withTimeout(getDocs(query(collection(db, "products"), orderBy("createdAt", "desc"))));
-    let products = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
-    
-    // Fallback: If Firestore is empty (not yet populated), use sampleProducts
-    if (products.length === 0) {
-      products = sampleProducts;
-    }
+    const products = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
     
     cachedProducts = products;
     setSessionCache("atj_cache_products", cachedProducts);
     return cachedProducts;
   } catch (err) {
-    console.warn("Firestore getProducts failed, falling back to static sample data:", err);
-    return sampleProducts; // Static fallback
+    console.warn("Firestore getProducts failed:", err);
+    return [];
   }
 }
 
@@ -190,7 +184,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   }
   
   if (!hasFirebaseConfig || !db) {
-    return sampleProducts.find((p) => p.slug === slug) ?? null;
+    return null;
   }
   
   try {
@@ -204,21 +198,10 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       return found;
     }
     
-    // Fallback: Product not found in Firestore, try static data
-    const fallback = sampleProducts.find((p) => p.slug === slug) ?? null;
-    if (fallback) {
-      cachedProductBySlug[slug] = fallback;
-      setSessionCache(`atj_cache_product_slug_${slug}`, fallback);
-    }
-    return fallback;
+    return null;
   } catch (err) {
-    console.warn("Firestore getProductBySlug failed, falling back to static sample data:", err);
-    const fallback = sampleProducts.find((p) => p.slug === slug) ?? null;
-    if (fallback) {
-      cachedProductBySlug[slug] = fallback;
-      setSessionCache(`atj_cache_product_slug_${slug}`, fallback);
-    }
-    return fallback;
+    console.warn("Firestore getProductBySlug failed:", err);
+    return null;
   }
 }
 
@@ -460,7 +443,7 @@ export async function createOrder(orderData: {
 
   // Safe tracking info schema
   const publicTrackingOrder = {
-    id: orderDocId,
+    orderId: orderDocId,
     orderNumber,
     orderStatus: initialStatus,
     status: initialStatus, // fallback
@@ -469,39 +452,10 @@ export async function createOrder(orderData: {
     courierName: "",
     trackingNumber: "",
     trackingUrl: "",
+    customerPhoneLast4: cleanPhone.slice(-4),
     timeline: initialTimeline,
     createdAt: now,
-    updatedAt: now,
-    items: orderData.items.map(item => ({
-      product: {
-        id: item.product.id,
-        name: item.product.name,
-        slug: item.product.slug,
-        images: item.product.images || [],
-        salePrice: item.product.salePrice
-      },
-      quantity: item.quantity
-    })),
-    total: orderData.total,
-    subtotal: orderData.subtotal,
-    shippingFee: orderData.shipping,
-    discount: orderData.discount,
-    shippingAddress: {
-      fullName: "",
-      phone: "",
-      line1: "",
-      city: orderData.address.city,
-      state: orderData.address.state,
-      pincode: ""
-    },
-    address: {
-      fullName: "",
-      phone: "",
-      line1: "",
-      city: orderData.address.city,
-      state: orderData.address.state,
-      pincode: ""
-    }
+    updatedAt: now
   };
 
   // Lookup key schema
@@ -664,32 +618,54 @@ export async function getUserOrders(userId: string, email?: string): Promise<Ord
   
 
   try {
-    const q1 = query(
-      collection(db, "orders"),
-      where("userId", "==", uid),
-      orderBy("createdAt", "desc")
-    );
-    const snap1 = await withTimeout(getDocs(q1));
-    const orders1 = snap1.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
-
-    if (email && email.trim()) {
-      const q2 = query(
+    let orders1: Order[] = [];
+    try {
+      const q1 = query(
         collection(db, "orders"),
-        where("customerEmail", "==", email.trim()),
+        where("userId", "==", uid),
         orderBy("createdAt", "desc")
       );
-      const snap2 = await withTimeout(getDocs(q2));
-      const orders2 = snap2.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
-      
-      const orderMap = new Map<string, Order>();
-      orders1.forEach(o => orderMap.set(o.id, o));
-      orders2.forEach(o => orderMap.set(o.id, o));
-      return Array.from(orderMap.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      const snap1 = await withTimeout(getDocs(q1));
+      orders1 = snap1.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+    } catch (err1) {
+      console.warn("getUserOrders: query q1 failed (likely missing index), falling back to unordered:", err1);
+      const q1Fallback = query(collection(db, "orders"), where("userId", "==", uid));
+      const snap1Fallback = await withTimeout(getDocs(q1Fallback));
+      orders1 = snap1Fallback.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+      orders1.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+    }
+
+    if (email && email.trim()) {
+      try {
+        let orders2: Order[] = [];
+        try {
+          const q2 = query(
+            collection(db, "orders"),
+            where("customerEmail", "==", email.trim()),
+            orderBy("createdAt", "desc")
+          );
+          const snap2 = await withTimeout(getDocs(q2));
+          orders2 = snap2.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+        } catch (err2) {
+          console.warn("getUserOrders: query q2 failed, falling back to unordered:", err2);
+          const q2Fallback = query(collection(db, "orders"), where("customerEmail", "==", email.trim()));
+          const snap2Fallback = await withTimeout(getDocs(q2Fallback));
+          orders2 = snap2Fallback.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+        }
+        
+        const orderMap = new Map<string, Order>();
+        orders1.forEach(o => orderMap.set(o.id, o));
+        orders2.forEach(o => orderMap.set(o.id, o));
+        return Array.from(orderMap.values()).sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+      } catch (emailErr) {
+        console.warn("getUserOrders: Fetching by email failed completely (possibly due to rules). Returning userId orders only.", emailErr);
+        return orders1;
+      }
     }
 
     return orders1;
   } catch (err) {
-    console.error("Firestore operation failed:", err);
+    console.error("Firestore operation failed in getUserOrders:", err);
     throw err;
   }
 }
@@ -744,12 +720,26 @@ export async function getAllOrders(forceRefresh = false): Promise<Order[]> {
     }
   }
 
-  
   try {
     console.log("getAllOrders: Querying 'orders' collection ordered by 'createdAt' desc");
-    const snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
+    let snap;
+    try {
+      snap = await withTimeout(getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc"))));
+    } catch (err) {
+      console.warn("getAllOrders: orderBy createdAt failed, falling back to unordered fetch:", err);
+      snap = await withTimeout(getDocs(collection(db, "orders")));
+    }
+    
     console.log("getAllOrders: Received", snap.docs.length, "documents");
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+    let list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+    
+    // If we fell back, sort client-side
+    list.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+
     cachedOrders = list;
     setSessionCache("atj_cache_orders", cachedOrders);
     return list;
@@ -1232,7 +1222,8 @@ export async function addBanner(banner: Omit<Banner, "id">): Promise<string> {
   clearAllCaches(); // Invalidate cache
   
   try {
-    const ref = await addDoc(collection(db, "banners"), banner);
+    const cleanBanner = Object.fromEntries(Object.entries(banner).filter(([_, v]) => v !== undefined));
+    const ref = await addDoc(collection(db, "banners"), cleanBanner);
     return ref.id;
   } catch (err) {
     console.error("Firestore operation failed:", err);
@@ -1244,7 +1235,8 @@ export async function updateBanner(id: string, banner: Partial<Banner>): Promise
   clearAllCaches(); // Invalidate cache
   
   try {
-    await updateDoc(doc(db, "banners", id), { ...banner, updatedAt: new Date().toISOString() });
+    const cleanBanner = Object.fromEntries(Object.entries(banner).filter(([_, v]) => v !== undefined));
+    await updateDoc(doc(db, "banners", id), { ...cleanBanner, updatedAt: new Date().toISOString() });
   } catch (err) {
     console.error("Firestore operation failed:", err);
     throw err;
@@ -1472,7 +1464,7 @@ const defaultAnnouncements: AnnouncementSettings = {
   showAnnouncement: true,
   text: "Get 20% off your first order! Use code ATJ20 at checkout.",
   showNewsletterPopup: false,
-  whatsAppSupport: "+919876543210"
+  whatsAppSupport: "917250569370"
 };
 
 export async function getAnnouncements(): Promise<AnnouncementSettings> {
@@ -1709,10 +1701,20 @@ export function getProductsFromCacheOnly(): Product[] {
 
 
 // IMAGE UPLOAD
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadImage(file: File, folderName: string = "product-images"): Promise<string> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
+  // Validate file type and size before any upload attempt
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Invalid file type. Only images are allowed.");
+  }
+  const MAX_SIZE_MB = 5;
+  if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+    throw new Error(`File size exceeds ${MAX_SIZE_MB}MB limit.`);
+  }
+
+  // Cloudinary fallback if configured
   if (cloudName && uploadPreset) {
     try {
       const formData = new FormData();
@@ -1733,30 +1735,25 @@ export async function uploadImage(file: File): Promise<string> {
         return data.secure_url;
       }
     } catch (err) {
-      console.warn("Cloudinary upload failed, falling back to Firebase/Local:", err);
+      console.warn("Cloudinary upload failed, falling back to Firebase:", err);
     }
   }
 
   if (!hasFirebaseConfig || !storage) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject("Failed to convert image to Base64");
-      reader.readAsDataURL(file);
-    });
+    throw new Error("Firebase Storage is not configured. Cannot upload image.");
   }
 
   try {
-    const fileRef = storageRef(storage, `images/${Date.now()}-${file.name}`);
+    // Sanitize filename
+    const safeFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const tempId = Date.now().toString();
+    
+    // Upload to specified folder
+    const fileRef = storageRef(storage, `${folderName}/${tempId}/${safeFileName}`);
     await uploadBytes(fileRef, file);
-    return getDownloadURL(fileRef);
-  } catch (err) {
-    console.warn("Firebase Storage upload failed, falling back to Base64:", err);
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject("Failed to convert image to Base64");
-      reader.readAsDataURL(file);
-    });
+    return await getDownloadURL(fileRef);
+  } catch (err: any) {
+    console.error("Firebase Storage upload error:", err);
+    throw new Error(err.message || "Failed to upload image to Firebase Storage.");
   }
 }

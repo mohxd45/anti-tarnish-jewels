@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllOrders, listenToAllOrders, updateOrder, updateOrderStatus, updateOrderTracking } from "@/lib/firestore";
+import { listenToAllOrders, updateOrderStatus, updateOrderTracking } from "@/lib/firestore";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 import { ShoppingBag, Eye, Calendar, User, Truck, Search, CreditCard, Loader } from "lucide-react";
 
 const statuses: OrderStatus[] = [
@@ -208,9 +210,13 @@ export default function ManageOrdersPage() {
               <ShoppingBag size={20} /> All Orders ({filteredOrders.length})
             </h2>
             {loading ? (
-              <div className="p-12 text-center text-stoneGray">Loading orders...</div>
+              <div className="p-12"><PageLoader text="Loading orders..." /></div>
             ) : filteredOrders.length === 0 ? (
-              <div className="p-12 text-center text-stoneGray">No orders found matching the filter criteria.</div>
+              <EmptyStateCard 
+                icon={ShoppingBag} 
+                text="No orders found" 
+                subtext="Try adjusting your filter criteria." 
+              />
             ) : (
               <div className="divide-y divide-goldBeige/40 overflow-y-auto max-h-[600px] scrollbar-thin">
                 {paginatedOrders.map((order) => (

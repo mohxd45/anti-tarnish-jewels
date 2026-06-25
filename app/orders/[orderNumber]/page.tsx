@@ -122,7 +122,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
   if (error || !order) {
     return (
       <section className="mx-auto max-w-xl px-4 py-20 text-center">
-        <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-10 shadow-jewel flex flex-col items-center">
+        <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-10 shadow-jewel flex flex-col items-center">
           <AlertCircle className="text-dustyRose w-16 h-16 mb-4" />
           <h1 className="text-2xl font-serif font-semibold text-charcoalBrown">{error || "Order Not Found"}</h1>
           <p className="mt-2 text-stoneGray text-sm">Please verify the order number or contact support.</p>
@@ -148,7 +148,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
     <section className="mx-auto max-w-4xl px-4 py-10 space-y-8 pb-24">
       {/* Header breadcrumb */}
       <div className="flex items-center gap-3">
-        <Link href="/orders" className="rounded-full p-2 border border-goldBeige bg-warmwhite text-charcoalBrown hover:bg-champagne/10 transition-all">
+        <Link href="/orders" className="rounded-full p-2 border border-goldBeige bg-white/70 backdrop-blur-md text-charcoalBrown hover:bg-champagne/10 transition-all">
           <ArrowLeft size={16} />
         </Link>
         <div>
@@ -161,7 +161,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
         {/* Main tracking & items column */}
         <div className="md:col-span-2 space-y-6">
           {/* Stepper tracking progress */}
-          <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-6 md:p-8 shadow-jewel">
+          <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 md:p-8 shadow-jewel">
             <div className="flex justify-between items-center border-b border-goldBeige/20 pb-4 mb-6">
               <h3 className="text-sm font-serif font-semibold text-champagne uppercase tracking-wider">Order Journey</h3>
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -191,7 +191,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                           className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
                               ? "bg-champagne border-champagne text-charcoalBrown shadow-jewel shadow-champagne/20"
-                              : "bg-warmwhite border-goldBeige text-stoneGray/30"
+                              : "bg-white/70 backdrop-blur-md border-goldBeige text-stoneGray/30"
                           }`}
                         >
                           {isCompleted ? <CheckCircle2 size={15} className="stroke-[2.5]" /> : <span className="text-[10px]">{idx + 1}</span>}
@@ -215,7 +215,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                           className={`absolute -left-[35px] w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
                               ? "bg-champagne border-champagne text-charcoalBrown shadow-jewel"
-                              : "bg-warmwhite border-goldBeige text-stoneGray/30"
+                              : "bg-white/70 backdrop-blur-md border-goldBeige text-stoneGray/30"
                           }`}
                         >
                           {isCompleted ? <CheckCircle2 size={12} className="stroke-[2.5]" /> : <div className="w-1.5 h-1.5 rounded-full bg-goldBeige/40" />}
@@ -236,7 +236,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           </div>
 
           {/* Items checklist */}
-          <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-6 shadow-jewel">
+          <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 shadow-jewel">
             <h3 className="text-sm font-serif font-semibold text-champagne uppercase tracking-wider border-b border-goldBeige/20 pb-4 mb-4 flex items-center gap-1.5">
               <ShoppingBag size={16} /> Items Purchased
             </h3>
@@ -288,7 +288,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           )}
 
           {/* Shipping Address */}
-          <div className="rounded-[2.5rem] border border-goldBeige bg-warmwhite p-6 shadow-jewel space-y-4">
+          <div className="rounded-[2.5rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 shadow-jewel space-y-4">
             <h3 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5 border-b border-goldBeige/20 pb-3">
               <MapPin size={14} /> Shipping Address
             </h3>
@@ -304,7 +304,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           </div>
 
           {/* Order Summary breakdown */}
-          <div className="rounded-[2.5rem] border border-goldBeige bg-warmwhite p-6 shadow-jewel space-y-4">
+          <div className="rounded-[2.5rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 shadow-jewel space-y-4">
             <h3 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5 border-b border-goldBeige/20 pb-3">
               <CreditCard size={14} /> Payment & Billing
             </h3>

@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
 import { getCoupons, addCoupon, updateCoupon, deleteCoupon } from "@/lib/firestore";
 import { Coupon } from "@/types";
-import { Plus, Trash2, CheckCircle, XCircle, Calendar, Edit2, Search, X, Check } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { Trash2, Edit2, Check, Plus, Calendar, Search, Ticket, CheckCircle, XCircle, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
 export default function CouponsPage() {
@@ -39,20 +42,34 @@ export default function CouponsPage() {
 
   async function handleToggleActive(coupon: Coupon) {
     const updatedStatus = !coupon.active;
-    await updateCoupon(coupon.id, { active: updatedStatus });
-    setCoupons(coupons.map((c) => (c.id === coupon.id ? { ...c, active: updatedStatus } : c)));
-    if (editingCoupon && editingCoupon.id === coupon.id) {
-      setEditingCoupon({ ...editingCoupon, active: updatedStatus });
+    try {
+      await updateCoupon(coupon.id, { active: updatedStatus });
+      setCoupons(coupons.map((c) => (c.id === coupon.id ? { ...c, active: updatedStatus } : c)));
+      if (editingCoupon && editingCoupon.id === coupon.id) {
+        setEditingCoupon({ ...editingCoupon, active: updatedStatus });
+      }
+      setMessage("Coupon status updated.");
+    } catch (err: any) {
+      console.error("Firebase Toggle Error:", err);
+      setMessage("Error updating status: " + err.message);
     }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Are you sure you want to delete this coupon?")) return;
-    await deleteCoupon(id);
-    setCoupons(coupons.filter((c) => c.id !== id));
-    if (editingCoupon && editingCoupon.id === id) {
-      handleCancelEdit();
+    setLoading(true);
+    try {
+      await deleteCoupon(id);
+      setCoupons(coupons.filter((c) => c.id !== id));
+      if (editingCoupon && editingCoupon.id === id) {
+        handleCancelEdit();
+      }
+      setMessage("Coupon deleted successfully.");
+    } catch (err: any) {
+      console.error("Firebase Delete Error:", err);
+      setMessage("Error deleting coupon: " + err.message);
     }
+    setLoading(false);
   }
 
   function handleEdit(coupon: Coupon) {
@@ -107,61 +124,64 @@ export default function CouponsPage() {
       code: uppercaseCode,
       type,
       value: Number(value),
-      minimumOrderAmount: minimumOrderAmount > 0 ? Number(minimumOrderAmount) : undefined,
-      minOrderValue: minimumOrderAmount > 0 ? Number(minimumOrderAmount) : undefined, // fallback
-      maximumDiscount: maximumDiscount > 0 ? Number(maximumDiscount) : undefined,
-      startDate: startDate || undefined,
-      expiryDate: expiryDate || undefined,
-      usageLimit: usageLimit > 0 ? Number(usageLimit) : undefined,
       updatedAt: now
     };
+    
+    if (minimumOrderAmount > 0) {
+      couponData.minimumOrderAmount = Number(minimumOrderAmount);
+      couponData.minOrderValue = Number(minimumOrderAmount);
+    }
+    if (maximumDiscount > 0) {
+      couponData.maximumDiscount = Number(maximumDiscount);
+    }
+    if (startDate) couponData.startDate = startDate;
+    if (expiryDate) couponData.expiryDate = expiryDate;
+    if (usageLimit > 0) couponData.usageLimit = Number(usageLimit);
 
-    if (editingCoupon) {
-      await updateCoupon(editingCoupon.id, couponData);
-      
-      setCoupons(
-        coupons.map((c) =>
-          c.id === editingCoupon.id
-            ? { ...c, ...couponData }
-            : c
-        )
-      );
-      
-      setMessage("Coupon updated successfully!");
-      handleCancelEdit();
-    } else {
-      const newCouponData: Omit<Coupon, "id"> = {
-        code: uppercaseCode,
-        type,
-        value: Number(value),
-        active: true,
-        minimumOrderAmount: minimumOrderAmount > 0 ? Number(minimumOrderAmount) : undefined,
-        minOrderValue: minimumOrderAmount > 0 ? Number(minimumOrderAmount) : undefined,
-        maximumDiscount: maximumDiscount > 0 ? Number(maximumDiscount) : undefined,
-        startDate: startDate || undefined,
-        expiryDate: expiryDate || undefined,
-        usageLimit: usageLimit > 0 ? Number(usageLimit) : undefined,
-        usedCount: 0,
-        usageCount: 0,
-        createdAt: now,
-        updatedAt: now
-      };
+    try {
+      if (editingCoupon) {
+        await updateCoupon(editingCoupon.id, couponData);
+        
+        setCoupons(
+          coupons.map((c) =>
+            c.id === editingCoupon.id
+              ? { ...c, ...couponData }
+              : c
+          )
+        );
+        
+        setMessage("Coupon updated successfully!");
+        handleCancelEdit();
+      } else {
+        const newCouponData: Partial<Coupon> = {
+          ...couponData,
+          active: true,
+          usedCount: 0,
+          usageCount: 0,
+          createdAt: now,
+          updatedAt: now
+        };
 
-      const res = await addCoupon(newCouponData);
-      setCoupons([...coupons, { ...newCouponData, id: res.id }]);
-      
-      setCode("");
-      setValue(0);
-      setMinimumOrderAmount(0);
-      setMaximumDiscount(0);
-      setStartDate("");
-      setExpiryDate("");
-      setUsageLimit(0);
-      setMessage("Coupon added successfully!");
+        const res = await addCoupon(newCouponData as Omit<Coupon, "id">);
+        setCoupons([...coupons, { ...(newCouponData as Omit<Coupon, "id">), id: res.id }]);
+        
+        setCode("");
+        setValue(0);
+        setMinimumOrderAmount(0);
+        setMaximumDiscount(0);
+        setStartDate("");
+        setExpiryDate("");
+        setUsageLimit(0);
+        setMessage("Coupon added successfully!");
+      }
+    } catch (err: any) {
+      console.error("Firebase Save Error:", err);
+      setMessage("Error saving coupon: " + err.message);
     }
     
     setLoading(false);
   }
+
 
   // Filter coupons by search query
   const filteredCoupons = coupons.filter((c) =>
@@ -197,9 +217,13 @@ export default function CouponsPage() {
             </div>
 
             {loading && coupons.length === 0 ? (
-              <div className="p-8 text-center text-cream/60">Loading coupons...</div>
+              <div className="p-8"><PageLoader text="Loading coupons..." /></div>
             ) : filteredCoupons.length === 0 ? (
-              <div className="p-8 text-center text-cream/60">No coupons found matching your query.</div>
+              <EmptyStateCard 
+                icon={Ticket} 
+                text="No coupons found" 
+                subtext="No coupons match your query." 
+              />
             ) : (
               <div className="divide-y divide-gold/10 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
                 {filteredCoupons.map((coupon) => (
@@ -394,14 +418,15 @@ export default function CouponsPage() {
                 />
               </div>
 
-              <button
+              <LoadingButton
                 type="submit"
-                disabled={loading}
+                loading={loading}
+                loadingText="Saving..."
                 className="w-full rounded-full bg-gold px-6 py-3.5 font-semibold text-noir hover:bg-gold-light transition-colors flex items-center justify-center gap-2 mt-4 shadow-jewel text-sm"
               >
                 {editingCoupon ? <Check size={16} /> : <Plus size={16} />}
                 {editingCoupon ? "Save Coupon Changes" : "Create Coupon"}
-              </button>
+              </LoadingButton>
 
               {message && (
                 <p className={`text-center text-xs mt-3 ${message.includes("successfully") ? "text-emerald-400" : "text-rose"}`}>

@@ -7,19 +7,15 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag, Truck, CheckCircle2, Package, MapPin, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 
 export default function OrdersPage() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-7xl px-4 py-24 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 border-2 border-champagne border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-stoneGray text-sm tracking-wide">Loading secure area...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader text="Loading secure area..." />;
   }
 
   if (!user) {
@@ -50,11 +46,20 @@ export default function OrdersPage() {
 function OrdersInner() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [fetching, setFetching] = useState(true);
+  const [error, setError] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
-      getUserOrders(user.uid, user.email || undefined).then(setOrders);
+      setFetching(true);
+      setError("");
+      getUserOrders(user.uid, user.email || undefined)
+        .then(setOrders)
+        .catch((err) => {
+          setError(err.message || "Failed to load orders. Please try again.");
+        })
+        .finally(() => setFetching(false));
     }
   }, [user]);
 
@@ -91,7 +96,16 @@ function OrdersInner() {
       </div>
 
       <div className="grid gap-6">
-        {orders.length ? (
+        {fetching ? (
+          <div className="py-24">
+            <HeartLoader text="Finding your orders..." />
+          </div>
+        ) : error ? (
+          <div className="rounded-[2rem] border border-dustyRose/20 bg-dustyRose/5 p-12 text-center text-dustyRose">
+            <p className="font-serif font-semibold text-lg">{error}</p>
+            <p className="text-sm mt-2 opacity-80">Please check your connection and try again.</p>
+          </div>
+        ) : orders.length ? (
           orders.map((order) => {
             const isExpanded = expandedOrderId === order.id;
             const currentIdx = getStepIndex(order.status);
@@ -99,7 +113,7 @@ function OrdersInner() {
             const isReturned = order.status === "Returned";
 
             return (
-              <div key={order.id} className="rounded-[2rem] border border-goldBeige bg-warmwhite overflow-hidden shadow-jewel">
+              <div key={order.id} className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md overflow-hidden shadow-jewel">
                 {/* Header Summary */}
                 <div
                   onClick={() => toggleExpand(order.id)}
@@ -154,7 +168,7 @@ function OrdersInner() {
                                   className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${
                                     isCompleted
                                       ? "bg-champagne border-champagne text-charcoalBrown shadow-jewel shadow-champagne/20"
-                                      : "bg-warmwhite border-goldBeige text-stoneGray/30"
+                                      : "bg-white/70 backdrop-blur-md border-goldBeige text-stoneGray/30"
                                   }`}
                                 >
                                   {isCompleted ? <CheckCircle2 size={18} className="stroke-[2.5]" /> : <div className="w-2.5 h-2.5 rounded-full bg-goldBeige/40" />}
@@ -295,11 +309,11 @@ function OrdersInner() {
             );
           })
         ) : (
-          <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-12 text-center text-stoneGray">
-            <Package size={48} className="mx-auto text-champagne/30 mb-4" />
-            <p className="font-serif font-semibold text-charcoalBrown text-lg">No orders found</p>
-            <p className="text-sm text-stoneGray mt-1">Once you purchase items from the checkout page, they will show up here.</p>
-          </div>
+          <EmptyStateCard 
+            icon={Package} 
+            text="No orders found" 
+            subtext="Once you purchase items from the checkout page, they will show up here." 
+          />
         )}
       </div>
     </section>

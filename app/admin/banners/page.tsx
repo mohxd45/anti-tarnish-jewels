@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { getBanners, addBanner, updateBanner, deleteBanner, uploadImage } from "@/lib/firestore";
 import { Banner, BannerPlacement } from "@/types";
-import { Save, Trash2, Edit, Plus, X, Upload, Loader, CheckCircle, AlertCircle } from "lucide-react";
+import { Save, Trash2, Edit, Plus, X, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 export default function BannersPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -84,12 +87,12 @@ export default function BannersPage() {
 
       // Upload main image if chosen
       if (imageFile) {
-        finalImageUrl = await uploadImage(imageFile);
+        finalImageUrl = await uploadImage(imageFile, "banner-images");
       }
       
       // Upload mobile image if chosen
       if (mobileImageFile) {
-        finalMobileImageUrl = await uploadImage(mobileImageFile);
+        finalMobileImageUrl = await uploadImage(mobileImageFile, "banner-images");
       }
 
       if (!finalImageUrl) {
@@ -155,15 +158,12 @@ export default function BannersPage() {
       </div>
 
       {loading ? (
-        <div className="flex h-[40vh] items-center justify-center text-gold">
-          <Loader className="animate-spin" size={32} />
-          <span className="ml-2">Loading banners...</span>
-        </div>
+        <PageLoader text="Loading banners..." />
       ) : banners.length === 0 ? (
-        <div className="rounded-[2rem] border border-gold/15 bg-white/[0.03] p-12 text-center shadow-jewel">
-          <h3 className="text-xl font-serif text-gold">No Banners Configured</h3>
-          <p className="text-cream/55 text-sm mt-2">Click the button above to launch your first promotional banner.</p>
-        </div>
+        <EmptyStateCard 
+          text="No Banners Configured" 
+          subtext="Click the button above to launch your first promotional banner." 
+        />
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {banners.map((b) => (
@@ -359,14 +359,15 @@ export default function BannersPage() {
                 <span>Enable and Publish this banner</span>
               </label>
 
-              <button
+              <LoadingButton
                 type="submit"
-                disabled={uploading}
+                loading={uploading}
+                loadingText="Saving..."
                 className="mt-6 w-full rounded-full bg-gold py-3 text-sm font-semibold text-noir hover:bg-gold-light transition-all flex items-center justify-center gap-2"
               >
-                {uploading ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
-                {editingBanner.id ? "Update Banner" : "Add Banner"}
-              </button>
+                <Save size={16} />
+                Save Banner
+              </LoadingButton>
             </form>
           </aside>
         </div>

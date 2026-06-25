@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { BrandLogo } from "@/components/BrandLogo";
+import { OrderSuccessAnimation } from "@/components/ui/OrderSuccessAnimation";
 import { getWhatsAppNumber, createWhatsAppUrl } from "@/lib/whatsapp";
+import { OrderSuccessCard } from "@/components/ui/OrderSuccessCard";
 
 export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ order?: string }> }) {
   const resolvedSearchParams = await searchParams;
@@ -12,9 +13,9 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
   const whatsappUrl = createWhatsAppUrl(whatsappNumber, confirmMsg);
 
   return (
-    <section className="mx-auto max-w-xl px-4 py-20 text-center">
-      <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-10 shadow-jewel flex flex-col items-center">
-        <BrandLogo size={80} className="mb-6" />
+    <section className="mx-auto max-w-xl px-4 py-20 text-center relative">
+      <OrderSuccessCard>
+        <OrderSuccessAnimation />
         <h1 className="text-4xl font-serif font-semibold text-champagne">Order Placed!</h1>
         
         <div className="mt-6 w-full rounded-2xl bg-amber-500/10 border border-amber-500/20 p-5 text-amber-800 text-sm max-w-md leading-relaxed text-left space-y-2">
@@ -61,13 +62,13 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
             )}
             <Link
               href="/shop"
-              className="rounded-full border border-goldBeige px-6 py-3.5 text-champagne hover:bg-champagne/5 transition-all flex-1 text-center text-sm"
+              className="rounded-full border border-[#F1CFCF]/50 px-6 py-3.5 text-champagne hover:bg-champagne/5 transition-all flex-1 text-center text-sm"
             >
               Continue Shopping
             </Link>
           </div>
         </div>
-      </div>
+      </OrderSuccessCard>
     </section>
   );
 }

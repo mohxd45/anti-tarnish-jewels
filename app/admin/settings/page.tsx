@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { getSiteSettings, saveSiteSettings } from "@/lib/firestore";
 import { SiteSettings } from "@/types";
-import { Save, Loader, Settings, CheckCircle, AlertCircle } from "lucide-react";
+import { Save, Settings, CheckCircle, AlertCircle } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -46,12 +48,7 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center text-gold">
-        <Loader className="animate-spin" size={32} />
-        <span className="ml-2 font-medium">Loading settings...</span>
-      </div>
-    );
+    return <PageLoader text="Loading settings..." />;
   }
 
   return (
@@ -99,27 +96,19 @@ export default function SettingsPage() {
                 <option value="maintenance">Maintenance mode</option>
               </select>
             </div>
-
-            {/* Dark mode switch */}
-            <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none md:col-span-2 mt-2">
-              <input
-                type="checkbox"
-                checked={!!settings.darkMode}
-                onChange={(e) => setSettings({ ...settings, darkMode: e.target.checked })}
-                className="accent-gold h-4 w-4 rounded border-gold/30 bg-noir text-gold"
-              />
-              <span className="font-semibold">Force dynamic theme dark mode variables</span>
-            </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
-          >
-            {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
-            Save System Configurations
-          </button>
+          <div className="flex justify-end pt-6 border-t border-gold/15">
+            <LoadingButton
+              type="submit"
+              loading={saving}
+              loadingText="Saving..."
+              className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2 shadow-jewel"
+            >
+              <Save size={16} />
+              Save System Configurations
+            </LoadingButton>
+          </div>
         </form>
       )}
     </div>

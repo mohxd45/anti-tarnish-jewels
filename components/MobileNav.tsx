@@ -32,7 +32,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-goldBeige/50 bg-warmwhite/95 px-2 py-2 backdrop-blur-xl lg:hidden shadow-[0_-4px_20px_rgba(47,42,38,0.06)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-goldBeige/50 bg-white/70 backdrop-blur-md px-2 py-2 backdrop-blur-xl lg:hidden shadow-[0_-4px_20px_rgba(47,42,38,0.06)]">
       <div className="grid grid-cols-5">
         {nav.map((item) => {
           const Icon = item.icon;

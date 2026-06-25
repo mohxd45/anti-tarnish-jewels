@@ -1,181 +1,193 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Gem, Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
-import { getCategories, getSiteSettings } from "@/lib/firestore";
-import { Category, SiteSettings } from "@/types";
 
-// Module-level cache — fetched once per browser session, not on every mount
-let cachedCategories: Category[] | null = null;
-let cachedSettings: SiteSettings | null = null;
-
-const defaultDesktopCategories = [
-  { name: "Earrings" },
-  { name: "Rings" },
-  { name: "Necklaces" },
-  { name: "Bracelets" }
+const NAV_LINKS = [
+  { label: "All Jewellery", href: "/shop" },
+  { label: "Rings", href: "/shop?category=Rings" },
+  { label: "Earrings", href: "/shop?category=Earrings" },
+  { label: "Necklaces", href: "/shop?category=Necklaces" },
+  { label: "Bracelets", href: "/shop?category=Bracelets" },
+  { label: "Daily Wear", href: "/shop?category=Daily Wear Jewellery" },
+  { label: "Sale", href: "/sale" },
+  { label: "Track Order", href: "/track-order" },
 ];
 
 export function Header() {
-  // ✅ ALL hooks must be called unconditionally at the top — React rules of hooks
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
   const { items } = useCart();
   const wishlist = useWishlist();
-  const { user, logout, isAdmin } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
 
   const isAdminPage = pathname?.startsWith("/admin");
 
-  // useEffect MUST come before any conditional returns
   useEffect(() => {
-    if (isAdminPage) return; // Skip data loading on admin pages
     setMounted(true);
-    loadData();
-  }, [isAdminPage]);
+    const f = () => setScrolled(window.scrollY > 30);
+    f(); 
+    window.addEventListener("scroll", f); 
+    return () => window.removeEventListener("scroll", f);
+  }, []);
 
-  async function loadData() {
-    try {
-      if (cachedCategories && cachedSettings) {
-        setCategories(cachedCategories);
-        setSettings(cachedSettings);
-        return;
-      }
-      const [cats, siteSettings] = await Promise.all([
-        getCategories(),
-        getSiteSettings()
-      ]);
-      const activeCats = cats.filter(c => c.isActive);
-      cachedCategories = activeCats;
-      cachedSettings = siteSettings;
-      setCategories(activeCats);
-      setSettings(siteSettings);
-    } catch (err) {
-      console.error("Error loading header data:", err);
-    }
-  }
-
-  // ✅ NOW it's safe to return null conditionally — all hooks already called above
-  if (isAdminPage) {
-    return null;
-  }
-
-  const brandName = settings?.logoText || "Anti Tarnish Jewels";
-
-  const renderNavLinks = (isMobile: boolean) => {
-    const list = [];
-
-    list.push({ label: "All Jewellery", href: "/shop" });
-
-    if (isMobile) {
-      list.push({ label: "Earrings", href: "/shop?category=Earrings" });
-      list.push({ label: "Rings", href: "/shop?category=Rings" });
-      list.push({ label: "Necklaces", href: "/shop?category=Necklaces" });
-      list.push({ label: "Bracelets", href: "/shop?category=Bracelets" });
-      list.push({ label: "Bangles", href: "/shop?category=Bangles" });
-      list.push({ label: "Anklets", href: "/shop?category=Anklets" });
-      list.push({ label: "Daily Wear", href: "/shop?category=Daily Wear Jewellery" });
-      list.push({ label: "Waterproof Jewellery", href: "/shop?category=Waterproof Jewellery" });
-      list.push({ label: "Bridal Collection", href: "/shop?category=Bridal Sets" });
-      list.push({ label: "New Arrivals", href: "/shop?newArrivals=true" });
-      list.push({ label: "Best Sellers", href: "/shop?bestSellers=true" });
+  // Use body lock for search/drawer, but check if we're not on mobile nav overlap
+  useEffect(() => { 
+    if (open || searchOpen) {
+      document.body.style.overflow = "hidden";
     } else {
-      list.push({ label: "Earrings", href: "/shop?category=Earrings" });
-      list.push({ label: "Rings", href: "/shop?category=Rings" });
-      list.push({ label: "Necklaces", href: "/shop?category=Necklaces" });
-      list.push({ label: "Bracelets", href: "/shop?category=Bracelets" });
-      list.push({ label: "Daily Wear", href: "/shop?category=Daily Wear Jewellery" });
+      document.body.style.overflow = "";
     }
+  }, [open, searchOpen]);
 
-    list.push({ label: "Sale", href: "/sale" });
-    list.push({ label: "Track Order", href: "/track-order" });
-
-    if (isMobile) {
-      list.push({ label: "Contact", href: "/contact" });
-    }
-
-    return list.map((link) => (
-      <Link
-        key={link.href}
-        href={link.href}
-        onClick={() => setOpen(false)}
-        className="hover:text-champagne transition-colors"
-      >
-        {link.label}
-      </Link>
-    ));
-  };
+  if (isAdminPage) {
+    return null; // Keep admin clean
+  }
 
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b border-goldBeige/40 bg-ivory/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-2.5 py-3 sm:px-4 sm:py-4">
-          <Link href="/" className="text-xs min-[320px]:text-sm min-[375px]:text-base sm:text-2xl font-serif font-semibold tracking-wider sm:tracking-[0.25em] text-champagne hover:text-champagne/90 transition-colors uppercase max-w-none">
-            <span className="hidden sm:inline">{brandName}</span>
-            <span className="inline sm:hidden">
-              {brandName.length > 12 ? "AT Jewels" : brandName}
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${scrolled ? "py-2" : "py-4"}`}>
+      <div className={`mx-auto max-w-7xl px-4 sm:px-6`}>
+        <div className={`flex items-center justify-between gap-3 ${scrolled ? "glass rounded-full px-4 py-2.5" : "px-2 py-2"}`}>
+          <Link href="/" className="flex items-center gap-2 min-w-0">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full" style={{ background: "var(--gradient-gold)" }}>
+              <Gem className="h-4 w-4 text-white" />
             </span>
+            <span className="hidden truncate font-display text-xl font-semibold tracking-wide text-ink sm:block">Anti Tarnish</span>
           </Link>
 
-          <nav className="hidden items-center gap-6 text-sm font-medium text-charcoalBrown/85 lg:flex">
-            {renderNavLinks(false)}
-            {isAdmin && <Link href="/admin" className="text-champagne font-semibold">Admin</Link>}
+          <nav className="hidden items-center gap-6 text-[13px] text-ink/75 xl:flex">
+            {NAV_LINKS.map(l => {
+              const isActive = pathname === l.href.split('?')[0] && !l.href.includes('?');
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={`relative whitespace-nowrap transition-colors hover:text-ink after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-[var(--rose-gold)] after:transition-all hover:after:w-full ${isActive ? "text-[var(--rose-gold)]" : ""}`}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <Link href="/shop" aria-label="Search" className="rounded-full border border-goldBeige/60 p-1.5 sm:p-2 hover:bg-champagne/10 text-champagne transition-colors">
-              <Search className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-            </Link>
-            <Link href="/wishlist" aria-label="Wishlist" className="relative rounded-full border border-goldBeige/60 p-2 hover:bg-champagne/10 text-champagne transition-colors hidden sm:block">
-              <Heart size={18} />
-              {wishlist.items.length > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-dustyRose px-1.5 text-xs text-white">{wishlist.items.length}</span>}
-            </Link>
-            <Link href="/cart" aria-label="Cart" className="relative rounded-full border border-goldBeige/60 p-1.5 sm:p-2 hover:bg-champagne/10 text-champagne transition-colors">
-              <ShoppingBag className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-              {items.length > 0 && (
-                <span className="absolute -right-1 -top-1 rounded-full bg-champagne px-1.5 text-[10px] sm:text-xs text-charcoalBrown font-semibold leading-none py-0.5">
-                  {items.length}
-                </span>
+          <div className="flex items-center gap-1.5">
+            <button aria-label="Search" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-full glass text-ink/80 transition hover:text-[var(--rose-gold)]">
+              <Search className="h-4 w-4" />
+            </button>
+            <Link href="/wishlist" aria-label="Wishlist" className="hidden relative h-10 w-10 place-items-center rounded-full glass text-ink/80 transition hover:text-[var(--rose-gold)] sm:grid">
+              <Heart className="h-4 w-4" />
+              {mounted && wishlist.items.length > 0 && (
+                <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full text-[10px] font-semibold text-white" style={{ background: "var(--gradient-gold)" }}>{wishlist.items.length}</span>
               )}
             </Link>
-            <Link href={user ? "/account" : "/login"} aria-label="Account" className="hidden rounded-full border border-goldBeige/60 p-2 hover:bg-champagne/10 text-champagne transition-colors sm:block">
-              <User size={18} />
+            <Link href="/cart" aria-label="Cart" className="relative grid h-10 w-10 place-items-center rounded-full glass text-ink/80 transition hover:text-[var(--rose-gold)]">
+              <ShoppingBag className="h-4 w-4" />
+              {mounted && items.length > 0 && (
+                <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full text-[10px] font-semibold text-white" style={{ background: "var(--gradient-gold)" }}>{items.length}</span>
+              )}
             </Link>
-            <button onClick={() => setOpen(true)} className="rounded-full border border-goldBeige/60 p-1.5 sm:p-2 text-champagne lg:hidden" aria-label="Menu">
-              <Menu className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
+            
+            <div className="relative group hidden sm:block">
+              <Link href={user ? "/account" : "/login"} aria-label="Profile" className="grid h-10 w-10 place-items-center rounded-full glass text-ink/80 transition hover:text-[var(--rose-gold)]">
+                <User className="h-4 w-4" />
+              </Link>
+              {/* Profile Dropdown */}
+              <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right">
+                <div className="glass rounded-2xl p-2 w-48 shadow-[var(--shadow-soft)] flex flex-col gap-1">
+                  {user ? (
+                    <>
+                      <Link href="/account" className="px-4 py-2 text-sm text-ink/80 hover:bg-white/40 hover:text-[var(--rose-gold)] rounded-xl transition-colors">My Profile</Link>
+                      <Link href="/orders" className="px-4 py-2 text-sm text-ink/80 hover:bg-white/40 hover:text-[var(--rose-gold)] rounded-xl transition-colors">My Orders</Link>
+                      {isAdmin && (
+                        <Link href="/admin" className="px-4 py-2 text-sm font-semibold text-[var(--gold)] hover:bg-white/40 rounded-xl transition-colors">Admin Dashboard</Link>
+                      )}
+                      <button onClick={logout} className="px-4 py-2 text-left text-sm text-red-500/80 hover:bg-white/40 hover:text-red-500 rounded-xl transition-colors">Logout</button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" className="px-4 py-2 text-sm text-ink/80 hover:bg-white/40 hover:text-[var(--rose-gold)] rounded-xl transition-colors">Login</Link>
+                      <Link href="/signup" className="px-4 py-2 text-sm text-ink/80 hover:bg-white/40 hover:text-[var(--rose-gold)] rounded-xl transition-colors">Sign Up</Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <button aria-label="Menu" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center rounded-full glass text-ink/80 xl:hidden">
+              <Menu className="h-4 w-4" />
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
+      {/* Mobile drawer */}
       {open && (
-        <div className="fixed inset-0 z-[60] bg-black/70">
-          <aside className="ml-auto h-full w-80 max-w-[85vw] border-l border-goldBeige/40 bg-warmwhite p-6 shadow-jewel overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-goldBeige/20 pb-4">
-              <span className="text-base min-[375px]:text-lg font-serif font-semibold tracking-wider text-champagne uppercase">{brandName === "Anti Tarnish Jewels" ? "AT Jewels" : brandName} Menu</span>
-              <button onClick={() => setOpen(false)} className="text-champagne"><X /></button>
+        <div className="fixed inset-0 z-[60] xl:hidden" onClick={() => setOpen(false)}>
+          <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" />
+          <div onClick={e => e.stopPropagation()} className="absolute right-0 top-0 h-full w-[88%] max-w-sm overflow-y-auto p-6"
+            style={{ background: "var(--gradient-deep)" }}>
+            <div className="flex items-center justify-between">
+              <span className="font-display text-xl text-white">Menu</span>
+              <button aria-label="Close" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-full glass text-white/80 hover:text-white">
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <div className="mt-8 flex flex-col gap-5 text-charcoalBrown/90 font-medium">
-              <Link onClick={() => setOpen(false)} href="/" className="hover:text-champagne">Home</Link>
-              {renderNavLinks(true)}
-              <Link onClick={() => setOpen(false)} href="/wishlist" className="hover:text-champagne">Wishlist</Link>
-              {isAdmin && <Link onClick={() => setOpen(false)} href="/admin" className="text-champagne">Admin Dashboard</Link>}
+            <nav className="mt-8 flex flex-col gap-1">
+              {NAV_LINKS.map(l => {
+                const isActive = pathname === l.href.split('?')[0] && !l.href.includes('?');
+                return (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className={`rounded-2xl px-4 py-3.5 font-display text-2xl transition ${isActive ? "text-[var(--rose-gold)] bg-white/10" : "text-white/85 hover:bg-white/10"}`}
+                  >
+                    {l.label}
+                  </Link>
+                );
+              })}
+              {isAdmin && (
+                <Link href="/admin" onClick={() => setOpen(false)} className="rounded-2xl px-4 py-3.5 font-display text-2xl text-[var(--gold)] hover:bg-white/10 transition mt-4">
+                  Admin Dashboard
+                </Link>
+              )}
+            </nav>
+            <div className="mt-8 grid grid-cols-2 gap-2 mb-24">
+              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex flex-col items-center gap-1 rounded-2xl glass py-3 text-xs text-white/75 hover:text-white transition-colors"><Heart className="h-4 w-4" /> Wishlist</Link>
               {user ? (
-                <button onClick={() => { logout(); setOpen(false); }} className="text-left text-dustyRose">Logout</button>
+                <button onClick={() => { logout(); setOpen(false); }} className="flex flex-col items-center gap-1 rounded-2xl glass py-3 text-xs text-red-300 hover:text-red-400 transition-colors"><User className="h-4 w-4" /> Logout</button>
               ) : (
-                <Link onClick={() => setOpen(false)} href="/login" className="hover:text-champagne">Login / Signup</Link>
+                <Link href="/login" onClick={() => setOpen(false)} className="flex flex-col items-center gap-1 rounded-2xl glass py-3 text-xs text-white/75 hover:text-white transition-colors"><User className="h-4 w-4" /> Login</Link>
               )}
             </div>
-          </aside>
+          </div>
         </div>
       )}
-    </>
+
+      {/* Search overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-[60]" onClick={() => setSearchOpen(false)}>
+          <div className="absolute inset-0 bg-ink/40 backdrop-blur-md" />
+          <div onClick={e => e.stopPropagation()} className="absolute inset-x-0 top-0 p-6">
+            <div className="mx-auto max-w-2xl glass rounded-3xl p-2">
+              <div className="flex items-center gap-3 px-4 py-2">
+                <Search className="h-5 w-5 text-ink/60" />
+                <input autoFocus placeholder="Search rings, pearls, gold…" className="flex-1 bg-transparent py-3 text-base text-ink placeholder:text-ink/40 focus:outline-none" />
+                <button onClick={() => setSearchOpen(false)} className="grid h-9 w-9 place-items-center rounded-full bg-white/40"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }

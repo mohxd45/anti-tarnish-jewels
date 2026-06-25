@@ -5,34 +5,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { getBanners } from "@/lib/firestore";
-import { Banner } from "@/types";
+interface Slide { id: string; image?: string; tagline: string; title: string; description: string; ctaText: string; link: string; }
 import { BrandLogo } from "./BrandLogo";
-
-interface Slide {
-  id: string;
-  tagline: string;
-  title: string;
-  description: string;
-  image: string;
-  ctaText: string;
-  link: string;
-}
+import { PublicJewelryBackground } from "./ui/PublicJewelryBackground";
+import { ParallaxLayer } from "./ui/ParallaxLayer";
 
 const defaultSlides: Slide[] = [
   {
     id: "default-1",
-    tagline: "Waterproof & Tarnish-Free",
-    title: "Premium Anti-Tarnish Jewellery for Everyday Shine",
-    description: "Shop waterproof, tarnish-free, non-fading jewellery designed for daily wear and lasting elegance.",
+    tagline: "Exclusive Collection",
+    title: "Premium Anti-Tarnish Jewellery",
+    description: "Shop premium jewellery designed for daily wear and lasting elegance.",
     image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200&auto=format&fit=crop",
     ctaText: "Shop Now",
     link: "/shop?category=Jewellery"
   },
   {
     id: "default-2",
-    tagline: "Waterproof & Non-Fading",
-    title: "Anti-Tarnish Luxury Monogram Rings",
-    description: "Discover our signature waterproof rings that preserve their golden champagne shine without ever fading or tarnishing.",
+    tagline: "Exclusive Collection",
+    title: "Luxury Monogram Rings",
+    description: "Discover our signature rings that preserve their golden champagne shine.",
     image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=1200&auto=format&fit=crop",
     ctaText: "Shop Rings",
     link: "/shop?category=Jewellery"
@@ -40,8 +32,8 @@ const defaultSlides: Slide[] = [
   {
     id: "default-3",
     tagline: "Elegant Everyday Styling",
-    title: "Tarnish-Free Necklaces & Earrings",
-    description: "Accentuate your daily look with necklaces and earrings that combine minimalist aesthetics with unmatched waterproofing.",
+    title: "Necklaces & Earrings",
+    description: "Accentuate your daily look with necklaces and earrings that combine minimalist aesthetics.",
     image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1200&auto=format&fit=crop",
     ctaText: "Shop Best Sellers",
     link: "/shop?category=Jewellery"
@@ -64,7 +56,6 @@ export function HeroSlider() {
       const heroBanners = banners.filter(b => b.isActive && b.placement === "hero");
       
       if (heroBanners.length > 0) {
-        // Sort by priority ascending
         const sorted = [...heroBanners].sort((a, b) => a.priority - b.priority);
         const mapped: Slide[] = sorted.map((b) => ({
           id: b.id,
@@ -86,89 +77,83 @@ export function HeroSlider() {
     if (!mounted || slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
-    }, 5500); // Premium luxury pacing
+    }, 5500);
     return () => clearInterval(timer);
   }, [mounted, slides.length]);
-
-
 
   const next = () => setCurrent((prev) => (prev + 1) % slides.length);
   const prev = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative overflow-hidden px-4 py-8 md:py-16">
-      {/* Background radial gradient element */}
-      <div className="absolute inset-0 -z-10 bg-gold-radial opacity-30" />
+    <PublicJewelryBackground variant="hero" className="w-screen max-w-none relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-ivory">
+      {/* Background radial gradient element with parallax depth */}
+      <ParallaxLayer speed={0.3} className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-gold-radial opacity-30" />
+      </ParallaxLayer>
 
-      <div className="mx-auto max-w-7xl relative">
+      <div className="relative w-full">
         {/* Slides Outer Container */}
-        <div className="relative w-full min-h-[280px] sm:min-h-[400px] flex items-center">
+        <div className="relative w-full min-h-[600px] md:min-h-[800px] flex items-center justify-center overflow-hidden py-12 md:py-20">
           {slides.map((slide, idx) => {
             const isActive = idx === current;
             return (
               <div
                 key={slide.id}
-                className={`w-full transition-all duration-1000 ease-in-out grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center ${
+                className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out flex flex-col items-center justify-center px-4 ${
                   isActive
-                    ? "relative opacity-100 translate-x-0 pointer-events-auto z-10"
-                    : "absolute top-0 left-0 opacity-0 translate-x-8 pointer-events-none z-0"
+                    ? "opacity-100 z-10 pointer-events-auto"
+                    : "opacity-0 z-0 pointer-events-none"
                 }`}
               >
-                {/* Text Content */}
-                <div className="flex flex-col justify-center">
-                  {/* Brand Monogram Emblem */}
-                  <div className="mb-6 flex items-center gap-3 w-fit">
-                    <BrandLogo size={52} withBg={true} />
-                    <div className="flex flex-col items-start">
-                      <span className="font-serif text-xs font-semibold tracking-[0.25em] text-champagne uppercase">Anti Tarnish Jewels</span>
-                      <span className="text-[9px] uppercase tracking-[0.15em] text-stoneGray/80 mt-0.5">Waterproof & Non-Fading</span>
+                <div className="relative z-20 flex flex-col items-center text-center max-w-6xl mx-auto w-full">
+                  {/* Branding Block (Top) */}
+                  <div className="mb-8 md:mb-10 flex flex-col items-center gap-3 w-fit mx-auto">
+                    <BrandLogo size={56} withBg={true} />
+                    <div className="flex flex-col items-center text-charcoalBrown mt-2">
+                      <span className="font-serif text-sm md:text-base font-semibold tracking-[0.25em] uppercase">Anti Tarnish Jewels</span>
+                      <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-charcoalBrown/70 mt-1">{slide.tagline}</span>
                     </div>
                   </div>
 
-                  <span className="text-xs md:text-sm font-medium uppercase tracking-[0.2em] md:tracking-[0.45em] text-champagne inline-flex items-center gap-2">
-                    <span className="h-[1px] w-6 bg-champagne/50" /> {slide.tagline}
-                  </span>
-                  <h1 className="mt-3 md:mt-5 max-w-3xl text-[clamp(1.35rem,5vw,2.75rem)] font-semibold leading-tight text-charcoalBrown">
-                    {slide.title}
-                  </h1>
-                  <p className="mt-4 md:mt-6 max-w-2xl text-sm md:text-lg leading-relaxed md:leading-8 text-charcoalBrown/70">
-                    {slide.description}
-                  </p>
-                  <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3">
-                    <Link
-                      href={slide.link}
-                      className="group rounded-full bg-champagne px-5 py-3 md:px-7 md:py-4 text-xs md:text-sm font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all flex items-center justify-center gap-2 shadow-jewel hover:shadow-champagne/25 w-full sm:w-auto text-center"
-                    >
-                      {slide.ctaText}
-                      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform shrink-0" />
-                    </Link>
-                    <Link
-                      href="/shop"
-                      className="rounded-full border border-goldBeige/60 px-5 py-3 md:px-7 md:py-4 text-xs md:text-sm font-semibold text-champagne hover:bg-champagne/10 transition-colors w-full sm:w-auto text-center"
-                    >
-                      Explore All Store
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Banner/Image Content */}
-                <div className="rounded-[2rem] border border-goldBeige/60 bg-warmwhite p-4 shadow-jewel relative group/image max-w-md lg:max-w-none mx-auto w-full">
-                  <div className="aspect-[3/2] md:aspect-[4/5] relative rounded-[1.5rem] overflow-hidden bg-ivory flex items-center justify-center">
+                  {/* Large Banner Image Section (Card) */}
+                  <div className="w-full aspect-[16/9] md:aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] mb-10 group bg-white/70 backdrop-blur-md border border-goldBeige/30">
                     {slide.image ? (
                       <Image
                         src={slide.image}
                         alt={slide.title}
                         fill
                         priority={idx === 0}
-                        className="object-cover transition-transform duration-700 group-hover/image:scale-105"
-                        sizes="(max-w-7xl) 100vw, 50vw"
+                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                        sizes="(max-w-7xl) 100vw, 90vw"
                       />
                     ) : (
-                      <ImageIcon className="text-champagne/20" size={60} />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <ImageIcon className="text-champagne/30" size={60} />
+                      </div>
                     )}
+                    {/* Subtle inner overlay for image richness */}
+                    <div className="absolute inset-0 bg-charcoalBrown/5 pointer-events-none" />
                   </div>
-                  {/* Subtle glass reflection overlay */}
-                  <div className="absolute inset-0 rounded-[2rem] pointer-events-none bg-gradient-to-tr from-white/[0.03] to-white/[0.1]" />
+
+                  {/* Main Text Content (Bottom) */}
+                  <div className="flex flex-col items-center max-w-3xl mx-auto">
+                    <h1 className="text-[clamp(1.75rem,5vw,3.5rem)] font-serif font-bold leading-tight text-charcoalBrown">
+                      {slide.title}
+                    </h1>
+                    <p className="mt-4 md:mt-6 text-sm md:text-lg text-charcoalBrown/70 leading-relaxed">
+                      {slide.description}
+                    </p>
+                    
+                    <div className="mt-8 md:mt-10">
+                      <Link
+                        href={slide.link}
+                        className="group inline-flex rounded-full bg-champagne px-8 py-4 text-sm md:text-base font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all items-center justify-center gap-2 shadow-jewel hover:shadow-champagne/30"
+                      >
+                        {slide.ctaText}
+                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform shrink-0" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -176,40 +161,42 @@ export function HeroSlider() {
         </div>
 
         {/* Navigation Controls */}
-        <div className="flex items-center justify-between mt-10 z-20 relative">
-          {/* Dots Indicator */}
-          <div className="flex gap-2">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrent(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  idx === current ? "w-8 bg-champagne" : "w-2 bg-champagne/30 hover:bg-champagne/50"
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
-          </div>
+        <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center z-30 pointer-events-none">
+          <div className="flex items-center justify-between w-full max-w-7xl px-4 md:px-10 pointer-events-auto">
+            {/* Dots */}
+            <div className="flex gap-3">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrent(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 shadow-sm ${
+                    idx === current ? "w-10 bg-champagne" : "w-3 bg-champagne/30 hover:bg-champagne/60"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
 
-          {/* Arrow Buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={prev}
-              className="p-2 sm:p-3 rounded-full border border-goldBeige/50 text-champagne bg-ivory/60 hover:bg-champagne hover:text-charcoalBrown transition-all"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              onClick={next}
-              className="p-2 sm:p-3 rounded-full border border-goldBeige/50 text-champagne bg-ivory/60 hover:bg-champagne hover:text-charcoalBrown transition-all"
-              aria-label="Next slide"
-            >
-              <ChevronRight size={20} />
-            </button>
+            {/* Arrows */}
+            <div className="flex gap-4 hidden sm:flex">
+              <button
+                onClick={prev}
+                className="p-3 rounded-full border border-champagne/30 text-charcoalBrown bg-ivory/80 hover:bg-champagne hover:border-champagne backdrop-blur-md transition-all shadow-md"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={next}
+                className="p-3 rounded-full border border-champagne/30 text-charcoalBrown bg-ivory/80 hover:bg-champagne hover:border-champagne backdrop-blur-md transition-all shadow-md"
+                aria-label="Next slide"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </PublicJewelryBackground>
   );
 }

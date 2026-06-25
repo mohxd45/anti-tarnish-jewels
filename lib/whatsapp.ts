@@ -16,7 +16,7 @@ export async function getWhatsAppNumber(): Promise<string> {
   }
   
   if (!rawNumber || !rawNumber.trim()) {
-    rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+    rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "917250569370";
   }
   
   // Sanitize: remove spaces, +, -, brackets, keep only digits

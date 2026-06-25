@@ -5,7 +5,11 @@ import { Protected } from "@/components/Protected";
 import { getProducts, deleteProduct, updateProduct, getCategories, uploadImage } from "@/lib/firestore";
 import { Product, Category } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
-import { Edit2, Trash2, X, Check, Search, Plus, Filter, Image as ImageIcon, ToggleLeft, ToggleRight, Sparkles, Upload, Loader } from "lucide-react";
+import { Edit2, Trash2, X, Check, Search, Plus, Filter, Image as ImageIcon, ToggleLeft, ToggleRight, Sparkles, Upload } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import Link from "next/link";
 
 export default function ManageProductsPage() {
@@ -225,7 +229,7 @@ export default function ManageProductsPage() {
       const finalSalePrice = Number(editSalePrice);
       const finalRegularPrice = Number(editRegularPrice) || finalSalePrice;
       const discountPercentage = finalRegularPrice ? Math.round(((finalRegularPrice - finalSalePrice) / finalRegularPrice) * 100) : 0;
-      const finalImages = editImages && editImages.length ? editImages : ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop"];
+      const finalImages = editImages && editImages.length > 0 ? editImages : ["/product-placeholder.png"];
 
       // Safe slug generation
       const baseSlug = slugify(editName);
@@ -245,6 +249,7 @@ export default function ManageProductsPage() {
         discountPercentage: discountPercentage > 0 ? discountPercentage : 0,
         stock: Number(editStock),
         images: finalImages,
+        thumbnail: finalImages[0],
         warranty: (editWarranty || "").trim(),
         returnPolicy: (editReturnPolicy || "").trim(),
         specifications: specsObj,
@@ -378,9 +383,13 @@ export default function ManageProductsPage() {
         {/* Products Table Grid */}
         <div className="overflow-x-auto rounded-[2rem] border border-goldBeige bg-warmwhite shadow-jewel">
           {loading ? (
-            <div className="p-12 text-center text-stoneGray">Fetching inventory items...</div>
+            <div className="p-12"><PageLoader text="Fetching inventory items..." /></div>
           ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-stoneGray">No products match specified criteria.</div>
+            <EmptyStateCard 
+              icon={Sparkles} 
+              text="No products available" 
+              subtext="Try adjusting your filter or add a new product." 
+            />
           ) : (
             <table className="w-full min-w-[1000px] text-left text-sm text-charcoalBrown">
               <thead className="bg-beige text-champagne uppercase tracking-wider text-xs border-b border-goldBeige/60">
@@ -485,7 +494,7 @@ export default function ManageProductsPage() {
                             title="Delete Product"
                           >
                             {deletingId === p.id ? (
-                              <Loader className="animate-spin h-3.5 w-3.5" />
+                              <HeartLoader size="sm" text="" />
                             ) : (
                               <Trash2 size={15} />
                             )}
@@ -693,13 +702,11 @@ export default function ManageProductsPage() {
                       <label className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-goldBeige bg-beige px-4 py-2.5 text-champagne text-xs font-semibold hover:bg-champagne/10 transition-all">
                         {uploadingImg ? (
                           <>
-                            <Loader className="animate-spin" size={13} />
-                            Uploading Image...
+                            <HeartLoader size="sm" text="Uploading Image..." />
                           </>
                         ) : (
                           <>
-                            <Upload size={13} />
-                            Upload Local File
+                            <Upload size={14} /> Replace Image
                           </>
                         )}
                         <input
@@ -1012,22 +1019,19 @@ export default function ManageProductsPage() {
               </div>
 
               {/* Drawer Footer Actions */}
-              <div className="border-t border-goldBeige/40 pt-4 mt-6 flex justify-end gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setEditingProduct(null)}
-                  className="rounded-full border border-goldBeige px-6 py-2.5 text-charcoalBrown hover:bg-beige/40 text-sm transition-all"
-                >
+              <div className="flex gap-3 justify-end items-center mt-6">
+                <button type="button" onClick={() => setEditingProduct(null)} className="px-5 py-2.5 text-stoneGray font-semibold hover:text-charcoalBrown transition-all text-sm">
                   Cancel
                 </button>
-                <button
+                <LoadingButton
                   type="button"
-                  disabled={saveLoading}
+                  loading={saveLoading}
+                  loadingText="Saving Customizations..."
                   onClick={handleSaveProduct}
                   className="rounded-full bg-champagne px-6 py-2.5 text-charcoalBrown font-semibold hover:opacity-90 transition-all text-sm shadow-jewel"
                 >
-                  {saveLoading ? "Saving Customizations..." : "Save Product Details"}
-                </button>
+                  Save Product Details
+                </LoadingButton>
               </div>
 
             </div>

@@ -86,7 +86,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Left Column: Image Gallery */}
         <div className="flex flex-col gap-4">
-          <div className="rounded-[2.5rem] border border-goldBeige/60 bg-warmwhite p-4 shadow-jewel">
+          <div className="rounded-[2.5rem] border border-[#F1CFCF]/40 bg-white/55 backdrop-blur-md p-4 shadow-[0_20px_60px_rgba(224,169,165,0.15)] relative z-10">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-ivory">
               <Image
                 src={getOptimizedImageUrl(product.images?.[activeImage] || product.images?.[0] || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop", 850)}
@@ -118,9 +118,9 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
         </div>
 
         {/* Right Column: Content and buy actions */}
-        <div>
+        <div className="rounded-[2.5rem] bg-white/80 backdrop-blur-sm p-6 sm:p-8 shadow-[0_20px_60px_rgba(224,169,165,0.15)] relative z-10 border border-[#F1CFCF]/40">
           {/* Breadcrumb info */}
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-champagne font-semibold">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-[#8A5A2B] font-semibold">
             <span>{product.category}</span>
             {product.brand && (
               <>
@@ -130,7 +130,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
             )}
           </div>
 
-          <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide text-charcoalBrown leading-tight break-words">
+          <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide text-[#3B2B2B] leading-tight break-words">
             {product.name}
           </h1>
 
@@ -146,7 +146,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
               ))}
             </div>
             <span className="text-sm font-semibold">{product.rating || 5}</span>
-            <span className="text-xs text-stoneGray/60">({product.reviewCount || 0} reviews)</span>
+            <span className="text-xs text-[#7A6262]">({product.reviewCount || 0} reviews)</span>
           </div>
 
           {/* Jewellery Attributes Badges */}
@@ -170,10 +170,10 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
 
           {/* Pricing */}
           <div className="mt-6 flex flex-wrap items-baseline gap-2 sm:gap-4">
-            <span className="text-2xl sm:text-3xl font-serif font-semibold text-charcoalBrown break-all sm:break-normal">{formatPrice(product.salePrice)}</span>
+            <span className="text-2xl sm:text-3xl font-serif font-semibold text-[#8A5A2B] break-all sm:break-normal">{formatPrice(product.salePrice)}</span>
             {product.salePrice < product.regularPrice && (
               <>
-                <span className="text-base sm:text-lg text-stoneGray/60 line-through mb-0.5 break-all sm:break-normal">{formatPrice(product.regularPrice)}</span>
+                <span className="text-base sm:text-lg text-[#7A6262] line-through mb-0.5 break-all sm:break-normal">{formatPrice(product.regularPrice)}</span>
                 <span className="rounded-full bg-dustyRose px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider shrink-0 mt-1 sm:mt-0">
                   {product.discountPercentage}% OFF
                 </span>
@@ -182,7 +182,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
           </div>
 
           {/* Description */}
-          <p className="mt-6 text-sm md:text-base leading-7 text-charcoalBrown/75 font-sans">
+          <p className="mt-6 text-sm md:text-base leading-7 text-[#5F4747] font-sans">
             {product.description}
           </p>
 
@@ -206,31 +206,31 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
           <div className="mt-6 grid grid-cols-1 min-[320px]:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-sm border-b border-goldBeige/25 pb-6">
             {product.color && (
               <div>
-                <span className="text-stoneGray block text-xs">Color:</span>
-                <span className="font-semibold text-charcoalBrown">{product.color}</span>
+                <span className="text-[#7A6262] block text-xs">Color:</span>
+                <span className="font-semibold text-[#3B2B2B]">{product.color}</span>
               </div>
             )}
             {product.material && (
               <div>
-                <span className="text-stoneGray block text-xs">Material:</span>
-                <span className="font-semibold text-charcoalBrown">{product.material}</span>
+                <span className="text-[#7A6262] block text-xs">Material:</span>
+                <span className="font-semibold text-[#3B2B2B]">{product.material}</span>
               </div>
             )}
             {product.occasion && (
               <div>
-                <span className="text-stoneGray block text-xs">Occasion:</span>
-                <span className="font-semibold text-charcoalBrown">{product.occasion}</span>
+                <span className="text-[#7A6262] block text-xs">Occasion:</span>
+                <span className="font-semibold text-[#3B2B2B]">{product.occasion}</span>
               </div>
             )}
             {product.size && (
               <div>
-                <span className="text-stoneGray block text-xs">Size:</span>
-                <span className="font-semibold text-charcoalBrown">{product.size}</span>
+                <span className="text-[#7A6262] block text-xs">Size:</span>
+                <span className="font-semibold text-[#3B2B2B]">{product.size}</span>
               </div>
             )}
             <div>
-              <span className="text-stoneGray block text-xs">Availability:</span>
-              <span className={`font-semibold ${product.stock > 0 ? "text-emerald-600" : "text-dustyRose"}`}>
+              <span className="text-[#7A6262] block text-xs">Availability:</span>
+              <span className={`font-semibold ${product.stock > 0 ? "text-emerald-600" : "text-white"}`}>
                 {product.stock > 0 ? `In Stock (${product.stock} left)` : "Out of Stock"}
               </span>
             </div>
@@ -240,7 +240,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
           {product.stock > 0 && (
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <span className="text-sm text-stoneGray font-medium">Quantity:</span>
-              <div className="flex items-center border border-goldBeige bg-warmwhite rounded-full overflow-hidden shrink-0">
+              <div className="flex items-center border border-[#F1CFCF]/40 bg-white/55 backdrop-blur-md shadow-sm rounded-full overflow-hidden shrink-0">
                 <button
                   onClick={decreaseQty}
                   className="px-3 sm:px-4 py-2 hover:bg-champagne/10 text-champagne transition-colors"
@@ -268,7 +268,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
                 alert("Product added to cart!");
               }}
               disabled={product.stock === 0}
-              className="rounded-full bg-champagne px-8 py-4 font-semibold text-charcoalBrown hover:bg-champagne/90 hover:shadow-champagne/10 transition-all flex items-center gap-2.5 shadow-jewel disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-full bg-champagne px-8 py-4 font-semibold text-[#3B2B2B] hover:bg-champagne/90 hover:shadow-champagne/10 transition-all flex items-center gap-2.5 shadow-jewel disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShoppingBag size={18} />
               Add to Cart
@@ -289,7 +289,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
               onClick={() => {
                 if (product.stock > 0) addToCart(product, quantity);
               }}
-              className={`rounded-full border border-dustyRose bg-dustyRose/10 px-8 py-4 font-semibold text-dustyRose hover:bg-dustyRose hover:text-white text-center flex items-center justify-center transition-all ${
+              className={`rounded-full border border-dustyRose bg-[#C98484] px-8 py-4 font-semibold text-white hover:bg-[#a66a6a] hover:text-white text-center flex items-center justify-center transition-all ${
                 product.stock === 0 ? "pointer-events-none opacity-50" : ""
               }`}
             >
@@ -298,8 +298,8 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
           </div>
 
           {/* Specification Tabs */}
-          <div className="mt-10 rounded-[1.5rem] border border-goldBeige/60 bg-warmwhite p-5 shadow-sm text-sm">
-            <div className="flex border-b border-goldBeige/30 pb-3 gap-6 font-medium text-xs uppercase tracking-wider">
+          <div className="mt-10 rounded-[1.5rem] border border-[#F1CFCF]/40 bg-white/55 backdrop-blur-md p-5 shadow-[0_20px_60px_rgba(224,169,165,0.15)] text-sm relative z-10">
+            <div className="flex border-b border-[#F1CFCF]/40 pb-3 gap-6 font-medium text-xs uppercase tracking-wider">
               <button
                 onClick={() => setActiveTab("specs")}
                 className={`pb-1 transition-all ${
@@ -426,10 +426,10 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
             { name: "Rahul D.", rating: 5, date: "1 week ago", comment: "Bought this as a gift and she loved it. The packaging was luxury grade and delivery was fast!" },
             { name: "Meera K.", rating: 4.8, date: "2 weeks ago", comment: "Beautiful minimal design. It is very comfortable to wear for long hours. Will buy again!" }
           ].map((rev, idx) => (
-            <div key={idx} className="rounded-3xl border border-goldBeige/60 bg-warmwhite p-6 shadow-sm">
+            <div key={idx} className="rounded-3xl border border-[#F1CFCF]/40 bg-white/55 backdrop-blur-md p-6 shadow-[0_20px_60px_rgba(224,169,165,0.15)] relative z-10">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-sm text-charcoalBrown">{rev.name}</span>
-                <span className="text-[10px] text-stoneGray/60">{rev.date}</span>
+                <span className="text-[10px] text-[#7A6262]">{rev.date}</span>
               </div>
               <div className="flex text-champagne text-xs gap-0.5 mt-2">
                 {[...Array(5)].map((_, i) => (
@@ -455,7 +455,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
                 addToCart(product, quantity);
                 alert("Product added to cart!");
               }}
-              className="rounded-full bg-champagne px-2.5 min-[360px]:px-3.5 py-2 text-xs font-semibold text-charcoalBrown hover:bg-champagne/90 flex items-center gap-1 sm:gap-1.5 shadow-sm"
+              className="rounded-full bg-champagne px-2.5 min-[360px]:px-3.5 py-2 text-xs font-semibold text-[#3B2B2B] hover:bg-champagne/90 flex items-center gap-1 sm:gap-1.5 shadow-sm"
             >
               <ShoppingBag className="h-3.5 w-3.5 shrink-0" />
               <span>Add</span>
@@ -465,7 +465,7 @@ export function ProductDetailsClient({ product, initialSimilar }: { product: Pro
               onClick={() => {
                 addToCart(product, quantity);
               }}
-              className="rounded-full bg-dustyRose px-3 min-[360px]:px-4 py-2 text-xs font-semibold text-white hover:bg-dustyRose/90 text-center whitespace-nowrap"
+              className="rounded-full bg-dustyRose px-3 min-[360px]:px-4 py-2 text-xs font-semibold text-white hover:bg-[#a66a6a]/90 text-center whitespace-nowrap"
             >
               Buy Now
             </Link>

@@ -58,7 +58,7 @@ export default function LoginPage() {
 
   return (
     <section className="mx-auto max-w-md px-4 py-16">
-      <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-5 sm:p-8 shadow-jewel flex flex-col items-stretch text-center">
+      <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-5 sm:p-8 shadow-jewel flex flex-col items-stretch text-center">
         <BrandLogo size={64} className="mb-4 mx-auto" />
         <h1 className="text-3xl font-serif font-semibold text-champagne tracking-wide">Login</h1>
         <form onSubmit={submit} className="mt-6 grid gap-4 text-left">
@@ -71,7 +71,7 @@ export default function LoginPage() {
               type="text" 
               required 
               placeholder="Email or Username" 
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
           <div>
@@ -83,7 +83,7 @@ export default function LoginPage() {
               type="password" 
               required 
               placeholder="Password" 
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
           <button 
@@ -97,7 +97,7 @@ export default function LoginPage() {
 
         <div className="relative my-6 flex items-center justify-center">
           <div className="absolute inset-0 border-t border-goldBeige/30" />
-          <span className="relative bg-warmwhite px-4 text-xs text-stoneGray uppercase tracking-wider">Or</span>
+          <span className="relative bg-white/70 backdrop-blur-md px-4 text-xs text-stoneGray uppercase tracking-wider">Or</span>
         </div>
 
         <button 

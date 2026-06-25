@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { getContactMessages, updateContactMessage, deleteContactMessage } from "@/lib/firestore";
 import { ContactMessage } from "@/types";
-import { Mail, MailOpen, Trash2, CheckCircle2, Loader, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, MailOpen, Trash2, CheckCircle2, CheckCircle, AlertCircle } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -104,15 +107,13 @@ export default function MessagesPage() {
       </div>
 
       {loading ? (
-        <div className="flex h-[40vh] items-center justify-center text-gold">
-          <Loader className="animate-spin" size={32} />
-          <span className="ml-2">Loading messages...</span>
-        </div>
+        <PageLoader text="Loading messages..." />
       ) : messages.length === 0 ? (
-        <div className="rounded-[2rem] border border-gold/15 bg-white/[0.03] p-12 text-center shadow-jewel">
-          <h3 className="text-xl font-serif text-gold">No Messages Received</h3>
-          <p className="text-cream/55 text-sm mt-2">Emails submitted through the contact page will appear here.</p>
-        </div>
+        <EmptyStateCard 
+          icon={Mail}
+          text="No Messages Received" 
+          subtext="Emails submitted through the contact page will appear here." 
+        />
       ) : (
         <div className="space-y-4">
           {paginatedMessages.map((m) => {
@@ -159,7 +160,7 @@ export default function MessagesPage() {
                     }`}
                   >
                     {statusLoadingId === targetId ? (
-                      <Loader className="animate-spin h-3.5 w-3.5" />
+                      <HeartLoader size="sm" text="" />
                     ) : (
                       <CheckCircle2 size={12} />
                     )}
@@ -179,7 +180,7 @@ export default function MessagesPage() {
                       title={m.isRead ? "Mark unread" : "Mark read"}
                     >
                       {statusLoadingId === targetId ? (
-                        <Loader className="animate-spin h-3.5 w-3.5" />
+                        <HeartLoader size="sm" text="" />
                       ) : m.isRead ? (
                         <MailOpen size={14} />
                       ) : (
@@ -194,7 +195,7 @@ export default function MessagesPage() {
                       title="Delete message"
                     >
                       {deleteLoadingId === targetId ? (
-                        <Loader className="animate-spin h-3.5 w-3.5" />
+                        <HeartLoader size="sm" text="" />
                       ) : (
                         <Trash2 size={14} />
                       )}

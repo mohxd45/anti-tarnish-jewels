@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Anti Tarnish Jewels</string>
+    <string name="title_activity_main">Anti Tarnish Jewels</string>
+    <string name="package_name">com.antitarnishjewels.app</string>
+    <string name="custom_url_scheme">com.antitarnishjewels.app</string>
+</resources>

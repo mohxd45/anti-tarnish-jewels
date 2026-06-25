@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { getSEOSettings, saveSEOSettings, uploadImage } from "@/lib/firestore";
 import { SEOSettings } from "@/types";
-import { Save, Loader, Search, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { Save, Search, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 export default function SEOPage() {
   const [seo, setSeo] = useState<SEOSettings | null>(null);
@@ -21,8 +23,9 @@ export default function SEOPage() {
     try {
       const data = await getSEOSettings();
       setSeo(data);
-    } catch {
-      showToast("error", "Failed to fetch SEO settings.");
+    } catch (err: any) {
+      console.error("SEO Settings fetch error:", err);
+      showToast("error", "Failed to fetch SEO settings. " + (err.message || ""));
     }
     setLoading(false);
   }
@@ -59,12 +62,7 @@ export default function SEOPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center text-gold">
-        <Loader className="animate-spin" size={32} />
-        <span className="ml-2 font-medium">Loading SEO metrics...</span>
-      </div>
-    );
+    return <PageLoader text="Loading SEO metrics..." />;
   }
 
   return (
@@ -187,14 +185,17 @@ export default function SEOPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
-          >
-            {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
-            Save SEO Metadata Settings
-          </button>
+          <div className="flex justify-end pt-6">
+            <LoadingButton
+              type="submit"
+              loading={saving}
+              loadingText="Saving..."
+              className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2 shadow-jewel"
+            >
+              <Save size={16} />
+              Save SEO Metadata Settings
+            </LoadingButton>
+          </div>
         </form>
       )}
     </div>

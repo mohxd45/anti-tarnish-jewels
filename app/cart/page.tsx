@@ -4,7 +4,8 @@ import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Trash2, Plus, Minus, X, ShoppingBag, ShieldCheck, Heart, Sparkles } from "lucide-react";
+import { Gift, Package, ShieldCheck, ShoppingBag, Trash2, ArrowLeft, Plus, Minus, X, Sparkles } from "lucide-react";
+import { PublicJewelryBackground } from "@/components/ui/PublicJewelryBackground";
 
 export default function CartPage() {
   const cart = useCart();
@@ -28,16 +29,21 @@ export default function CartPage() {
 
   if (!cart.items.length) {
     return (
-      <section className="mx-auto max-w-xl px-4 py-20 text-center animate-fade-in">
+      <PublicJewelryBackground variant="subtle" intensity="low" className="min-h-screen pt-20" contentClassName="mx-auto max-w-xl px-4 py-20 text-center animate-fade-in">
         <div className="w-20 h-20 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-6">
           <ShoppingBag className="w-10 h-10 text-champagne" />
         </div>
         <h1 className="text-3xl font-serif font-semibold text-charcoalBrown">Your jewellery cart is empty</h1>
-        <p className="mt-4 text-stoneGray">Add premium anti-tarnish, daily-wear pieces to your collection.</p>
-        <Link href="/shop" className="mt-6 inline-block rounded-full bg-champagne px-8 py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all shadow-jewel">
-          Explore Jewellery
+        <p className="mt-4 text-stoneGray leading-relaxed max-w-sm mx-auto">
+          Explore our collections and discover beautiful waterproof pieces.
+        </p>
+        <Link
+          href="/shop"
+          className="mt-8 inline-flex items-center justify-center rounded-full bg-champagne px-8 py-3.5 text-sm font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-jewel hover:shadow-champagne/25"
+        >
+          Explore Collection
         </Link>
-      </section>
+      </PublicJewelryBackground>
     );
   }
 
@@ -51,7 +57,7 @@ export default function CartPage() {
   const giftUnlocked = cart.subtotal >= giftThreshold;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 md:py-10 pb-32">
+    <PublicJewelryBackground variant="subtle" intensity="low" className="min-h-screen" contentClassName="mx-auto max-w-7xl px-4 py-8 md:py-10 pb-32">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl sm:text-4xl font-serif font-semibold text-charcoalBrown">
           Your Jewellery Cart <span className="text-lg text-stoneGray font-sans font-normal">({totalItems} piece{totalItems !== 1 ? 's' : ''})</span>
@@ -68,7 +74,7 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="grid gap-3 h-fit">
           {cart.items.map((item) => (
-            <div key={item.product.id} className="flex gap-2.5 sm:gap-4 rounded-2xl sm:rounded-3xl border border-goldBeige bg-warmwhite p-2.5 sm:p-4 shadow-jewel hover:border-champagne/60 transition-colors">
+            <div key={item.product.id} className="flex gap-2.5 sm:gap-4 rounded-2xl sm:rounded-3xl border border-goldBeige bg-white/70 backdrop-blur-md p-2.5 sm:p-4 shadow-jewel hover:border-champagne/60 transition-colors">
               <Link href={`/product/${item.product.slug}`} className="relative h-20 w-20 min-[360px]:h-24 min-[360px]:w-24 shrink-0 overflow-hidden rounded-2xl bg-beige border border-goldBeige/20">
                 <Image src={item.product.images?.[0] || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600"} alt={item.product.name} fill className="object-cover" sizes="96px" />
               </Link>
@@ -106,7 +112,7 @@ export default function CartPage() {
         </div>
 
         {/* Order Summary sidebar */}
-        <aside className="h-fit lg:sticky lg:top-24 rounded-[2rem] border border-goldBeige bg-warmwhite p-4 sm:p-6 shadow-jewel space-y-5">
+        <aside className="h-fit lg:sticky lg:top-24 rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-4 sm:p-6 shadow-jewel space-y-5">
           <h2 className="text-xl sm:text-2xl font-serif font-semibold text-champagne border-b border-goldBeige/20 pb-3">Order Summary</h2>
           
           {/* Free Shipping Alert & Progress */}
@@ -145,7 +151,7 @@ export default function CartPage() {
                 onChange={(e) => setCode(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
                 placeholder="Promo code (e.g. ATJ20)"
-                className="flex-1 w-full min-w-0 rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm"
+                className="flex-1 w-full min-w-0 rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm"
                 disabled={!!cart.coupon}
               />
               {cart.coupon ? (
@@ -188,11 +194,11 @@ export default function CartPage() {
 
           {/* Trust Policies / Badges */}
           <div className="grid grid-cols-2 gap-2 text-center text-[10px] text-stoneGray border-t border-goldBeige/25 pt-4">
-            <div className="flex flex-col items-center p-2 rounded-xl bg-warmwhite border border-goldBeige/20">
+            <div className="flex flex-col items-center p-2 rounded-xl bg-white/70 backdrop-blur-md border border-goldBeige/20">
               <span className="text-champagne font-bold text-xs mb-0.5">✓ COD Available</span>
               <span>Pay on delivery</span>
             </div>
-            <div className="flex flex-col items-center p-2 rounded-xl bg-warmwhite border border-goldBeige/20">
+            <div className="flex flex-col items-center p-2 rounded-xl bg-white/70 backdrop-blur-md border border-goldBeige/20">
               <span className="text-champagne font-bold text-xs mb-0.5">✓ Easy Returns</span>
               <span>7-day exchange</span>
             </div>
@@ -205,7 +211,6 @@ export default function CartPage() {
           </div>
         </aside>
       </div>
-    </section>
+    </PublicJewelryBackground>
   );
 }
-

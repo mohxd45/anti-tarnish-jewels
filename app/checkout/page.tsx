@@ -7,6 +7,8 @@ import { Address } from "@/types";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Loader, ShieldCheck, Truck, RotateCcw, Lock, ArrowLeft } from "lucide-react";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { PublicJewelryBackground } from "@/components/ui/PublicJewelryBackground";
 
 const countries = [
   { code: "+91", name: "India (+91)" },
@@ -22,7 +24,9 @@ const countries = [
 
 export default function CheckoutPage() {
   return (
-    <CheckoutInner />
+    <PublicJewelryBackground variant="subtle" intensity="low" className="min-h-screen">
+      <CheckoutInner />
+    </PublicJewelryBackground>
   );
 }
 
@@ -103,8 +107,8 @@ function CheckoutInner() {
     setCouponMsg("");
   }
 
-  async function placeOrder(e: React.FormEvent) {
-    e.preventDefault();
+  async function placeOrder(e?: React.FormEvent) {
+    if (e) e.preventDefault();
     if (!user) return setError("Please sign in to place your order.");
     if (!cart.items.length) return setError("Cart is empty.");
 
@@ -286,7 +290,7 @@ function CheckoutInner() {
 
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:py-10 pb-20 lg:grid-cols-[1fr_380px]">
-      <div className="rounded-[2rem] border border-goldBeige bg-warmwhite p-4 sm:p-6 md:p-8 shadow-jewel">
+      <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-4 sm:p-6 md:p-8 shadow-jewel">
         <div className="flex items-center gap-3 border-b border-goldBeige/20 pb-4">
           <Lock className="text-champagne w-6 h-6" />
           <h1 className="text-2xl md:text-3xl font-serif font-semibold text-charcoalBrown">Secure Checkout</h1>
@@ -304,15 +308,15 @@ function CheckoutInner() {
 
             {authMode === "options" && (
               <div className="flex flex-col gap-3.5">
-                <button
+                <LoadingButton
                   type="button"
-                  disabled={authLoading}
+                  loading={authLoading}
+                  loadingText="Connecting..."
                   onClick={handleInlineGoogleLogin}
-                  className="rounded-full border border-goldBeige bg-warmwhite px-6 py-3.5 font-semibold text-champagne hover:bg-champagne/5 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                  className="rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-6 py-3.5 font-semibold text-champagne hover:bg-champagne/5 transition-all flex items-center justify-center gap-2 text-sm"
                 >
-                  {authLoading && <Loader className="animate-spin h-4 w-4" />}
                   Continue with Google
-                </button>
+                </LoadingButton>
                 <button
                   type="button"
                   onClick={() => {
@@ -347,7 +351,7 @@ function CheckoutInner() {
                     value={authEmail}
                     onChange={(e) => setAuthEmail(e.target.value)}
                     placeholder="e.g. aarav@example.com"
-                    className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
+                    className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -359,17 +363,17 @@ function CheckoutInner() {
                     value={authPassword}
                     onChange={(e) => setAuthPassword(e.target.value)}
                     placeholder="Password"
-                    className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
+                    className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
                   />
                 </div>
                 <div className="flex flex-col gap-2 pt-2">
-                  <button
-                    disabled={authLoading}
-                    className="w-full rounded-full bg-champagne py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm shadow-jewel disabled:opacity-50"
+                  <LoadingButton
+                    loading={authLoading}
+                    loadingText="Logging in..."
+                    className="w-full rounded-full bg-champagne py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm shadow-jewel"
                   >
-                    {authLoading && <Loader className="animate-spin h-4 w-4" />}
-                    {authLoading ? "Logging in..." : "Login"}
-                  </button>
+                    Login
+                  </LoadingButton>
                   <button
                     type="button"
                     disabled={authLoading}
@@ -392,7 +396,7 @@ function CheckoutInner() {
                     value={authName}
                     onChange={(e) => setAuthName(e.target.value)}
                     placeholder="e.g. Aarav Sharma"
-                    className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
+                    className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -404,7 +408,7 @@ function CheckoutInner() {
                     value={authEmail}
                     onChange={(e) => setAuthEmail(e.target.value)}
                     placeholder="e.g. aarav@example.com"
-                    className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
+                    className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -414,7 +418,7 @@ function CheckoutInner() {
                       disabled={authLoading}
                       value={authPhoneCountryCode}
                       onChange={(e) => setAuthPhoneCountryCode(e.target.value)}
-                      className="rounded-full border border-goldBeige bg-warmwhite px-2 py-2.5 outline-none text-charcoalBrown focus:border-champagne text-xs w-24 shrink-0 cursor-pointer"
+                      className="rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-2 py-2.5 outline-none text-charcoalBrown focus:border-champagne text-xs w-24 shrink-0 cursor-pointer"
                     >
                       {countries.map((c) => (
                         <option key={c.code} value={c.code}>
@@ -428,7 +432,7 @@ function CheckoutInner() {
                       value={authPhoneNumber}
                       onChange={(e) => setAuthPhoneNumber(e.target.value.replace(/\D/g, ""))}
                       placeholder={authPhoneCountryCode === "+91" ? "10-digit number" : "Phone number"}
-                      className="flex-1 rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm font-mono disabled:opacity-50"
+                      className="flex-1 rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm font-mono disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -441,7 +445,7 @@ function CheckoutInner() {
                     value={authPassword}
                     onChange={(e) => setAuthPassword(e.target.value)}
                     placeholder="Password (min 6 chars)"
-                    className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
+                    className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -453,17 +457,17 @@ function CheckoutInner() {
                     value={authConfirmPassword}
                     onChange={(e) => setAuthConfirmPassword(e.target.value)}
                     placeholder="Confirm Password"
-                    className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
+                    className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2.5 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm disabled:opacity-50"
                   />
                 </div>
                 <div className="flex flex-col gap-2 pt-2">
-                  <button
-                    disabled={authLoading}
-                    className="w-full rounded-full bg-champagne py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm shadow-jewel disabled:opacity-50"
+                  <LoadingButton
+                    loading={authLoading}
+                    loadingText="Creating account..."
+                    className="w-full rounded-full bg-champagne py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm shadow-jewel"
                   >
-                    {authLoading && <Loader className="animate-spin h-4 w-4" />}
-                    {authLoading ? "Creating account..." : "Create Account"}
-                  </button>
+                    Create Account
+                  </LoadingButton>
                   <button
                     type="button"
                     disabled={authLoading}
@@ -497,7 +501,7 @@ function CheckoutInner() {
                   value={address.fullName} 
                   onChange={(e) => setAddress({ ...address, fullName: e.target.value })} 
                   placeholder="e.g. Aarav Sharma" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
                 />
               </div>
 
@@ -509,7 +513,7 @@ function CheckoutInner() {
                     disabled={placingOrder}
                     value={phoneCountryCode}
                     onChange={(e) => setPhoneCountryCode(e.target.value)}
-                    className="rounded-full border border-goldBeige bg-warmwhite px-3 py-3 outline-none text-charcoalBrown focus:border-champagne text-xs w-28 shrink-0 cursor-pointer"
+                    className="rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-3 py-3 outline-none text-charcoalBrown focus:border-champagne text-xs w-28 shrink-0 cursor-pointer"
                   >
                     {countries.map((c) => (
                       <option key={c.code} value={c.code}>
@@ -524,7 +528,7 @@ function CheckoutInner() {
                     value={phoneNumber} 
                     onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))} 
                     placeholder={phoneCountryCode === "+91" ? "10-digit number" : "Phone number"} 
-                    className="flex-1 rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50 font-mono" 
+                    className="flex-1 rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50 font-mono" 
                   />
                 </div>
               </div>
@@ -539,7 +543,7 @@ function CheckoutInner() {
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                   placeholder="e.g. aarav@example.com" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
                 />
               </div>
 
@@ -552,7 +556,7 @@ function CheckoutInner() {
                   value={address.line1} 
                   onChange={(e) => setAddress({ ...address, line1: e.target.value })} 
                   placeholder="Flat, House no., Building, Company, Apartment" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
                 />
               </div>
 
@@ -564,7 +568,7 @@ function CheckoutInner() {
                   value={address.line2 || ""} 
                   onChange={(e) => setAddress({ ...address, line2: e.target.value })} 
                   placeholder="Area, Street, Sector, Village" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
                 />
               </div>
 
@@ -576,7 +580,7 @@ function CheckoutInner() {
                   value={address.landmark || ""} 
                   onChange={(e) => setAddress({ ...address, landmark: e.target.value })} 
                   placeholder="e.g. near Apollo Hospital" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
                 />
               </div>
 
@@ -590,7 +594,7 @@ function CheckoutInner() {
                   value={address.pincode} 
                   onChange={(e) => setAddress({ ...address, pincode: e.target.value.replace(/\D/g, "") })} 
                   placeholder="e.g. 110001" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50 font-mono" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50 font-mono" 
                 />
               </div>
 
@@ -603,7 +607,7 @@ function CheckoutInner() {
                   value={address.city} 
                   onChange={(e) => setAddress({ ...address, city: e.target.value })} 
                   placeholder="e.g. New Delhi" 
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50" 
                 />
               </div>
 
@@ -615,7 +619,7 @@ function CheckoutInner() {
                   disabled={placingOrder}
                   value={address.state}
                   onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                  className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50 cursor-pointer"
+                  className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3 text-sm text-charcoalBrown outline-none focus:border-champagne transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <option value="">Select State</option>
                   {[
@@ -660,7 +664,7 @@ function CheckoutInner() {
 
               {/* Stripe Option */}
               <label 
-                className="flex items-center gap-3 rounded-2xl border border-goldBeige bg-warmwhite p-4 opacity-50 cursor-not-allowed select-none"
+                className="flex items-center gap-3 rounded-2xl border border-goldBeige bg-white/70 backdrop-blur-md p-4 opacity-50 cursor-not-allowed select-none"
               >
                 <input 
                   type="radio" 
@@ -677,7 +681,7 @@ function CheckoutInner() {
 
               {/* Razorpay Option */}
               <label 
-                className="flex items-center gap-3 rounded-2xl border border-goldBeige bg-warmwhite p-4 opacity-50 cursor-not-allowed select-none"
+                className="flex items-center gap-3 rounded-2xl border border-goldBeige bg-white/70 backdrop-blur-md p-4 opacity-50 cursor-not-allowed select-none"
               >
                 <input 
                   type="radio" 
@@ -727,13 +731,16 @@ function CheckoutInner() {
 
             {error && <p className="mt-5 rounded-2xl border border-dustyRose/40 p-3 text-sm text-dustyRose bg-dustyRose/5">{error}</p>}
 
-            <button 
-              disabled={placingOrder || !confirmedDetails} 
-              className="mt-8 w-full sm:w-auto rounded-full bg-champagne px-8 py-4 font-semibold text-charcoalBrown hover:opacity-90 transition-all text-center shadow-jewel disabled:opacity-50 flex items-center justify-center gap-2 animate-pulse"
+            <LoadingButton
+              type="button"
+              onClick={placeOrder}
+              disabled={placingOrder || !confirmedDetails}
+              loading={placingOrder}
+              loadingText="Placing Order..."
+              className="mt-8 w-full sm:w-auto rounded-full bg-champagne px-8 py-4 font-semibold text-charcoalBrown hover:opacity-90 transition-all text-center shadow-jewel"
             >
-              {placingOrder && <Loader className="animate-spin h-4 w-4" />}
-              {placingOrder ? "Placing Order..." : "Place Order Securely"}
-            </button>
+              Place Order Securely
+            </LoadingButton>
 
             {/* Trust Guarantees */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-goldBeige/25 pt-6 text-stoneGray text-xs">
@@ -754,7 +761,7 @@ function CheckoutInner() {
         )}
       </div>
 
-      <aside className="h-fit rounded-[2rem] border border-goldBeige bg-warmwhite p-4 sm:p-6 shadow-jewel space-y-6">
+      <aside className="h-fit rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-4 sm:p-6 shadow-jewel space-y-6">
         <div>
           <h2 className="text-xl font-serif font-semibold text-champagne border-b border-goldBeige/20 pb-3">Order Summary</h2>
           <div className="mt-4 divide-y divide-goldBeige/25 max-h-[220px] overflow-y-auto pr-2">
@@ -779,7 +786,7 @@ function CheckoutInner() {
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
               placeholder="e.g. WELCOME10"
-              className="flex-1 rounded-full border border-goldBeige bg-warmwhite px-4 py-2 text-sm outline-none text-charcoalBrown focus:border-champagne transition-all"
+              className="flex-1 rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-4 py-2 text-sm outline-none text-charcoalBrown focus:border-champagne transition-all"
               disabled={!!cart.coupon}
             />
             {cart.coupon ? (

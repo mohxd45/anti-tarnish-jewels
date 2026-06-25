@@ -5,7 +5,9 @@ import { getProducts, getAllOrders, getUsers, getContactMessages } from "@/lib/f
 import { Product, Order } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
-import { ArrowRight, ShoppingBag, DollarSign, Package, AlertTriangle, ListOrdered, Users, Mail, CheckCircle2, CreditCard } from "lucide-react";
+import { ArrowRight, ShoppingBag, DollarSign, Package, AlertTriangle, ListOrdered, Users, Mail, CheckCircle2, CreditCard, CheckCircle } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -34,33 +36,46 @@ export default function AdminPage() {
 
       // Step 2: fetch fresh metrics in the background (slower)
       try {
-        const freshProducts = await getProducts(true);
-        const freshOrders = await getAllOrders(true);
-        const freshUsers = await getUsers(true);
-        const freshMsgs = await getContactMessages();
+        const [freshProducts, freshOrders, freshUsers, freshMsgs] = await Promise.allSettled([
+          getProducts(true),
+          getAllOrders(true),
+          getUsers(true),
+          getContactMessages()
+        ]);
 
-        setProducts(freshProducts);
-        setOrders(freshOrders);
-        setUserCount(freshUsers.length);
-        setMsgCount(freshMsgs.filter(m => !m.isRead).length);
+        if (freshProducts.status === "fulfilled") setProducts(freshProducts.value);
+        if (freshOrders.status === "fulfilled") setOrders(freshOrders.value);
+        if (freshUsers.status === "fulfilled") setUserCount(freshUsers.value.length);
+        if (freshMsgs.status === "fulfilled") setMsgCount(freshMsgs.value.filter(m => !m.isRead).length);
       } catch (err) {
         console.error("Error loading fresh dashboard metrics in background", err);
+      } finally {
+        setLoading(false);
       }
     }
     loadData();
   }, []);
 
   // Compute Stats
-  const activeOrders = orders.filter(o => o.status !== "Cancelled" && o.status !== "Returned");
+  const activeOrders = orders.filter(o => {
+    const s = (o.status || "").toLowerCase().trim();
+    return s !== "cancelled" && s !== "canceled" && s !== "returned" && s !== "failed";
+  });
   const totalSales = activeOrders.reduce((sum, o) => sum + (o.total || 0), 0);
   const totalOrders = orders.length;
-  const pendingOrders = orders.filter((o) => o.status === "Pending" || o.status === "Pending Verification").length;
-  const confirmedOrders = orders.filter((o) => o.status === "Confirmed").length;
-  const deliveredOrders = orders.filter((o) => o.status === "Delivered").length;
-  const cancelledOrders = orders.filter((o) => o.status === "Cancelled").length;
+  const pendingOrders = orders.filter((o) => {
+    const s = (o.status || "").toLowerCase().trim();
+    return s === "pending" || s === "pending verification";
+  }).length;
+  const confirmedOrders = orders.filter((o) => (o.status || "").toLowerCase().trim() === "confirmed").length;
+  const deliveredOrders = orders.filter((o) => (o.status || "").toLowerCase().trim() === "delivered").length;
+  const cancelledOrders = orders.filter((o) => {
+    const s = (o.status || "").toLowerCase().trim();
+    return s === "cancelled" || s === "canceled";
+  }).length;
   const codOrders = orders.filter((o) => (o.paymentMethod || "").toLowerCase().includes("delivery") || (o.paymentMethod || "").toLowerCase() === "cod").length;
   const totalProducts = products.length;
-  const lowStockCount = products.filter((p) => p.stock !== undefined && p.stock !== null && p.stock < 8).length;
+  const lowStockCount = products.filter((p) => p.stock !== undefined && p.stock !== null && p.stock <= 5).length;
 
   const stats = [
     { label: "Total Sales", value: formatPrice(totalSales), icon: DollarSign, color: "text-emerald-500" },
@@ -91,7 +106,9 @@ export default function AdminPage() {
             <div key={stat.label} className="rounded-3xl border border-goldBeige bg-warmwhite p-5 flex items-center justify-between shadow-jewel">
               <div className="min-w-0 flex-1 pr-2">
                 <p className="text-[10px] uppercase tracking-wider text-stoneGray truncate block">{stat.label}</p>
-                <h2 className="mt-1.5 text-xl lg:text-2xl font-serif font-semibold text-champagne truncate">{loading ? "..." : stat.value}</h2>
+                <h2 className="mt-1.5 text-xl lg:text-2xl font-serif font-semibold text-champagne truncate">
+                  {loading ? <HeartLoader size="sm" text="" /> : stat.value}
+                </h2>
               </div>
               <div className={`p-2.5 rounded-2xl bg-beige border border-goldBeige/40 shrink-0 ${iconColor}`}>
                 <Icon size={18} />
@@ -111,7 +128,9 @@ export default function AdminPage() {
               <p className="text-xs text-stoneGray mt-0.5">Manage Customer spends and roles</p>
             </div>
           </div>
-          <span className="text-xl font-bold text-champagne">{loading ? "..." : userCount}</span>
+          <span className="text-xl font-bold text-champagne">
+            {loading ? <HeartLoader size="sm" text="" /> : userCount}
+          </span>
         </Link>
         
         <Link href="/admin/messages" className="rounded-3xl border border-goldBeige bg-warmwhite p-6 hover:border-champagne/40 transition-all flex items-center justify-between shadow-sm">
@@ -122,7 +141,9 @@ export default function AdminPage() {
               <p className="text-xs text-stoneGray mt-0.5">Customer feedback and query emails</p>
             </div>
           </div>
-          <span className="text-xl font-bold text-dustyRose">{loading ? "..." : msgCount}</span>
+          <span className="text-xl font-bold text-dustyRose">
+            {loading ? <HeartLoader size="sm" text="" /> : msgCount}
+          </span>
         </Link>
       </div>
 
@@ -137,9 +158,13 @@ export default function AdminPage() {
             <Link href="/admin/orders" className="text-xs text-champagne hover:underline">View All</Link>
           </div>
           {loading ? (
-            <p className="text-sm text-stoneGray py-10 text-center">Loading recent orders...</p>
+            <div className="py-10 flex justify-center"><HeartLoader size="sm" text="Loading recent orders..." /></div>
           ) : orders.length === 0 ? (
-            <p className="text-sm text-stoneGray py-10 text-center">No orders placed yet.</p>
+            <EmptyStateCard 
+              icon={ShoppingBag} 
+              text="No orders placed yet" 
+              subtext="" 
+            />
           ) : (
             <div className="divide-y divide-goldBeige/25 space-y-3">
               {orders.slice(0, 5).map((order) => (
@@ -167,12 +192,16 @@ export default function AdminPage() {
             <Link href="/admin/products" className="text-xs text-champagne hover:underline">View Inventory</Link>
           </div>
           {loading ? (
-            <p className="text-sm text-stoneGray py-10 text-center">Loading inventory...</p>
-          ) : products.filter((p) => (p.stock ?? Infinity) < 8).length === 0 ? (
-            <p className="text-sm text-emerald-600 py-10 text-center">All products are healthy in stock!</p>
+            <div className="py-10 flex justify-center"><HeartLoader size="sm" text="Loading inventory..." /></div>
+          ) : products.filter((p) => p.stock !== undefined && p.stock !== null && p.stock <= 5).length === 0 ? (
+            <EmptyStateCard 
+              icon={CheckCircle} 
+              text="Stock looks good" 
+              subtext="All products are healthy in stock!" 
+            />
           ) : (
             <div className="divide-y divide-goldBeige/25 space-y-3">
-              {products.filter((p) => (p.stock ?? Infinity) < 8).slice(0, 5).map((p) => (
+              {products.filter((p) => p.stock !== undefined && p.stock !== null && p.stock <= 5).slice(0, 5).map((p) => (
                 <div key={p.id} className="pt-3 flex justify-between items-center text-sm">
                   <div>
                     <p className="font-serif font-semibold text-charcoalBrown">{p.name}</p>

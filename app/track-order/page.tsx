@@ -6,6 +6,8 @@ import { getWhatsAppNumber, createWhatsAppUrl } from "@/lib/whatsapp";
 import { Order, OrderStatus } from "@/types";
 import { Truck, CheckCircle2, AlertCircle, Search, Calendar, ShieldCheck, Phone } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 
 const steps: { label: string; status: OrderStatus }[] = [
   { label: "Ordered", status: "Pending" },
@@ -106,7 +108,7 @@ export default function TrackOrderPage() {
         <p className="mt-3 text-sm text-stoneGray">Enter your order/tracking number and phone number to verify details</p>
       </div>
 
-      <form onSubmit={handleTrack} className="max-w-md mx-auto space-y-4 rounded-3xl border border-goldBeige bg-warmwhite p-6 md:p-8 shadow-jewel">
+      <form onSubmit={handleTrack} className="max-w-md mx-auto space-y-4 rounded-3xl border border-goldBeige bg-white/70 backdrop-blur-md p-6 md:p-8 shadow-jewel">
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-[#2E2823] uppercase tracking-wider">
             Order or Tracking Number
@@ -117,7 +119,7 @@ export default function TrackOrderPage() {
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               placeholder="Example: ATJ-20260608-1001"
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3.5 pl-11 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm uppercase tracking-wider"
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3.5 pl-11 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm uppercase tracking-wider"
             />
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-champagne/60" />
           </div>
@@ -134,53 +136,49 @@ export default function TrackOrderPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g. +91 98765 43210"
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-5 py-3.5 pl-11 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm tracking-wider"
+              className="w-full rounded-full border border-goldBeige bg-white/70 backdrop-blur-md px-5 py-3.5 pl-11 outline-none text-charcoalBrown focus:border-champagne transition-all text-sm tracking-wider"
             />
             <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-champagne/60" />
           </div>
         </div>
 
-        <button
+        <LoadingButton
           type="submit"
-          disabled={loading}
+          loading={loading}
+          loadingText="Verifying..."
           className="w-full rounded-full bg-champagne py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all text-sm shadow-jewel flex items-center justify-center gap-2"
         >
-          {loading ? "Verifying..." : "Track Shipment"}
-        </button>
+          Track Shipment
+        </LoadingButton>
       </form>
 
-      {/* Error state */}
       {searched && error && (
-        <div className="mt-8 rounded-3xl border border-dustyRose/20 bg-dustyRose/5 p-6 max-w-md mx-auto flex flex-col items-center text-center gap-4 animate-fade-in">
-          <div className="flex items-start gap-3 text-left w-full">
-            <AlertCircle className="text-dustyRose shrink-0 mt-0.5" size={20} />
-            <div>
-              <h4 className="font-semibold text-dustyRose text-sm">Tracking Error</h4>
-              <p className="text-stoneGray text-xs mt-1 leading-5">
-                Order not found. Please check your order/tracking number and phone number, or contact support.
-              </p>
-            </div>
-          </div>
-          
-          {whatsAppNumber && (
-            <a
-              href={createWhatsAppUrl(
-                whatsAppNumber,
-                `Hi Anti Tarnish Jewels, I need help tracking my order. My order/tracking number is: ${orderId.trim()}`
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full rounded-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 font-semibold text-center transition-all text-sm shadow-sm flex items-center justify-center gap-2 mt-2"
-            >
-              <span>Need help? Contact us on WhatsApp.</span>
-            </a>
-          )}
+        <div className="mt-8">
+          <EmptyStateCard 
+            icon={AlertCircle} 
+            text="Tracking Error" 
+            subtext="Order not found. Please check your order/tracking number and phone number, or contact support." 
+          >
+            {whatsAppNumber && (
+              <a
+                href={createWhatsAppUrl(
+                  whatsAppNumber,
+                  `Hi Anti Tarnish Jewels, I need help tracking my order. My order/tracking number is: ${orderId.trim()}`
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full rounded-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 font-semibold text-center transition-all text-sm shadow-sm flex items-center justify-center gap-2"
+              >
+                <span>Need help? Contact us on WhatsApp.</span>
+              </a>
+            )}
+          </EmptyStateCard>
         </div>
       )}
 
       {/* Tracking results */}
       {searched && order && (
-        <div className="mt-10 rounded-[2rem] border border-goldBeige bg-warmwhite p-6 md:p-8 shadow-jewel space-y-8 animate-fade-in">
+        <div className="mt-10 rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 md:p-8 shadow-jewel space-y-8 animate-fade-in">
           
           {/* Summary Row */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-goldBeige/40 pb-5">
@@ -253,7 +251,7 @@ export default function TrackOrderPage() {
                         className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
                           isCompleted
                             ? "bg-champagne border-champagne text-charcoalBrown shadow-jewel shadow-champagne/25"
-                            : "bg-warmwhite border-goldBeige text-stoneGray/30"
+                            : "bg-white/70 backdrop-blur-md border-goldBeige text-stoneGray/30"
                         }`}
                       >
                         {isCompleted ? <CheckCircle2 size={16} className="stroke-[2.5]" /> : <span className="text-[10px]">{idx + 1}</span>}

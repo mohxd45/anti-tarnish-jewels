@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { getSiteContent, saveSiteContent } from "@/lib/firestore";
 import { SiteContent } from "@/types";
-import { Save, AlertCircle, CheckCircle, Loader } from "lucide-react";
+import { Save, AlertCircle, CheckCircle } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 type TabId = "home" | "about" | "faq" | "policies";
 
@@ -60,12 +62,7 @@ export default function SiteContentPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center text-gold">
-        <Loader className="animate-spin" size={32} />
-        <span className="ml-2 font-medium">Loading content data...</span>
-      </div>
-    );
+    return <PageLoader text="Loading content data..." />;
   }
 
   return (
@@ -164,14 +161,15 @@ export default function SiteContentPage() {
               />
             </div>
 
-            <button
+            <LoadingButton
               onClick={() => handleSave("home", ["heroTitle", "heroSubtitle", "heroCtaText", "promotionalText", "footerText"])}
-              disabled={saving}
+              loading={saving}
+              loadingText="Saving..."
               className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
             >
-              {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
+              <Save size={16} />
               Save Homepage Copy
-            </button>
+            </LoadingButton>
           </div>
         )}
 
@@ -189,14 +187,15 @@ export default function SiteContentPage() {
               />
             </div>
 
-            <button
+            <LoadingButton
               onClick={() => handleSave("about", ["aboutText"])}
-              disabled={saving}
+              loading={saving}
+              loadingText="Saving..."
               className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
             >
-              {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
+              <Save size={16} />
               Save About copy
-            </button>
+            </LoadingButton>
           </div>
         )}
 
@@ -214,14 +213,15 @@ export default function SiteContentPage() {
               />
             </div>
 
-            <button
+            <LoadingButton
               onClick={() => handleSave("faq", ["faqText"])}
-              disabled={saving}
+              loading={saving}
+              loadingText="Saving..."
               className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
             >
-              {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
+              <Save size={16} />
               Save FAQ Content
-            </button>
+            </LoadingButton>
           </div>
         )}
 
@@ -249,14 +249,15 @@ export default function SiteContentPage() {
               />
             </div>
 
-            <button
+            <LoadingButton
               onClick={() => handleSave("policies", ["returnPolicyText", "privacyPolicyText"])}
-              disabled={saving}
+              loading={saving}
+              loadingText="Saving..."
               className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
             >
-              {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
+              <Save size={16} />
               Save Policies Copy
-            </button>
+            </LoadingButton>
           </div>
         )}
       </div>

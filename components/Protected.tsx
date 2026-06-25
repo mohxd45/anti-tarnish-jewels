@@ -53,7 +53,7 @@ export function Protected({ children, adminOnly = false }: { children: React.Rea
               <Link href="/login" className="flex items-center justify-center gap-2 rounded-full bg-champagne px-6 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors">
                 Login with Email
               </Link>
-              <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-goldBeige/60 bg-warmwhite px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
+              <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-goldBeige/60 bg-white/70 backdrop-blur-md px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
                 Create Account
               </Link>
             </>

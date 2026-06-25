@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader } from "lucide-react";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import { BrandLogo } from "@/components/BrandLogo";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -83,13 +84,13 @@ export default function AdminLoginPage() {
               className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-3 outline-none text-charcoalBrown focus:border-champagne transition-all disabled:opacity-55 text-sm" 
             />
           </div>
-          <button 
-            disabled={loading} 
+          <LoadingButton 
+            loading={loading}
+            loadingText="Authenticating..."
             className="w-full rounded-full bg-champagne px-5 py-3.5 font-semibold text-charcoalBrown hover:opacity-90 transition-all disabled:opacity-55 flex items-center justify-center gap-2 text-sm shadow-jewel"
           >
-            {loading && <Loader className="animate-spin h-4 w-4" />}
-            {loading ? "Authenticating..." : "Secure Login"}
-          </button>
+            Secure Login
+          </LoadingButton>
         </form>
         
         {message && <p className="mt-6 text-sm text-dustyRose font-medium bg-dustyRose/5 border border-dustyRose/20 p-2.5 rounded-2xl">{message}</p>}

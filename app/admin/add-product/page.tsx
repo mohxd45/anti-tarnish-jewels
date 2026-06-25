@@ -7,6 +7,7 @@ import { Product, Category } from "@/types";
 import { slugify } from "@/lib/utils";
 import { X, Sparkles, Image as ImageIcon, Upload, Loader, Plus, ToggleLeft, ToggleRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -154,7 +155,7 @@ export default function AddProductPage() {
       const finalSalePrice = isNaN(Number(salePrice)) ? 0 : Number(salePrice);
       const finalRegularPrice = isNaN(Number(regularPrice)) ? finalSalePrice : Number(regularPrice);
       const discountPercentage = finalRegularPrice ? Math.round(((finalRegularPrice - finalSalePrice) / finalRegularPrice) * 100) : 0;
-      const finalImages = images && images.length ? images : ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop"];
+      const finalImages = images && images.length > 0 ? images : ["/product-placeholder.png"];
 
       // Safe slug generation
       const baseSlug = slugify(name);
@@ -171,6 +172,7 @@ export default function AddProductPage() {
         salePrice: finalSalePrice,
         discountPercentage: discountPercentage > 0 ? discountPercentage : 0,
         images: finalImages,
+        thumbnail: finalImages[0],
         stock: Number(stock),
         rating: 4.5,
         reviewCount: 0,
@@ -239,7 +241,7 @@ export default function AddProductPage() {
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-stoneGray">Fetching categories catalog...</div>
+          <HeartLoader text="Fetching categories catalog..." />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 rounded-[2rem] border border-goldBeige bg-warmwhite p-4 sm:p-8">
             
@@ -717,7 +719,7 @@ export default function AddProductPage() {
                 disabled={saving}
                 className="w-full rounded-full bg-champagne px-6 py-4 font-semibold text-noir hover:bg-champagne-light transition-all flex items-center justify-center gap-2 shadow-jewel text-sm"
               >
-                {saving ? "Saving Product..." : "Create Product Record"}
+                {saving ? <HeartLoader size="sm" text="Saving..." /> : "Create Product Record"}
               </button>
               {message && (
                 <p className={`text-sm ${message.includes("successfully") ? "text-emerald-400" : "text-dustyRose"}`}>

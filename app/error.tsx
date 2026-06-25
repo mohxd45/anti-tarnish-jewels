@@ -37,7 +37,7 @@ export default function Error({
 
         {/* Error detail (only in dev) */}
         {process.env.NODE_ENV === "development" && (
-          <pre className="text-left text-xs bg-beige border border-goldBeige rounded-2xl p-4 mb-6 text-dustyRose overflow-auto max-h-40">
+          <pre className="text-left text-xs bg-beige border border-[#F1CFCF]/50 rounded-2xl p-4 mb-6 text-dustyRose overflow-auto max-h-40">
             {error.message}
           </pre>
         )}
@@ -52,7 +52,7 @@ export default function Error({
           </button>
           <Link
             href="/"
-            className="rounded-full border border-goldBeige px-7 py-3 font-semibold text-champagne hover:bg-champagne/10 transition-colors text-sm"
+            className="rounded-full border border-[#F1CFCF]/50 px-7 py-3 font-semibold text-champagne hover:bg-champagne/10 transition-colors text-sm"
           >
             Go Home
           </Link>

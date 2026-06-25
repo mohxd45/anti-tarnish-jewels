@@ -25,8 +25,9 @@ export default function HomepageSectionsPage() {
         setSections(fetchedSections.sort((a, b) => a.order - b.order));
         setProducts(fetchedProducts);
         setCategories(fetchedCategories);
-      } catch {
-        showToast("error", "Failed to fetch homepage sections structure.");
+      } catch (err: any) {
+        console.error("Home Layout fetch error:", err);
+        showToast("error", "Failed to fetch homepage sections structure. " + (err.message || ""));
       }
       setLoading(false);
     }

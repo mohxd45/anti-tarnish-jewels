@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { getReviews, updateReview, deleteReview } from "@/lib/firestore";
-import { Star, Check, X, Trash2, Loader, CheckCircle, AlertCircle } from "lucide-react";
+import { Star, Check, X, Trash2, CheckCircle, AlertCircle } from "lucide-react";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -85,15 +88,13 @@ export default function ReviewsPage() {
       </div>
 
       {loading ? (
-        <div className="flex h-[40vh] items-center justify-center text-gold">
-          <Loader className="animate-spin" size={32} />
-          <span className="ml-2">Loading reviews...</span>
-        </div>
+        <PageLoader text="Loading reviews..." />
       ) : reviews.length === 0 ? (
-        <div className="rounded-[2rem] border border-gold/15 bg-white/[0.03] p-12 text-center shadow-jewel">
-          <h3 className="text-xl font-serif text-gold">No Reviews Submitted</h3>
-          <p className="text-cream/55 text-sm mt-2">Reviews posted by users will populate here for moderator vetting.</p>
-        </div>
+        <EmptyStateCard 
+          icon={Star} 
+          text="No Reviews Submitted" 
+          subtext="Reviews posted by users will populate here for moderator vetting." 
+        />
       ) : (
         <div className="grid gap-4">
           {paginatedReviews.map((r) => (
@@ -144,7 +145,7 @@ export default function ReviewsPage() {
                     title={r.active ? "Hide review" : "Approve review"}
                   >
                     {statusLoadingId === r.id ? (
-                      <Loader className="animate-spin h-3.5 w-3.5" />
+                      <HeartLoader size="sm" text="" />
                     ) : r.active ? (
                       <X size={14} />
                     ) : (
@@ -159,7 +160,7 @@ export default function ReviewsPage() {
                     title="Delete permanently"
                   >
                     {deleteLoadingId === r.id ? (
-                      <Loader className="animate-spin h-3.5 w-3.5" />
+                      <HeartLoader size="sm" text="" />
                     ) : (
                       <Trash2 size={14} />
                     )}
