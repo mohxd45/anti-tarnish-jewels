@@ -248,7 +248,7 @@ function Bestsellers() {
   useEffect(() => {
     getProducts().then(products => {
       // Get products marked as bestselling or just top 3
-      let bestsellers = products.filter(p => p.isBestselling || p.tags?.includes("bestseller"));
+      let bestsellers = products.filter(p => p.isBestSeller);
       if (bestsellers.length < 3) {
         bestsellers = products; // Fallback if no bestsellers marked
       }
