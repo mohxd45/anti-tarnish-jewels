@@ -4,7 +4,9 @@ import { Product } from "@/types";
 import { ProductCard } from "@/components/ProductCard";
 import { useMemo, useState, useEffect } from "react";
 import { getCategories } from "@/lib/firestore";
-import { Filter, X, ChevronDown, ChevronUp, Star, RotateCcw, Search } from "lucide-react";
+import { Filter, X, ChevronDown, ChevronUp, Star, RotateCcw, Search, PackageSearch } from "lucide-react";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { PublicJewelryBackground } from "./ui/PublicJewelryBackground";
 
 interface ProductGridProps {
   products: Product[];
@@ -328,11 +330,11 @@ export function ProductGrid({
   const renderFiltersContent = () => (
     <div className="flex flex-col gap-6 text-charcoalBrown/85">
       {/* Reset button */}
-      <div className="flex items-center justify-between border-b border-goldBeige/40 pb-4">
+      <div className="flex items-center justify-between border-b border-ink/10 pb-4">
         <span className="text-lg font-serif font-medium text-champagne uppercase tracking-wider">Filters</span>
         <button
           onClick={resetFilters}
-          className="flex items-center gap-1 text-xs text-dustyRose hover:text-dustyRose/90 transition-colors"
+          className="flex items-center gap-1 text-xs text-[#C98484] hover:text-[#C98484]/90 transition-colors"
         >
           <RotateCcw size={12} />
           Reset All
@@ -340,10 +342,10 @@ export function ProductGrid({
       </div>
 
       {/* Categories Section */}
-      <div className="border-b border-goldBeige/30 pb-4">
+      <div className="border-b border-ink/10 pb-4">
         <button
           onClick={() => toggleSection("categories")}
-          className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+          className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
         >
           <span>Category</span>
           {openSections.categories ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -358,9 +360,9 @@ export function ProductGrid({
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleMultiSelect(cat, selectedCategories, setSelectedCategories)}
-                    className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                    className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
                   />
-                  <span className={isChecked ? "text-champagne font-semibold" : "hover:text-charcoalBrown/90"}>{cat}</span>
+                  <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{cat}</span>
                 </label>
               );
             })}
@@ -370,10 +372,10 @@ export function ProductGrid({
 
       {/* Materials Section */}
       {materials.length > 0 && (
-        <div className="border-b border-goldBeige/30 pb-4">
+        <div className="border-b border-ink/10 pb-4">
           <button
             onClick={() => toggleSection("materials")}
-            className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+            className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
           >
             <span>Material</span>
             {openSections.materials ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -388,9 +390,9 @@ export function ProductGrid({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMultiSelect(m, selectedMaterials, setSelectedMaterials)}
-                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
                     />
-                    <span className={isChecked ? "text-champagne font-semibold" : "hover:text-charcoalBrown/90"}>{m}</span>
+                    <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{m}</span>
                   </label>
                 );
               })}
@@ -401,10 +403,10 @@ export function ProductGrid({
 
       {/* Occasions Section */}
       {occasions.length > 0 && (
-        <div className="border-b border-goldBeige/30 pb-4">
+        <div className="border-b border-ink/10 pb-4">
           <button
             onClick={() => toggleSection("occasions")}
-            className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+            className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
           >
             <span>Occasion</span>
             {openSections.occasions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -419,9 +421,9 @@ export function ProductGrid({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMultiSelect(o, selectedOccasions, setSelectedOccasions)}
-                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
                     />
-                    <span className={isChecked ? "text-champagne font-semibold" : "hover:text-charcoalBrown/90"}>{o}</span>
+                    <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{o}</span>
                   </label>
                 );
               })}
@@ -432,10 +434,10 @@ export function ProductGrid({
 
       {/* Collections Section */}
       {collections.length > 0 && (
-        <div className="border-b border-goldBeige/30 pb-4">
+        <div className="border-b border-ink/10 pb-4">
           <button
             onClick={() => toggleSection("collections")}
-            className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+            className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
           >
             <span>Collection</span>
             {openSections.collections ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -450,9 +452,9 @@ export function ProductGrid({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMultiSelect(col, selectedCollections, setSelectedCollections)}
-                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
                     />
-                    <span className={isChecked ? "text-champagne font-semibold" : "hover:text-charcoalBrown/90"}>{col}</span>
+                    <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{col}</span>
                   </label>
                 );
               })}
@@ -462,10 +464,10 @@ export function ProductGrid({
       )}
 
       {/* Price Range Section */}
-      <div className="border-b border-goldBeige/30 pb-4">
+      <div className="border-b border-ink/10 pb-4">
         <button
           onClick={() => toggleSection("price")}
-          className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+          className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
         >
           <span>Price Range</span>
           {openSections.price ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -485,9 +487,9 @@ export function ProductGrid({
                   name="priceRange"
                   checked={priceRange === pOpt.value}
                   onChange={() => setPriceRange(pOpt.value)}
-                  className="accent-champagne h-4 w-4 border-goldBeige/60 bg-warmwhite text-champagne"
+                  className="accent-champagne h-4 w-4 border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
                 />
-                <span className={priceRange === pOpt.value ? "text-champagne font-semibold" : ""}>{pOpt.label}</span>
+                <span className={priceRange === pOpt.value ? "text-[#C98484] font-semibold" : ""}>{pOpt.label}</span>
               </label>
             ))}
 
@@ -498,15 +500,15 @@ export function ProductGrid({
                   placeholder="Min"
                   value={customMinPrice}
                   onChange={(e) => setCustomMinPrice(e.target.value)}
-                  className="w-full rounded-lg border border-goldBeige bg-warmwhite px-2.5 py-1.5 text-xs text-charcoalBrown outline-none focus:border-champagne"
+                  className="w-full rounded-lg border border-goldBeige bg-white/70 backdrop-blur-md px-2.5 py-1.5 text-xs text-[#3B2B2B] outline-none focus:border-[#C98484]"
                 />
-                <span className="text-stoneGray">-</span>
+                <span className="text-[#6F5555]">-</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={customMaxPrice}
                   onChange={(e) => setCustomMaxPrice(e.target.value)}
-                  className="w-full rounded-lg border border-goldBeige bg-warmwhite px-2.5 py-1.5 text-xs text-charcoalBrown outline-none focus:border-champagne"
+                  className="w-full rounded-lg border border-goldBeige bg-white/70 backdrop-blur-md px-2.5 py-1.5 text-xs text-[#3B2B2B] outline-none focus:border-[#C98484]"
                 />
               </div>
             )}
@@ -515,10 +517,10 @@ export function ProductGrid({
       </div>
 
       {/* Customer Ratings Section */}
-      <div className="border-b border-goldBeige/30 pb-4">
+      <div className="border-b border-ink/10 pb-4">
         <button
           onClick={() => toggleSection("rating")}
-          className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+          className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
         >
           <span>Customer Rating</span>
           {openSections.rating ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -532,9 +534,9 @@ export function ProductGrid({
                   name="rating"
                   checked={selectedRating === starVal}
                   onChange={() => setSelectedRating(starVal)}
-                  className="accent-champagne h-4 w-4 border-goldBeige/60 bg-warmwhite text-champagne"
+                  className="accent-champagne h-4 w-4 border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
                 />
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 text-[#3B2B2B]">
                   {starVal}★ & above
                 </span>
               </label>
@@ -545,9 +547,9 @@ export function ProductGrid({
                 name="rating"
                 checked={selectedRating === null}
                 onChange={() => setSelectedRating(null)}
-                className="accent-champagne h-4 w-4 border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span>Any Rating</span>
+              <span className="text-[#3B2B2B]">Any Rating</span>
             </label>
           </div>
         )}
@@ -555,10 +557,10 @@ export function ProductGrid({
 
       {/* Attributes Section (Colors Only) */}
       {colors.length > 0 && (
-        <div className="border-b border-goldBeige/30 pb-4">
+        <div className="border-b border-ink/10 pb-4">
           <button
             onClick={() => toggleSection("attributes")}
-            className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+            className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
           >
             <span>Color Specs</span>
             {openSections.attributes ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -575,8 +577,8 @@ export function ProductGrid({
                         onClick={() => toggleMultiSelect(c, selectedColors, setSelectedColors)}
                         className={`rounded-full border px-3 py-1 text-xs transition-colors ${
                           isSel
-                            ? "bg-champagne text-charcoalBrown border-champagne font-semibold"
-                            : "border-goldBeige/60 bg-ivory hover:border-champagne/50 hover:text-champagne"
+                            ? "bg-[#E0A9A5] text-white border-[#E0A9A5] font-semibold"
+                            : "border-goldBeige/60 bg-ivory hover:border-[#F1CFCF] hover:text-[#C98484]"
                         }`}
                       >
                         {c}
@@ -594,7 +596,7 @@ export function ProductGrid({
       <div className="pb-4">
         <button
           onClick={() => toggleSection("stock")}
-          className="flex w-full items-center justify-between font-medium text-charcoalBrown hover:text-champagne transition-colors"
+          className="flex w-full items-center justify-between font-medium text-[#3B2B2B] hover:text-[#C98484] transition-colors"
         >
           <span>Availability & Attributes</span>
           {openSections.stock ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -606,58 +608,58 @@ export function ProductGrid({
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={() => setInStockOnly(!inStockOnly)}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span className={inStockOnly ? "text-champagne font-semibold" : ""}>In Stock Only</span>
+              <span className={inStockOnly ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>In Stock Only</span>
             </label>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={waterproofOnly}
                 onChange={() => setWaterproofOnly(!waterproofOnly)}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span className={waterproofOnly ? "text-champagne font-semibold" : ""}>Waterproof Only</span>
+              <span className={waterproofOnly ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Waterproof Only</span>
             </label>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={antiTarnishOnly}
                 onChange={() => setAntiTarnishOnly(!antiTarnishOnly)}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span className={antiTarnishOnly ? "text-champagne font-semibold" : ""}>Anti-Tarnish Only</span>
+              <span className={antiTarnishOnly ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Anti-Tarnish Only</span>
             </label>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={flags.isNewArrival}
                 onChange={() => setFlags((prev) => ({ ...prev, isNewArrival: !prev.isNewArrival }))}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span className={flags.isNewArrival ? "text-champagne font-semibold" : ""}>New Arrivals</span>
+              <span className={flags.isNewArrival ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>New Arrivals</span>
             </label>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={flags.isBestSeller}
                 onChange={() => setFlags((prev) => ({ ...prev, isBestSeller: !prev.isBestSeller }))}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span className={flags.isBestSeller ? "text-champagne font-semibold" : ""}>Best Sellers</span>
+              <span className={flags.isBestSeller ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Best Sellers</span>
             </label>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={flags.isFlashDeal}
                 onChange={() => setFlags((prev) => ({ ...prev, isFlashDeal: !prev.isFlashDeal }))}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-warmwhite text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
               />
-              <span className={flags.isFlashDeal ? "text-champagne font-semibold" : ""}>Flash Deals Only</span>
+              <span className={flags.isFlashDeal ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Flash Deals Only</span>
             </label>
 
             <div>
-              <span className="text-xs text-stoneGray/80 uppercase tracking-wider block mb-2 mt-1">Discount Offer</span>
+              <span className="text-xs text-[#6F5555] uppercase tracking-wider block mb-2 mt-1">Discount Offer</span>
               <div className="flex flex-wrap gap-1.5">
                 {[10, 25, 50].map((dVal) => (
                   <button
@@ -665,8 +667,8 @@ export function ProductGrid({
                     onClick={() => setSelectedDiscount(selectedDiscount === dVal ? null : dVal)}
                     className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
                       selectedDiscount === dVal
-                        ? "bg-champagne text-charcoalBrown border-champagne font-semibold"
-                        : "border-goldBeige/60 bg-ivory hover:border-champagne/50 hover:text-champagne"
+                        ? "bg-[#E0A9A5] text-white border-[#E0A9A5] font-semibold"
+                        : "border-[#F1CFCF]/60 bg-ivory hover:border-[#C98484]/50 hover:text-[#C98484]"
                     }`}
                   >
                     {dVal}%+ Off
@@ -681,9 +683,11 @@ export function ProductGrid({
   );
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8">
+    <div className="relative min-h-[100svh] w-full pb-20 pt-28 sm:pt-36" style={{ background: "var(--gradient-luxe)" }}>
+      <div className="mx-auto max-w-7xl px-6">
+      
       {/* Title block */}
-      <div className="mb-6 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+      <div className="relative z-10 mb-6 flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div>
           <p className="text-xs uppercase tracking-[0.4em] text-champagne font-semibold">Anti Tarnish Jewels Collections</p>
           <h1 className="mt-1 text-3xl md:text-4xl font-serif font-semibold tracking-wide text-charcoalBrown">{title}</h1>
@@ -697,16 +701,16 @@ export function ProductGrid({
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               placeholder="Search products..."
-              className="w-full rounded-full border border-goldBeige bg-warmwhite pl-10 pr-4 py-2.5 text-sm outline-none text-charcoalBrown focus:border-champagne focus:ring-1 focus:ring-champagne"
+              className="w-full rounded-full border border-ink/10 glass pl-10 pr-4 py-2.5 text-sm outline-none text-[#3B2B2B] focus:border-[#C98484] focus:ring-1 focus:ring-[#C98484] placeholder:text-[#9B7A7A]"
             />
-            <Search size={16} className="absolute left-3.5 top-3 text-champagne/60" />
+            <Search size={16} className="absolute left-3.5 top-3 text-[#C98484]/80" />
           </div>
 
           {/* Sort Selector */}
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-sm outline-none text-charcoalBrown cursor-pointer focus:border-champagne"
+            className="rounded-full border border-ink/10 glass px-4 py-2.5 text-sm outline-none text-[#3B2B2B] cursor-pointer focus:border-[#C98484]"
           >
             <option value="newest">Sort by: Newest</option>
             <option value="low">Price: Low to High</option>
@@ -719,7 +723,7 @@ export function ProductGrid({
           {/* Mobile Filter Toggle Button */}
           <button
             onClick={() => setIsFilterDrawerOpen(true)}
-            className="flex items-center gap-2 rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-sm text-champagne hover:bg-champagne/10 lg:hidden transition-colors"
+            className="flex items-center gap-2 rounded-full border border-ink/10 glass px-4 py-2.5 text-sm text-[#C98484] hover:bg-[#C98484]/10 lg:hidden transition-colors font-semibold"
           >
             <Filter size={16} />
             Filters
@@ -732,7 +736,7 @@ export function ProductGrid({
 
       <div className="flex gap-8">
         {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block w-64 shrink-0 rounded-3xl border border-goldBeige/60 bg-warmwhite p-6 shadow-jewel h-fit sticky top-24 max-h-[80vh] overflow-y-auto scrollbar-thin">
+        <aside className="hidden lg:block w-64 shrink-0 rounded-3xl border border-ink/10 glass p-6 shadow-[0_20px_60px_rgba(224,169,165,0.15)] h-fit sticky top-24 max-h-[80vh] overflow-y-auto scrollbar-thin">
           {renderFiltersContent()}
         </aside>
 
@@ -750,7 +754,15 @@ export function ProductGrid({
             )}
           </div>
 
-          {filtered.length > 0 ? (
+          {products.length === 0 ? (
+            <div className="py-12">
+              <EmptyStateCard 
+                icon={PackageSearch} 
+                text="No products available yet" 
+                subtext="Please check back soon." 
+              />
+            </div>
+          ) : filtered.length > 0 ? (
             <div className="space-y-8">
               <div className="grid grid-cols-1 min-[320px]:grid-cols-2 min-[540px]:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-5">
                 {filtered.slice(0, visibleCount).map((product) => (
@@ -762,7 +774,7 @@ export function ProductGrid({
                 <div className="text-center pt-4">
                   <button
                     onClick={() => setVisibleCount((prev) => prev + 12)}
-                    className="rounded-full border border-champagne bg-warmwhite px-8 py-3 text-sm font-semibold text-charcoalBrown hover:bg-champagne/10 hover:-translate-y-0.5 transition-all shadow-sm inline-flex items-center gap-2"
+                    className="rounded-full border border-[#F1CFCF]/60 glass px-8 py-3 text-sm font-semibold text-[#3B2B2B] hover:bg-white/70 hover:-translate-y-0.5 transition-all shadow-[0_10px_30px_rgba(224,169,165,0.1)] inline-flex items-center gap-2"
                   >
                     Load More Products ({filtered.length - visibleCount} Remaining)
                   </button>
@@ -770,20 +782,19 @@ export function ProductGrid({
               )}
             </div>
           ) : (
-            <div className="rounded-[2rem] border border-goldBeige/60 bg-warmwhite p-16 text-center shadow-jewel max-w-2xl mx-auto my-12">
-              <div className="inline-flex rounded-full border border-goldBeige p-4 text-champagne mb-4">
-                <RotateCcw size={32} />
-              </div>
-              <h2 className="text-2xl font-serif font-semibold text-champagne">No products match your filters</h2>
-              <p className="mt-2 text-sm text-charcoalBrown/70">
-                Try widening your price range, choosing another category, or clearing the search terms.
-              </p>
-              <button
-                onClick={resetFilters}
-                className="mt-6 rounded-full bg-champagne px-6 py-2.5 text-sm font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors"
+            <div className="py-12">
+              <EmptyStateCard 
+                icon={Search} 
+                text="No products match your filters" 
+                subtext="Try widening your price range, choosing another category, or clearing the search terms." 
               >
-                Reset All Filters
-              </button>
+                <button
+                  onClick={resetFilters}
+                  className="rounded-full bg-champagne px-6 py-2.5 text-sm font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors"
+                >
+                  Reset All Filters
+                </button>
+              </EmptyStateCard>
             </div>
           )}
         </div>
@@ -796,7 +807,7 @@ export function ProductGrid({
           <div className="fixed inset-0 animate-fade-in" onClick={() => setIsFilterDrawerOpen(false)} />
           
           {/* Bottom Sheet */}
-          <aside className="relative w-full bg-warmwhite rounded-t-[2rem] border-t border-goldBeige p-5 shadow-jewel max-h-[80vh] flex flex-col justify-between z-10 overflow-hidden animate-slide-up">
+          <aside className="relative w-full bg-white/80 backdrop-blur-md rounded-t-[2rem] border-t border-ink/10 p-5 shadow-[0_-10px_40px_rgba(224,169,165,0.15)] max-h-[80vh] flex flex-col justify-between z-10 overflow-hidden animate-slide-up">
             {/* Drag Handle Bar */}
             <div className="w-12 h-1 bg-champagne/30 mx-auto rounded-full mb-3 shrink-0" />
             
@@ -832,7 +843,7 @@ export function ProductGrid({
               <button
                 type="button"
                 onClick={() => setIsFilterDrawerOpen(false)}
-                className="rounded-full bg-champagne py-2.5 text-xs font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all"
+                className="rounded-full bg-[#E0A9A5] text-white py-2.5 text-xs font-semibold hover:bg-[#C98484] transition-all"
               >
                 Apply ({filtered.length})
               </button>
@@ -840,6 +851,7 @@ export function ProductGrid({
           </aside>
         </div>
       )}
-    </section>
+          </div>
+    </div>
   );
 }
