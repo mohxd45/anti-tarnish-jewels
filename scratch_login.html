@@ -1,0 +1,53 @@
+<div id="page-login" class="page">
+  <div class="max-w-md mx-auto px-4 py-8">
+    <div class="glass-dark rounded-3xl p-8">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-full gold-trim flex items-center justify-center mx-auto mb-4">
+          <span class="font-serif text-white font-bold text-2xl">A</span>
+        </div>
+        <h1 class="font-serif text-3xl text-pink-900" id="authTitle">Welcome Back</h1>
+        <p class="text-pink-600" id="authSubtitle">Login to your account</p>
+      </div>
+      
+      <div id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Email</label>
+          <input type="email" id="loginEmail" class="neo-input w-full p-4 outline-none" placeholder="your@email.com">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Password</label>
+          <input type="password" id="loginPassword" class="neo-input w-full p-4 outline-none" placeholder="••••••••">
+        </div>
+        <button onclick="handleLogin()" class="btn-primary w-full py-4">Login</button>
+        <p class="text-center text-sm text-pink-600">
+          Don't have an account? <button onclick="toggleAuthMode()" class="text-pink-900 font-semibold">Sign Up</button>
+        </p>
+      </div>
+
+      <div id="signupForm" class="space-y-4 hidden">
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Full Name</label>
+          <input type="text" id="signupName" class="neo-input w-full p-4 outline-none" placeholder="Your name">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Email</label>
+          <input type="email" id="signupEmail" class="neo-input w-full p-4 outline-none" placeholder="your@email.com">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Phone</label>
+          <input type="tel" id="signupPhone" class="neo-input w-full p-4 outline-none" placeholder="+91 98765 43210">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Password</label>
+          <input type="password" id="signupPassword" class="neo-input w-full p-4 outline-none" placeholder="••••••••">
+        </div>
+        <button onclick="handleSignup()" class="btn-primary w-full py-4">Create Account</button>
+        <p class="text-center text-sm text-pink-600">
+          Already have an account? <button onclick="toggleAuthMode()" class="text-pink-900 font-semibold">Login</button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->

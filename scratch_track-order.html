@@ -1,0 +1,22 @@
+<div id="page-track-order" class="page">
+  <div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="glass-dark rounded-3xl p-8 mb-8">
+      <h1 class="font-serif text-4xl text-pink-900 mb-2">Track Your Order</h1>
+      <p class="text-pink-600 mb-6">Enter your order details to track</p>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Order Number</label>
+          <input type="text" id="trackOrderNumber" class="neo-input w-full p-4 outline-none" placeholder="ATJ-XXXXXX">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-pink-900 mb-2">Phone (Last 4 digits)</label>
+          <input type="text" id="trackPhone" class="neo-input w-full p-4 outline-none" placeholder="Last 4 digits" maxlength="4">
+        </div>
+        <button onclick="trackOrder()" class="btn-primary w-full py-4">Track Order</button>
+      </div>
+    </div>
+    <div id="trackResult"></div>
+  </div>
+</div>
+
+<!-- LOGIN/SIGNUP PAGE -->

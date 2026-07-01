@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Protected } from "@/components/Protected";
 import { getContactMessages, updateContactMessage, deleteContactMessage } from "@/lib/firestore";
 import { ContactMessage } from "@/types";
-import { Mail, MailOpen, Trash2, CheckCircle2, CheckCircle, AlertCircle } from "lucide-react";
-import { PageLoader } from "@/components/ui/PageLoader";
+import { Mail, Trash2, CheckCheck, Undo2, Check } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
-import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { AdminCard, StatusBadge } from "@/components/admin/Bits";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   // Pagination & per-item action states
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,14 +31,9 @@ export default function MessagesPage() {
       const data = await getContactMessages();
       setMessages(data);
     } catch {
-      showToast("error", "Failed to fetch contact messages.");
+      toast.error("Failed to fetch contact messages.");
     }
     setLoading(false);
-  }
-
-  function showToast(type: "success" | "error", msg: string) {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 3000);
   }
 
   async function toggleRead(msg: ContactMessage) {
@@ -47,9 +43,9 @@ export default function MessagesPage() {
     try {
       await updateContactMessage(targetId, { isRead });
       setMessages(messages.map(m => m.id === msg.id || m.createdAt === msg.createdAt ? { ...m, isRead } : m));
-      showToast("success", isRead ? "Marked as read." : "Marked as unread.");
+      toast.success(isRead ? "Marked as read." : "Marked as unread.");
     } catch {
-      showToast("error", "Failed to update read status.");
+      toast.error("Failed to update read status.");
     } finally {
       setStatusLoadingId(null);
     }
@@ -62,9 +58,9 @@ export default function MessagesPage() {
     try {
       await updateContactMessage(targetId, { isReplied });
       setMessages(messages.map(m => m.id === msg.id || m.createdAt === msg.createdAt ? { ...m, isReplied } : m));
-      showToast("success", isReplied ? "Marked as replied." : "Marked as pending reply.");
+      toast.success(isReplied ? "Marked as replied." : "Marked as pending reply.");
     } catch {
-      showToast("error", "Failed to update reply status.");
+      toast.error("Failed to update reply status.");
     } finally {
       setStatusLoadingId(null);
     }
@@ -77,9 +73,9 @@ export default function MessagesPage() {
     try {
       await deleteContactMessage(targetId);
       setMessages(messages.filter(m => m.id !== msg.id && m.createdAt !== msg.createdAt));
-      showToast("success", "Message deleted successfully.");
+      toast.success("Message deleted successfully.");
     } catch {
-      showToast("error", "Failed to delete message.");
+      toast.error("Failed to delete message.");
     } finally {
       setDeleteLoadingId(null);
     }
@@ -88,150 +84,117 @@ export default function MessagesPage() {
   const paginatedMessages = messages.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="space-y-8 animate-fade-in relative pb-10">
-      {/* Toast Alert */}
-      {toast && (
-        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 rounded-2xl px-5 py-3 shadow-lg border text-sm transition-all ${
-          toast.type === "success" 
-            ? "bg-emerald-950/90 text-emerald-400 border-emerald-500/20" 
-            : "bg-rose-950/90 text-rose-400 border-rose-500/20"
-        }`}>
-          {toast.type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-          <span>{toast.msg}</span>
+    <Protected adminOnly>
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Customer Messages</h1>
+            <p className="text-muted-foreground mt-1">Replies from your contact form</p>
+          </div>
         </div>
-      )}
 
-      <div>
-        <h1 className="text-3xl font-serif font-semibold text-gold tracking-wide">Customer Support enquiries</h1>
-        <p className="text-sm text-cream/55 mt-1">Read questions, trace email queries, and record client responses.</p>
-      </div>
-
-      {loading ? (
-        <PageLoader text="Loading messages..." />
-      ) : messages.length === 0 ? (
-        <EmptyStateCard 
-          icon={Mail}
-          text="No Messages Received" 
-          subtext="Emails submitted through the contact page will appear here." 
-        />
-      ) : (
-        <div className="space-y-4">
-          {paginatedMessages.map((m) => {
-            const targetId = m.id || m.createdAt;
-            return (
-              <div
-                key={targetId}
-                className={`rounded-3xl border p-5 bg-white/[0.03] transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 ${
-                  m.isRead ? "border-gold/5 opacity-70" : "border-gold/25 bg-gold/[0.01]"
-                }`}
-              >
-                {/* Message Details */}
-                <div className="space-y-2 flex-1">
-                  <div className="flex flex-wrap items-center gap-3 font-semibold">
-                    <span className={`text-sm ${m.isRead ? "text-cream/70" : "text-gold font-bold"}`}>
-                      {m.name}
-                    </span>
-                    <span className="text-xs text-cream/45 font-mono">({m.email})</span>
-                    {m.phone && (
-                      <span className="text-xs text-gold/80 font-mono">
-                        | Phone: {m.phone}
-                      </span>
-                    )}
-                    {m.createdAt && (
-                      <span className="text-[10px] text-cream/45 border-l border-gold/10 pl-3">
-                        {new Date(m.createdAt).toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-cream/80 text-sm font-sans whitespace-pre-wrap leading-relaxed">{m.message}</p>
-                </div>
-
-                {/* Status and Action Buttons */}
-                <div className="flex items-center gap-3 justify-end shrink-0">
-                  {/* Replied status indicator */}
-                  <button
-                    type="button"
-                    disabled={statusLoadingId === targetId || deleteLoadingId === targetId}
-                    onClick={() => toggleReplied(m)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all disabled:opacity-50 ${
-                      m.isReplied 
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
-                        : "bg-noir/30 text-cream/40 border-gold/10 hover:border-gold/30"
-                    }`}
-                  >
-                    {statusLoadingId === targetId ? (
-                      <HeartLoader size="sm" text="" />
-                    ) : (
-                      <CheckCircle2 size={12} />
-                    )}
-                    <span>{m.isReplied ? "Replied" : "Pending Reply"}</span>
-                  </button>
-
-                  {/* Read indicator & actions */}
-                  <div className="flex gap-2 border-l border-gold/15 pl-4">
-                    <button
-                      disabled={statusLoadingId === targetId || deleteLoadingId === targetId}
-                      onClick={() => toggleRead(m)}
-                      className={`p-2 rounded-full transition-colors disabled:opacity-50 ${
-                        m.isRead 
-                          ? "bg-noir text-cream/45 hover:bg-gold/10 hover:text-gold" 
-                          : "bg-gold/10 text-gold hover:bg-gold hover:text-noir"
-                      }`}
-                      title={m.isRead ? "Mark unread" : "Mark read"}
-                    >
-                      {statusLoadingId === targetId ? (
-                        <HeartLoader size="sm" text="" />
-                      ) : m.isRead ? (
-                        <MailOpen size={14} />
-                      ) : (
-                        <Mail size={14} />
-                      )}
-                    </button>
-
-                    <button
-                      disabled={statusLoadingId === targetId || deleteLoadingId === targetId}
-                      onClick={() => handleDelete(m)}
-                      className="p-2 rounded-full bg-noir text-rose border border-rose/20 hover:bg-rose hover:text-noir transition-colors disabled:opacity-50"
-                      title="Delete message"
-                    >
-                      {deleteLoadingId === targetId ? (
-                        <HeartLoader size="sm" text="" />
-                      ) : (
-                        <Trash2 size={14} />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Pagination Controls */}
-          {messages.length > ITEMS_PER_PAGE && (
-            <div className="flex items-center justify-between border-t border-gold/15 pt-6 mt-6">
-              <span className="text-xs text-cream/55">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, messages.length)} of {messages.length} messages
-              </span>
-              <div className="flex gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  className="rounded-full border border-gold/15 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-cream hover:border-gold disabled:opacity-50 transition-all"
-                >
-                  Previous
-                </button>
-                <button
-                  disabled={currentPage * ITEMS_PER_PAGE >= messages.length}
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className="rounded-full border border-gold/15 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-cream hover:border-gold disabled:opacity-50 transition-all"
-                >
-                  Next
-                </button>
-              </div>
+        {loading ? (
+          <div className="flex h-[40vh] items-center justify-center text-muted-foreground">
+            <HeartLoader text="Loading messages..." />
+          </div>
+        ) : messages.length === 0 ? (
+          <AdminCard className="p-12 text-center shadow-sm">
+            <div className="bg-secondary/50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Mail className="h-6 w-6 text-muted-foreground" />
             </div>
-          )}
-        </div>
-      )}
-    </div>
+            <h3 className="text-xl font-display text-foreground">No Messages Received</h3>
+            <p className="text-muted-foreground text-sm mt-2">Emails submitted through the contact page will appear here.</p>
+          </AdminCard>
+        ) : (
+          <div className="glass-card divide-y divide-border/60 rounded-2xl border border-border/60 shadow-sm bg-card/40">
+            {paginatedMessages.map((m) => {
+              const targetId = m.id || m.createdAt;
+              return (
+                <div key={targetId} className={`p-4 sm:p-5 flex flex-wrap gap-3 items-start hover:bg-secondary/30 transition-colors ${!m.isRead ? "bg-primary/5" : ""}`}>
+                  <div className="h-10 w-10 rounded-full grid place-items-center text-white text-xs font-semibold shrink-0" style={{ background: "var(--gradient-rose)" }}>
+                    {(m.name || "A").split(" ").map((n: string) => n[0]).join("")}
+                  </div>
+                  
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`font-medium ${!m.isRead ? "text-foreground font-semibold" : "text-foreground/80"}`}>{m.name}</span>
+                      <span className="text-xs text-muted-foreground">{m.email}</span>
+                      {m.phone && <span className="text-xs text-muted-foreground">· {m.phone}</span>}
+                      {m.createdAt && <span className="ml-auto text-xs text-muted-foreground">{new Date(m.createdAt).toLocaleString()}</span>}
+                    </div>
+                    
+                    <p className={`text-sm mt-1.5 whitespace-pre-wrap leading-relaxed ${!m.isRead ? "text-foreground" : "text-foreground/70"}`}>{m.message}</p>
+                    
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-border/30">
+                      <StatusBadge status={m.isReplied ? "Replied" : "Pending"} />
+                      <span className="ml-auto" />
+                      
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        disabled={statusLoadingId === targetId}
+                        onClick={() => toggleReplied(m)}
+                        className="h-8 text-xs rounded-xl"
+                      >
+                        {statusLoadingId === targetId ? <HeartLoader size="sm" text="" /> : m.isReplied ? <><Undo2 className="h-3.5 w-3.5 mr-1" /> Unmark Reply</> : <><Check className="h-3.5 w-3.5 mr-1" /> Mark Replied</>}
+                      </Button>
+
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        disabled={statusLoadingId === targetId}
+                        onClick={() => toggleRead(m)}
+                        className="h-8 text-xs rounded-xl"
+                      >
+                        {statusLoadingId === targetId ? <HeartLoader size="sm" text="" /> : m.isRead ? <><Mail className="h-3.5 w-3.5 mr-1" /> Mark unread</> : <><CheckCheck className="h-3.5 w-3.5 mr-1" /> Mark read</>}
+                      </Button>
+
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        disabled={deleteLoadingId === targetId}
+                        onClick={() => handleDelete(m)}
+                        className="h-8 w-8 rounded-xl text-dustyRose hover:text-dustyRose hover:bg-dustyRose/10"
+                      >
+                        {deleteLoadingId === targetId ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Pagination Controls */}
+            {messages.length > ITEMS_PER_PAGE && (
+              <div className="flex items-center justify-between p-4 px-5">
+                <span className="text-xs text-muted-foreground">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, messages.length)} of {messages.length} messages
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    className="h-8 text-xs rounded-xl"
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage * ITEMS_PER_PAGE >= messages.length}
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    className="h-8 text-xs rounded-xl"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Protected>
   );
 }

@@ -55,6 +55,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // LOCALHOST PREVIEW OVERRIDE
+    if (process.env.NODE_ENV !== "production") {
+      const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      if (isLocalhost && localStorage.getItem("admin_preview") === "true") {
+        setUser({ uid: "preview-admin", email: "admin@preview.local" } as any);
+        setProfile({ role: "admin", name: "Local Admin Preview" });
+        setLoading(false);
+        return;
+      }
+    }
+
     if (!hasFirebaseConfig || !auth) {
       setLoading(false);
       return;

@@ -10,10 +10,12 @@ const config: Config = {
       },
 
       colors: {
-        // Lovable Radiant Showroom Palette
+        // Lovable Radiant Showroom Palette Exact
         blush: "oklch(0.93 0.045 20)",
         "blush-deep": "oklch(0.83 0.08 18)",
+        rose: "oklch(0.72 0.13 12)",
         "rose-gold": "oklch(0.74 0.105 45)",
+        champagne: "oklch(0.86 0.08 80)",
         gold: "oklch(0.78 0.13 75)",
         ink: "oklch(0.18 0.03 20)",
 
@@ -21,7 +23,6 @@ const config: Config = {
         noir: "#FFF0F5", // Site Background
         charcoal: "#FFF9FB", // Card Background
         brandGoldOriginal: "#B8955E", // Gold Accent
-        rose: "#E89AAA", // Primary Theme (Pink)
         cream: "#3A2428", // Primary Text
         mutedGold: "#D8A7B1", // Secondary Color
         
@@ -43,7 +44,6 @@ const config: Config = {
         ivory: "#FFE6EE",
         beige: "#FFF0F5",
         warmwhite: "#FFF9FB",
-        champagne: "#E89AAA", // Mapped to Primary Pink so buttons/accents become pink
         taupe: "#D8A7B1",
         charcoalBrown: "#3A2428",
         stoneGray: "#8A626B",

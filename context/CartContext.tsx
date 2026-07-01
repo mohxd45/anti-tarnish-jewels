@@ -167,13 +167,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: "Please enter a coupon code." };
       }
       try {
-        const res = await validateCoupon(clean, items, subtotal);
-        if (res.isValid && res.coupon) {
-          setActiveCoupon(res.coupon);
+        const res = await fetch("/api/coupon/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: clean, subtotal })
+        });
+        const data = await res.json();
+        
+        if (data.success && data.coupon) {
+          setActiveCoupon(data.coupon);
           return { success: true };
         } else {
           setActiveCoupon(null);
-          return { success: false, error: res.error || "Invalid coupon code." };
+          return { success: false, error: data.error || "Invalid coupon code." };
         }
       } catch (err) {
         console.error("Error applying coupon:", err);

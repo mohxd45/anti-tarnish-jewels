@@ -372,3 +372,52 @@ nav.fixed {
   0%, 100% { box-shadow: 0 0 0 0 oklch(0.74 0.105 45 / 0.5); }
   50% { box-shadow: 0 0 60px 10px oklch(0.74 0.105 45 / 0.25); }
 }
+@keyframes float-anim {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-10px, -20px, 0) rotate(5deg); }
+}
+@keyframes float-reverse {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(15px, 20px, 0) rotate(-5deg); }
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@layer utilities {
+  .float-anim { animation: float-anim 6s ease-in-out infinite; }
+  .float-reverse { animation: float-reverse 8s ease-in-out infinite; }
+  .ticker-animate {
+    animation: ticker-scroll 20s linear infinite;
+    display: flex;
+    width: max-content;
+  }
+  .liquid-glass {
+  .btn-liquid {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: #831843;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-liquid:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+  }
+}
+
+.gold-trim {
+  background: linear-gradient(135deg, #D4AF37 0%, #E8D48B 50%, #B8860B 100%);
+  box-shadow:
+    0 2px 4px rgba(184, 134, 11, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+}

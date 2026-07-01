@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Protected } from "@/components/Protected";
 import { getReviews, updateReview, deleteReview } from "@/lib/firestore";
-import { Star, Check, X, Trash2, CheckCircle, AlertCircle } from "lucide-react";
-import { PageLoader } from "@/components/ui/PageLoader";
+import { Star, Check, X, Trash2, MessageSquare } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
-import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { AdminCard, StatusBadge } from "@/components/admin/Bits";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   
   // Pagination & per-item actions states
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,14 +30,9 @@ export default function ReviewsPage() {
       const data = await getReviews();
       setReviews(data);
     } catch {
-      showToast("error", "Failed to fetch reviews.");
+      toast.error("Failed to fetch reviews.");
     }
     setLoading(false);
-  }
-
-  function showToast(type: "success" | "error", msg: string) {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 3000);
   }
 
   async function handleStatus(id: string, active: boolean) {
@@ -44,9 +40,9 @@ export default function ReviewsPage() {
     try {
       await updateReview(id, { active });
       setReviews(reviews.map(r => r.id === id ? { ...r, active } : r));
-      showToast("success", active ? "Review approved successfully!" : "Review hidden from store.");
+      toast.success(active ? "Review approved successfully!" : "Review hidden from store.");
     } catch {
-      showToast("error", "Failed to update review status.");
+      toast.error("Failed to update review status.");
     } finally {
       setStatusLoadingId(null);
     }
@@ -58,9 +54,9 @@ export default function ReviewsPage() {
     try {
       await deleteReview(id);
       setReviews(reviews.filter(r => r.id !== id));
-      showToast("success", "Review deleted permanently.");
+      toast.success("Review deleted permanently.");
     } catch {
-      showToast("error", "Failed to delete review.");
+      toast.error("Failed to delete review.");
     } finally {
       setDeleteLoadingId(null);
     }
@@ -69,133 +65,125 @@ export default function ReviewsPage() {
   const paginatedReviews = reviews.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="space-y-8 animate-fade-in relative pb-10">
-      {/* Toast Alert */}
-      {toast && (
-        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 rounded-2xl px-5 py-3 shadow-lg border text-sm transition-all ${
-          toast.type === "success" 
-            ? "bg-emerald-950/90 text-emerald-400 border-emerald-500/20" 
-            : "bg-rose-950/90 text-rose-400 border-rose-500/20"
-        }`}>
-          {toast.type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-          <span>{toast.msg}</span>
+    <Protected adminOnly>
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Review Moderation</h1>
+            <p className="text-muted-foreground mt-1">Approve or hide customer reviews</p>
+          </div>
         </div>
-      )}
 
-      <div>
-        <h1 className="text-3xl font-serif font-semibold text-gold tracking-wide">Reviews & Moderation</h1>
-        <p className="text-sm text-cream/55 mt-1">Approve, reject, or delete customer reviews submitted across products.</p>
-      </div>
-
-      {loading ? (
-        <PageLoader text="Loading reviews..." />
-      ) : reviews.length === 0 ? (
-        <EmptyStateCard 
-          icon={Star} 
-          text="No Reviews Submitted" 
-          subtext="Reviews posted by users will populate here for moderator vetting." 
-        />
-      ) : (
-        <div className="grid gap-4">
-          {paginatedReviews.map((r) => (
-            <div
-              key={r.id}
-              className={`rounded-3xl border p-5 bg-white/[0.03] transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 ${
-                r.active ? "border-gold/15" : "border-rose/10 opacity-70"
-              }`}
-            >
-              {/* Review details */}
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-3 font-semibold">
-                  <span className="text-cream">{r.name}</span>
-                  <div className="flex items-center text-gold text-xs">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={12} className={i < r.rating ? "fill-gold" : "text-gold/20"} />
-                    ))}
+        {loading ? (
+          <div className="flex h-[40vh] items-center justify-center text-muted-foreground">
+            <HeartLoader text="Loading reviews..." />
+          </div>
+        ) : reviews.length === 0 ? (
+          <AdminCard className="p-12 text-center shadow-sm">
+            <div className="bg-secondary/50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+              <MessageSquare className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-display text-foreground">No Reviews Submitted</h3>
+            <p className="text-muted-foreground text-sm mt-2">Reviews posted by users will populate here for moderator vetting.</p>
+          </AdminCard>
+        ) : (
+          <div className="space-y-3">
+            {paginatedReviews.map((r) => (
+              <div key={r.id} className="glass-card p-4 sm:p-5 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/60 transition-colors shadow-sm">
+                <div className="flex flex-wrap items-start gap-3">
+                  <div className="h-10 w-10 rounded-full grid place-items-center text-white text-xs font-semibold shrink-0" style={{ background: "var(--gradient-gold)" }}>
+                    {(r.name || "A").split(" ").map((n: string) => n[0]).join("")}
                   </div>
-                  {r.productName && (
-                    <span className="text-[10px] text-gold uppercase tracking-wider font-mono">
-                      Product: {r.productName}
-                    </span>
-                  )}
-                </div>
-                <p className="text-cream/70 text-sm italic font-sans leading-relaxed">“{r.comment}”</p>
-                {r.createdAt && (
-                  <p className="text-[10px] text-cream/45">Posted on: {new Date(r.createdAt).toLocaleDateString()}</p>
-                )}
-              </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-foreground">{r.name}</span>
+                      <span className="text-xs text-muted-foreground">on</span>
+                      <span className="text-xs font-medium text-foreground/80">{r.productName || "Unknown Product"}</span>
+                      <div className="flex items-center gap-0.5 ml-auto">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "fill-amber-400 text-amber-400" : "text-stone-300 dark:text-stone-700"}`} />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-foreground/80 mt-2 italic leading-relaxed">“{r.comment}”</p>
+                    
+                    {r.createdAt && (
+                      <p className="text-[10px] text-muted-foreground mt-2">Posted on: {new Date(r.createdAt).toLocaleDateString()}</p>
+                    )}
 
-              {/* Status and Action Buttons */}
-              <div className="flex items-center gap-3 justify-end">
-                <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full ${
-                  r.active ? "bg-emerald-500/10 text-emerald-400" : "bg-rose/10 text-rose"
-                }`}>
-                  {r.active ? "Visible" : "Hidden"}
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border/40">
+                      <StatusBadge status={r.active ? "Visible" : "Hidden"} />
+                      <span className="ml-auto" />
+                      
+                      {r.active ? (
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          disabled={statusLoadingId === r.id}
+                          onClick={() => handleStatus(r.id, false)}
+                          className="h-8 text-xs rounded-xl hover:bg-rose/10 hover:text-rose hover:border-rose/20 transition-colors"
+                        >
+                          {statusLoadingId === r.id ? <HeartLoader size="sm" text="" /> : <><X className="h-3.5 w-3.5 mr-1" /> Hide</>}
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          disabled={statusLoadingId === r.id}
+                          onClick={() => handleStatus(r.id, true)}
+                          className="h-8 text-xs rounded-xl hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20 transition-colors"
+                        >
+                          {statusLoadingId === r.id ? <HeartLoader size="sm" text="" /> : <><Check className="h-3.5 w-3.5 mr-1" /> Approve</>}
+                        </Button>
+                      )}
+
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        disabled={deleteLoadingId === r.id}
+                        onClick={() => handleDelete(r.id)}
+                        className="h-8 w-8 rounded-xl text-rose hover:text-rose hover:bg-rose/10 transition-colors"
+                      >
+                        {deleteLoadingId === r.id ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-4 w-4 text-rose-600" />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Pagination Controls */}
+            {reviews.length > ITEMS_PER_PAGE && (
+              <div className="flex items-center justify-between border-t border-border/40 pt-4 mt-2 px-2">
+                <span className="text-xs text-muted-foreground">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, reviews.length)} of {reviews.length} reviews
                 </span>
-
-                <div className="flex gap-2 border-l border-gold/15 pl-4">
-                  <button
-                    disabled={statusLoadingId === r.id || deleteLoadingId === r.id}
-                    onClick={() => handleStatus(r.id, !r.active)}
-                    className={`p-2 rounded-full transition-colors disabled:opacity-50 ${
-                      r.active 
-                        ? "bg-rose/10 text-rose hover:bg-rose hover:text-noir" 
-                        : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-noir"
-                    }`}
-                    title={r.active ? "Hide review" : "Approve review"}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    className="h-8 text-xs rounded-xl"
                   >
-                    {statusLoadingId === r.id ? (
-                      <HeartLoader size="sm" text="" />
-                    ) : r.active ? (
-                      <X size={14} />
-                    ) : (
-                      <Check size={14} />
-                    )}
-                  </button>
-
-                  <button
-                    disabled={statusLoadingId === r.id || deleteLoadingId === r.id}
-                    onClick={() => handleDelete(r.id)}
-                    className="p-2 rounded-full bg-noir text-rose border border-rose/20 hover:bg-rose hover:text-noir transition-colors disabled:opacity-50"
-                    title="Delete permanently"
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage * ITEMS_PER_PAGE >= reviews.length}
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    className="h-8 text-xs rounded-xl"
                   >
-                    {deleteLoadingId === r.id ? (
-                      <HeartLoader size="sm" text="" />
-                    ) : (
-                      <Trash2 size={14} />
-                    )}
-                  </button>
+                    Next
+                  </Button>
                 </div>
               </div>
-            </div>
-          ))}
-
-          {/* Pagination Controls */}
-          {reviews.length > ITEMS_PER_PAGE && (
-            <div className="flex items-center justify-between border-t border-gold/15 pt-6 mt-6">
-              <span className="text-xs text-cream/55">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, reviews.length)} of {reviews.length} reviews
-              </span>
-              <div className="flex gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  className="rounded-full border border-gold/15 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-cream hover:border-gold disabled:opacity-50 transition-all"
-                >
-                  Previous
-                </button>
-                <button
-                  disabled={currentPage * ITEMS_PER_PAGE >= reviews.length}
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className="rounded-full border border-gold/15 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-cream hover:border-gold disabled:opacity-50 transition-all"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Protected>
   );
 }

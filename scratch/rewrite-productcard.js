@@ -1,102 +1,110 @@
 const fs = require('fs');
-const path = require('path');
 
-const file = path.join(__dirname, '..', 'components', 'ProductCard.tsx');
+const cardContent = `"use client";
 
-const content = `"use client";
-
-import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingBag, Star, Check, Sparkles, Droplets, Shield } from "lucide-react";
+import Image from "next/image";
+import { Heart, ShoppingBag } from "lucide-react";
 import { Product } from "@/types";
-import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useState } from "react";
-import { getOptimizedImageUrl } from "@/lib/firestore";
-import { motion, AnimatePresence } from "framer-motion";
-import { TiltCard } from "./ui/TiltCard";
+import { toast } from "react-hot-toast";
 
-export function ProductCard({ product }: { product: Product }) {
-  const { addToCart } = useCart();
-  const wishlist = useWishlist();
-  const [added, setAdded] = useState(false);
+interface ProductCardProps {
+  product: Product;
+}
 
-  function handleAdd() {
-    addToCart(product);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1200);
-  }
+export function ProductCard({ product }: ProductCardProps) {
+  const { dispatch: cartDispatch } = useCart();
+  const { addItem: addWishlist, removeItem: removeWishlist, items: wishlist } = useWishlist();
+  
+  const isWishlisted = wishlist.some(item => item.id === product.id);
 
-  const hasDiscount = product.salePrice < product.regularPrice;
-  const imageUrl = getOptimizedImageUrl(product.thumbnail || product.images?.[0] || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop", 400);
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to product detail
+    cartDispatch({ type: "ADD_ITEM", payload: { product, quantity: 1 } });
+    toast.success("Added to cart!");
+  };
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating
+    if (isWishlisted) {
+      removeWishlist(product.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addWishlist(product);
+      toast.success("Added to wishlist!");
+    }
+  };
+
+  const discount = product.compareAtPrice && product.compareAtPrice > product.price
+    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+    : 0;
 
   return (
-    <TiltCard className="group relative" max={10}>
-      <div className="shine relative overflow-hidden rounded-3xl glass p-3 transition-shadow hover:shadow-[var(--shadow-glow)]">
-        <Link href={\`/product/\${product.slug}\`} className="block">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
-            <Image 
-              src={imageUrl} 
-              alt={product.name} 
-              fill 
-              sizes="(max-w-640px) 50vw, (max-w-1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-110" 
-              style={{ transform: "translateZ(40px)" }}
-            />
-            {/* badges top-left */}
-            <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-              {product.isBestSeller && <span className="rounded-full bg-ink/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur">Bestseller</span>}
-              {product.isNewArrival && !product.isBestSeller && <span className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-ink backdrop-blur">New</span>}
-              {product.discountPercentage > 0 && <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white" style={{ background: "var(--gradient-gold)" }}>{product.discountPercentage}% OFF</span>}
-            </div>
-            
-            {/* wishlist top-right */}
-            <button
-              aria-label="Wishlist"
-              onClick={(e) => { e.preventDefault(); wishlist.toggleWishlist(product); }}
-              className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full glass text-ink/70 transition hover:text-[var(--rose-gold)] z-20"
-            >
-              <Heart className={\`h-4 w-4 \${wishlist.isWishlisted(product.id) ? "fill-[var(--rose-gold)] text-[var(--rose-gold)]" : ""}\`} />
-            </button>
-            
-            {/* trust badges bottom */}
-            <div className="absolute inset-x-3 bottom-3 flex flex-wrap gap-1.5 z-10">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 text-[10px] text-ink/75 backdrop-blur">
-                <Shield className="h-3 w-3 text-[var(--rose-gold)]" /> Anti-tarnish
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 text-[10px] text-ink/75 backdrop-blur">
-                <Droplets className="h-3 w-3 text-[var(--rose-gold)]" /> Waterproof
-              </span>
-            </div>
-          </div>
-        </Link>
-
-        <div className="flex items-end justify-between gap-3 px-2 pb-1 pt-4">
-          <div className="min-w-0">
-            <Link href={\`/product/\${product.slug}\`} className="block truncate font-display text-lg text-ink hover:text-[var(--rose-gold)]">
-              {product.name}
-            </Link>
-            <p className="text-sm text-ink/60 mt-1">
-              {formatPrice(product.salePrice)}
-              {hasDiscount && <span className="ml-2 text-xs text-ink/40 line-through">{formatPrice(product.regularPrice)}</span>}
-            </p>
-          </div>
-          <button
-            onClick={handleAdd}
-            className="shrink-0 overflow-hidden rounded-full px-4 py-2 text-xs font-medium text-white transition-transform hover:-translate-y-0.5 z-20"
-            style={{ background: "var(--gradient-gold)" }}
-          >
-            <span className="inline-flex items-center gap-1.5">
-              {added ? (<><Sparkles className="h-3.5 w-3.5" /> Added</>) : (<><ShoppingBag className="h-3.5 w-3.5" /> Add</>)}
+    <Link href={\`/product/\${product.slug || product.id}\`} className="block">
+      <div className="product-card group relative bg-[var(--charcoal)] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+        {/* Badges */}
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+          {product.tag && (
+            <span className="bg-[var(--gold)] text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full shadow-sm uppercase tracking-wider">
+              {product.tag}
             </span>
+          )}
+          {discount > 0 && !product.tag && (
+            <span className="bg-[var(--rose)] text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full shadow-sm">
+              {discount}% OFF
+            </span>
+          )}
+        </div>
+
+        {/* Wishlist Button */}
+        <button 
+          onClick={toggleWishlist}
+          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/50 backdrop-blur-sm text-[var(--rose)] hover:bg-white hover:text-red-500 transition-colors"
+        >
+          <Heart className={\`w-4 h-4 sm:w-5 sm:h-5 \${isWishlisted ? "fill-current text-red-500" : ""}\`} />
+        </button>
+
+        {/* Image */}
+        <div className="aspect-[4/5] overflow-hidden bg-[var(--ivory)]">
+          <Image 
+            src={product.images[0]} 
+            alt={product.name} 
+            width={400}
+            height={500}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </div>
+
+        {/* Content */}
+        <div className="p-4 sm:p-5 text-center bg-[var(--charcoal)]">
+          <p className="text-[var(--gold-dark)] text-[10px] sm:text-xs font-semibold tracking-wider uppercase mb-1 line-clamp-1">
+            {product.category}
+          </p>
+          <h3 className="font-display text-base sm:text-lg text-[var(--ink)] font-semibold mb-2 line-clamp-1">
+            {product.name}
+          </h3>
+          
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-[var(--ink)] font-bold text-sm sm:text-base">₹{product.price}</span>
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <span className="text-[var(--stoneGray)] text-xs sm:text-sm line-through">₹{product.compareAtPrice}</span>
+            )}
+          </div>
+          
+          <button 
+            onClick={handleAddToCart}
+            className="w-full btn-primary py-2.5 sm:py-3 rounded-xl opacity-90 group-hover:opacity-100 flex items-center justify-center gap-2 text-sm"
+          >
+            <ShoppingBag className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+            Add to Cart
           </button>
         </div>
       </div>
-    </TiltCard>
+    </Link>
   );
 }
 `;
 
-fs.writeFileSync(file, content, 'utf8');
-console.log('ProductCard.tsx rewritten to Lovable UI standard.');
+fs.writeFileSync('components/ProductCard.tsx', cardContent);

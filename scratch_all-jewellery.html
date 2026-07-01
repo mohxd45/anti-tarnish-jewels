@@ -1,0 +1,18 @@
+<div id="page-all-jewellery" class="page">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="font-serif text-4xl md:text-5xl text-pink-900 mb-2">All Jewellery</h1>
+      <p class="text-pink-600">Explore our complete collection</p>
+    </div>
+    <div class="flex flex-wrap gap-3 mb-8">
+      <button onclick="filterProducts('all')" class="btn-liquid filter-btn active" data-filter="all">All</button>
+      <button onclick="filterProducts('rings')" class="btn-liquid filter-btn" data-filter="rings">Rings</button>
+      <button onclick="filterProducts('earrings')" class="btn-liquid filter-btn" data-filter="earrings">Earrings</button>
+      <button onclick="filterProducts('necklaces')" class="btn-liquid filter-btn" data-filter="necklaces">Necklaces</button>
+      <button onclick="filterProducts('bracelets')" class="btn-liquid filter-btn" data-filter="bracelets">Bracelets</button>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6" id="allProductsGrid"></div>
+  </div>
+</div>
+
+<!-- CATEGORY PAGES (Rings, Earrings, Necklaces, Bracelets, Daily Wear) -->

@@ -13,7 +13,8 @@ import {
   AnnouncementSettings,
   ContactMessage,
   CartItem,
-  Address
+  Address,
+  Announcement
 } from "@/types";
 import {
   addDoc,
@@ -160,7 +161,19 @@ export async function getProducts(forceRefresh = false): Promise<Product[]> {
     }
   }
 
-  if (!hasFirebaseConfig || !db) return [];
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+  const isDev = process.env.NODE_ENV === "development";
+  const isPreviewMode = isDev && isLocalhost && typeof window !== "undefined" && localStorage.getItem("admin_preview") === "true";
+
+  if (!hasFirebaseConfig || !db) {
+    if (isPreviewMode) {
+      return [
+        { id: "mock-1", slug: "mock-1", name: "Luxury Rose Necklace", category: "Necklaces", price: 1999, originalPrice: 2499, description: "Beautiful mock necklace", images: ["/images/necklace.jpg"], inStock: true, isBestseller: true },
+        { id: "mock-2", slug: "mock-2", name: "Diamond Accent Ring", category: "Rings", price: 999, originalPrice: 1299, description: "Beautiful mock ring", images: ["/images/ring.jpg"], inStock: true, isBestseller: false },
+      ] as unknown as Product[];
+    }
+    return [];
+  }
 
   try {
     const snap = await withTimeout(getDocs(query(collection(db, "products"), orderBy("createdAt", "desc"))));
@@ -719,7 +732,41 @@ export async function getAllOrders(forceRefresh = false): Promise<Order[]> {
       return sessionCached;
     }
   }
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+  const isDev = process.env.NODE_ENV === "development";
+  const isPreviewMode = isDev && isLocalhost && typeof window !== "undefined" && localStorage.getItem("admin_preview") === "true";
 
+  if (!hasFirebaseConfig || !db) {
+    if (isPreviewMode) {
+      return [
+        {
+          id: "mock-order-1",
+          orderNumber: "ATJ-20261025-1234",
+          userId: "mock-user",
+          customerName: "Jane Doe",
+          customerEmail: "jane@example.com",
+          customerPhone: "+91 9876543210",
+          shippingAddress: {
+            fullName: "Jane Doe",
+            phone: "+91 9876543210",
+            street: "123 Mock St",
+            city: "Mumbai",
+            state: "MH",
+            pincode: "400001",
+            country: "India"
+          },
+          items: [{ id: "mock-1", title: "Luxury Rose Necklace", quantity: 1, price: 1999 }],
+          total: 1999,
+          paymentMethod: "Stripe",
+          paymentStatus: "Paid",
+          status: "Processing",
+          orderStatus: "Processing",
+          createdAt: new Date().toISOString()
+        } as unknown as Order
+      ];
+    }
+    return [];
+  }
   try {
     console.log("getAllOrders: Querying 'orders' collection ordered by 'createdAt' desc");
     let snap;
@@ -1216,6 +1263,12 @@ export async function getBanners(): Promise<Banner[]> {
     console.error("Firestore operation failed:", err);
     throw err;
   }
+}
+
+export async function getBannerBySlug(slug: string): Promise<Banner | null> {
+  const allBanners = await getBanners();
+  const found = allBanners.find(b => b.slug === slug);
+  return found || null;
 }
 
 export async function addBanner(banner: Omit<Banner, "id">): Promise<string> {
@@ -1756,4 +1809,31 @@ export async function uploadImage(file: File, folderName: string = "product-imag
     console.error("Firebase Storage upload error:", err);
     throw new Error(err.message || "Failed to upload image to Firebase Storage.");
   }
+}
+
+export async function getAnnouncementsList(): Promise<Announcement[]> {
+  if (!hasFirebaseConfig || !db) return [];
+  try {
+    const snap = await withTimeout(getDocs(query(collection(db, "announcementsList"), orderBy("order", "asc"))));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Announcement));
+  } catch (err) {
+    console.error("Firestore getAnnouncementsList failed:", err);
+    return [];
+  }
+}
+
+export async function addAnnouncement(data: Omit<Announcement, "id">) {
+  clearAllCaches();
+  const ref = await addDoc(collection(db, "announcementsList"), data);
+  return ref.id;
+}
+
+export async function updateAnnouncement(id: string, data: Partial<Announcement>) {
+  clearAllCaches();
+  await updateDoc(doc(db, "announcementsList", id), data);
+}
+
+export async function deleteAnnouncement(id: string) {
+  clearAllCaches();
+  await deleteDoc(doc(db, "announcementsList", id));
 }

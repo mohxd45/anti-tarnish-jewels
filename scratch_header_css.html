@@ -1,0 +1,590 @@
+<USER_REQUEST>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Anti Tarnish Jewels | Premium Anti-Tarnish Jewellery</title>
+<meta name="description" content="Discover premium anti-tarnish jewellery. Rings, earrings, necklaces, bracelets crafted for daily wear. Free delivery above ₹999.">
+<meta property="og:title" content="Anti Tarnish Jewels | Premium Anti-Tarnish Jewellery">
+<meta property="og:description" content="Luxury anti-tarnish jewellery for everyday elegance.">
+<meta property="og:image" content="https://image.qwenlm.ai/public_source/769dc054-4b45-4032-a7dd-4bbcb3cf2c3f/1c399a9de-7b2b-45b5-8bd3-8bf2af259754.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.12/index.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/index.min.css" rel="stylesheet">
+<style>
+:root {
+  --pink-50: #FDF2F8;
+  --pink-100: #FCE7F3;
+  --pink-200: #FBCFE8;
+  --pink-300: #F9A8D4;
+  --pink-400: #F472B6;
+  --pink-500: #EC4899;
+  --gold: #D4AF37;
+  --gold-light: #E8D48B;
+  --gold-dark: #B8860B;
+  --rose: #B76E79;
+  --rose-light: #E8B4B8;
+  --ivory: #FFFFF0;
+  --cream: #FAF0E6;
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.3);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #FDF2F8 0%, #FAF0E6 50%, #FCE7F3 100%);
+  min-height: 100vh;
+  color: #4A3040;
+  overflow-x: hidden;
+}
+.font-serif { font-family: 'Playfair Display', serif; }
+.font-sans { font-family: 'Inter', sans-serif; }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(183, 110, 121, 0.1);
+}
+.glass-dark {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Liquid Glass */
+.liquid-glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.3) 100%);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 8px 32px rgba(183, 110, 121, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 rgba(183, 110, 121, 0.1);
+}
+
+/* Spatial UI */
+.spatial {
+  transform: perspective(1000px) rotateX(2deg);
+  transition: transform 0.6s ease;
+}
+.spatial:hover {
+  transform: perspective(1000px) rotateX(0deg) scale(1.02);
+}
+
+/* Neomorphism for inputs */
+.neo-input {
+  background: #FAF0E6;
+  border: none;
+  box-shadow: 
+    inset 4px 4px 8px rgba(183, 110, 121, 0.15),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+}
+
+/* Claymorphism for badges */
+.clay-badge {
+  background: linear-gradient(145deg, #F9A8D4, #F472B6);
+  box-shadow: 
+    5px 5px 10px rgba(183, 110, 121, 0.2),
+    -5px -5px 10px rgba(255, 255, 255, 0.5),
+    inset 2px 2px 4px rgba(255,255,255,0.3);
+  border-radius: 20px;
+}
+
+/* Gold trim skeuomorphism */
+.gold-trim {
+  background: linear-gradient(135deg, #D4AF37 0%, #E8D48B 50%, #B8860B 100%);
+  box-shadow: 
+    0 2px 4px rgba(184, 134, 11, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* Velvet texture */
+.velvet-bg {
+  background: linear-gradient(135deg, #F8BBD0 0%, #F48FB1 100%);
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 40%);
+}
+
+/* Ticker animation */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-animate {
+  animation: ticker 30s linear infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(-3deg); }
+}
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(2deg); }
+}
+.float-anim { animation: float 6s ease-in-out infinite; }
+.float-slow { animation: floatSlow 8s ease-in-out infinite; }
+.float-reverse { animation: floatReverse 7s ease-in-out infinite; }
+
+/* Shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Page transitions */
+.page { display: none; animation: fadeIn 0.5s ease; }
+.page.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Product card hover */
+.product-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(183, 110, 121, 0.2);
+}
+
+/* Button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-liquid {
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.6);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+.btn-liquid:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%);
+  transform: translateY(-2px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #FDF2F8; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #D4AF37, #B76E79); border-radius: 4px; }
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .btn-primary { padding: 14px 20px; font-size: 14px; }
+  .product-card:hover { transform: none; }
+}
+
+/* Hide scrollbar for ticker */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Quantity controls neomorphism */
+.qty-btn {
+  width: 32px; height: 32px;
+  background: #FAF0E6;
+  border: none;
+  box-shadow: 
+    3px 3px 6px rgba(183, 110, 121, 0.2),
+    -3px -3px 6px rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #B76E79;
+  display: flex; align-items: center; justify-content: center;
+}
+.qty-btn:active {
+  box-shadow: 
+    inset 2px 2px 4px rgba(183, 110, 121, 0.2),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+}
+
+/* Admin sidebar */
+.admin-sidebar {
+  background: linear-gradient(180deg, #4A3040 0%, #2D1B2E 100%);
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* WhatsApp button */
+.whatsapp-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px; height: 56px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+.whatsapp-btn:hover { transform: scale(1.1); }
+
+/* Decorative floating objects */
+.deco-ring {
+  position: absolute;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Bento grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1024px) {
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .bento-grid { grid-template-columns: 1fr; }
+}
+
+/* Category card */
+.category-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  transition: all 0.4s ease;
+}
+.category-card:hover { transform: scale(1.03); }
+.category-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(74, 48, 64, 0.7) 100%);
+}
+
+/* Hero floating cards */
+.hero-float-card {
+  position: absolute;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+.hero-float-card:hover {
+  transform: scale(1.05) translateY(-10px);
+  z-index: 10;
+}
+
+/* Timeline for track order */
+.timeline-item {
+  position: relative;
+  padding-left: 32px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 24px;
+  bottom: -24px;
+  width: 2px;
+  background: linear-gradient(180deg, #D4AF37, #F9A8D4);
+}
+.timeline-item:last-child::before { display: none; }
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+}
+
+/* Search overlay */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 48, 64, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 200;
+  display: none;
+}
+.search-overlay.active { display: flex; }
+
+/* Mobile nav */
+.mobile-nav {
+  position: fixed;
+  top: 0; right: -100%;
+  width: 85%;
+  max-width: 320px;
+  height: 100vh;
+  background: linear-gradient(180deg, #FDF2F8 0%, #FAF0E6 100%);
+  z-index: 150;
+  transition: right 0.4s ease;
+  overflow-y: auto;
+  box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+}
+.mobile-nav.open { right: 0; }
+
+/* Image gallery thumbnails */
+.thumb-active {
+  border: 2px solid #D4AF37;
+  opacity: 1;
+}
+.thumb-inactive {
+  border: 2px solid transparent;
+  opacity: 0.6;
+}
+
+/* Sale badge pulse */
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); }
+}
+.sale-pulse { animation: pulse-gold 2s infinite; }
+
+/* Admin table */
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th {
+  background: linear-gradient(135deg, #FDF2F8, #FCE7F3);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #4A3040;
+  border-bottom: 2px solid #D4AF37;
+}
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(183, 110, 121, 0.1);
+}
+.admin-table tr:hover { background: rgba(252, 231, 243, 0.3); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 48, 64, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+/* Review stars */
+.star-filled { color: #D4AF37; }
+.star-empty { color: #E5E7EB; }
+
+/* Loading spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(212, 175, 55, 0.2);
+  border-top-color: #D4AF37;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive fixes */
+@media (max-width: 360px) {
+  .hero-float-card { width: 140px !important; }
+  .btn-primary { font-size: 13px; padding: 12px 16px; }
+}
+@media (min-width: 768px) {
+  .hero-float-card { width: 220px; }
+}
+@media (min-width: 1024px) {
+  .hero-float-card { width: 260px; }
+}
+
+/* Trust badge */
+.trust-badge {
+  background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+}
+
+/* Anti-tarnish badge */
+.anti-tarnish-badge {
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Search Overlay -->
+<div id="searchOverlay" class="search-overlay" onclick="closeSearch(event)">
+  <div class="glass-dark rounded-3xl p-6 w-full max-w-xl mx-4" onclick="event.stopPropagation()">
+    <div class="flex items-center gap-3 mb-4">
+      <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input type="text" id="searchInput" placeholder="Search jewellery..." class="flex-1 bg-transparent outline-none text-lg" oninput="handleSearch(this.value)">
+      <button onclick="closeSearch()" class="text-pink-400">✕</button>
+    </div>
+    <div id="searchResults" class="space-y-2 max-h-96 overflow-y-auto"></div>
+  </div>
+</div>
+
+<!-- Mobile Nav -->
+<div id="mobileNav" class="mobile-nav">
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="font-serif text-2xl text-pink-900">Menu</h2>
+      <button onclick="toggleMobileNav()" class="text-2xl">✕</button>
+    </div>
+    <nav class="space-y-4">
+      <a onclick="navigate('all-jewellery'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">All Jewellery</a>
+      <a onclick="navigate('rings'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Rings</a>
+      <a onclick="navigate('earrings'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Earrings</a>
+      <a onclick="navigate('necklaces'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Necklaces</a>
+      <a onclick="navigate('bracelets'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Bracelets</a>
+      <a onclick="navigate('daily-wear'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Daily Wear</a>
+      <a onclick="navigate('sale'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 text-pink-600 font-semibold cursor-pointer">Sale</a>
+      <a onclick="navigate('track-order'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Track Order</a>
+      <a onclick="navigate('contact'); toggleMobileNav()" class="block py-3 px-4 rounded-xl hover:bg-pink-100 cursor-pointer">Contact</a>
+    </nav>
+    <div class="mt-8 pt-6 border-t border-pink-200 space-y-3">
+      <a onclick="navigate('login'); toggleMobileNav()" class="block py-3 px-4 rounded-xl bg-pink-100 text-center cursor-pointer">Login / Signup</a>
+      <a onclick="navigate('cart'); toggleMobileNav()" class="block py-3 px-4 rounded-xl bg-gold text-center cursor-pointer" style="background: linear-gradient(135deg, #D4AF37, #B8860B); color: white;">Cart (<span id="mobileCartCount">0</span>)</a>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="liquid-glass fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <button onclick="toggleMobileNav()" class="md:hidden text-2xl">☰</button>
+      <a onclick="navigate('home')" class="cursor-pointer flex items-center gap-2">
+        <div class="w-10 h-10 rounded-full gold-trim flex items-center justify-center">
+          <span class="font-serif text-white font-bold text-lg">A</span>
+        </div>
+        <div class="hidden sm:block">
+          <h1 class="font-serif text-lg md:text-xl text-pink-900 leading-tight">Anti Tarnish</h1>
+          <p class="text-xs text-pink-600 -mt-1">Jewels</p>
+        </div>
+      </a>
+    </div>
+    
+    <div class="hidden lg:flex items-center gap-6">
+      <a onclick="navigate('all-jewellery')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">All Jewellery</a>
+      <a onclick="navigate('rings')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">Rings</a>
+      <a onclick="navigate('earrings')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">Earrings</a>
+      <a onclick="navigate('necklaces')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">Necklaces</a>
+      <a onclick="navigate('bracelets')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">Bracelets</a>
+      <a onclick="navigate('daily-wear')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">Daily Wear</a>
+      <a onclick="navigate('sale')" class="cursor-pointer text-sm font-semibold text-pink-600 hover:text-pink-700 transition">Sale</a>
+      <a onclick="navigate('track-order')" class="cursor-pointer text-sm font-medium hover:text-pink-600 transition">Track Order</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button onclick="openSearch()" class="p-2 rounded-full hover:bg-pink-100 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </button>
+      <button onclick="navigate('wishlist')" class="p-2 rounded-full hover:bg-pink-100 transition relative">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <span id="wishlistCount" class="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
+      </button>
+      <button onclick="navigate('cart')" class="p-2 rounded-full hover:bg-pink-100 transition relative">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <span id="cartCount" class="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs rounded-full flex items-center justify-center font-bold">0</span>
+      </button>
+      <button onclick="navigate('profile')" class="p-2 rounded-full hover:bg-pink-100 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Announcement Ticker -->
+<div class="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-pink-900 via-pink-800 to-pink-900 text-white py-2 overflow-hidden">
+  <div class="ticker-animate flex whitespace-nowrap">
+    <span class="mx-8 text-sm">✨ New collection live</span>
+    <span class="mx-8 text-sm">🚚 Free delivery above ₹999</span>
+    <span class="mx-8 text-sm">⏰ Limited time offer - 20% off</span>
+    <span class="mx-8 text-sm">💎 Anti-tarnish jewellery made for daily wear</span>
+    <span class="mx-8 text-sm">✨ New collection live</span>
+    <span class="mx-8 text-sm">🚚 Free delivery above ₹999</span>
+    <span class="mx-8 text-sm">⏰ Limited time offer - 20% off</span>
+    <span class="mx-8 text-sm">💎 Anti-tarnish jewellery made for daily wear</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="pt-32 pb-20">
+
+<!-- HOME PAGE -->

@@ -1,0 +1,81 @@
+<div id="page-checkout" class="page">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="font-serif text-4xl md:text-5xl text-pink-900 mb-8">Checkout</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2">
+        <div class="glass-dark rounded-3xl p-6 md:p-8 mb-6">
+          <h2 class="font-serif text-2xl text-pink-900 mb-6">Shipping Information</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-pink-900 mb-2">Full Name</label>
+              <input type="text" id="checkoutName" class="neo-input w-full p-4 outline-none" placeholder="Your full name">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-pink-900 mb-2">Phone Number</label>
+              <input type="tel" id="checkoutPhone" class="neo-input w-full p-4 outline-none" placeholder="+91 98765 43210">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-pink-900 mb-2">Address</label>
+              <textarea id="checkoutAddress" class="neo-input w-full p-4 outline-none" rows="3" placeholder="House no., Street, Area"></textarea>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-pink-900 mb-2">City</label>
+                <input type="text" id="checkoutCity" class="neo-input w-full p-4 outline-none" placeholder="City">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-pink-900 mb-2">State</label>
+                <input type="text" id="checkoutState" class="neo-input w-full p-4 outline-none" placeholder="State">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-pink-900 mb-2">Pincode</label>
+                <input type="text" id="checkoutPincode" class="neo-input w-full p-4 outline-none" placeholder="Pincode">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-dark rounded-3xl p-6 md:p-8">
+          <h2 class="font-serif text-2xl text-pink-900 mb-6">Payment Method</h2>
+          <div class="space-y-3">
+            <label class="flex items-center gap-4 p-4 glass rounded-2xl cursor-pointer">
+              <input type="radio" name="payment" value="cod" checked class="w-5 h-5">
+              <div>
+                <h4 class="font-semibold text-pink-900">Cash on Delivery</h4>
+                <p class="text-sm text-pink-600">Pay when you receive</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="glass-dark rounded-3xl p-6 md:p-8 sticky top-32">
+          <h2 class="font-serif text-2xl text-pink-900 mb-6">Order Summary</h2>
+          <div id="checkoutSummary" class="space-y-3 mb-6"></div>
+          <div class="border-t border-pink-200 pt-4 mb-4">
+            <div class="flex justify-between mb-2">
+              <span class="text-pink-700">Subtotal</span>
+              <span id="checkoutSubtotal" class="font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between mb-2">
+              <span class="text-pink-700">Delivery</span>
+              <span id="checkoutDelivery" class="font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold text-pink-900">
+              <span>Total</span>
+              <span id="checkoutTotal">₹0</span>
+            </div>
+          </div>
+          <div class="mb-4">
+            <input type="text" id="couponCode" class="neo-input w-full p-3 outline-none text-sm" placeholder="Coupon code">
+            <button onclick="applyCoupon()" class="btn-liquid w-full mt-2 text-sm py-2">Apply Coupon</button>
+          </div>
+          <button onclick="placeOrder()" class="btn-primary w-full py-4 text-lg">Place Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACK ORDER PAGE -->

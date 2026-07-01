@@ -8,22 +8,14 @@ export function TiltCard({ children, className, style, max = 18 }: { children: R
   const rx = useMotionValue(0), ry = useMotionValue(0);
   const sx = useSpring(rx, { stiffness: 200, damping: 20 });
   const sy = useSpring(ry, { stiffness: 200, damping: 20 });
-  
   const handle = (e: MouseEvent<HTMLDivElement>) => {
-    const el = ref.current; 
-    if (!el) return;
+    const el = ref.current; if (!el) return;
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width - 0.5;
     const y = (e.clientY - r.top) / r.height - 0.5;
-    ry.set(x * max); 
-    rx.set(-y * max);
+    ry.set(x * max); rx.set(-y * max);
   };
-  
-  const reset = () => { 
-    rx.set(0); 
-    ry.set(0); 
-  };
-  
+  const reset = () => { rx.set(0); ry.set(0); };
   return (
     <motion.div
       ref={ref}

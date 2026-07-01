@@ -3,6 +3,8 @@ export type Product = {
   name: string;
   slug: string;
   category: string;
+  categoryId?: string;
+  categorySlug?: string;
   subCategory?: string;
   brand?: string;
   collection?: string;
@@ -16,6 +18,7 @@ export type Product = {
   reviewCount: number;
   material?: string;
   color?: string;
+  colors?: string[];
   size?: string;
   occasion?: string;
   careInstructions?: string;
@@ -37,6 +40,7 @@ export type Product = {
   thumbnail?: string;
   searchKeywords?: string[];
   variants?: any[];
+  tags?: string[];
   badges?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -142,6 +146,7 @@ export type SiteContent = {
 
 export type BannerPlacement =
   | "hero"
+  | "hero-floating"
   | "promo"
   | "sale"
   | "category"
@@ -154,11 +159,23 @@ export type Banner = {
   subtitle?: string;
   imageUrl: string;
   mobileImageUrl?: string;
-  buttonText?: string;
-  link: string;
+  buttonText?: string; // Legacy
+  ctaText?: string;
+  link: string; // Legacy / Backward compat
+  linkUrl?: string;
+  linkType?: "category" | "product" | "custom-url" | "offer-page";
+  slug?: string;
+  categorySlug?: string;
+  productSlug?: string;
+  pageTitle?: string;
+  pageDescription?: string;
+  offerDetails?: string;
+  terms?: string;
   placement: BannerPlacement;
-  isActive: boolean;
-  priority: number;
+  isActive?: boolean;
+  active?: boolean;
+  priority?: number; // Legacy
+  order?: number;
   startDate?: string;
   endDate?: string;
   createdAt: string;
@@ -212,6 +229,7 @@ export type Category = {
   subcategories: string[];
   priority: number;
   isActive: boolean;
+  description?: string;
 };
 
 export type SEOSettings = {
@@ -257,3 +275,15 @@ export type ContactMessage = {
   isReplied?: boolean;
 };
 
+
+
+export type Announcement = {
+  id: string;
+  text: string;
+  couponCode?: string;
+  link?: string;
+  emoji?: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+};

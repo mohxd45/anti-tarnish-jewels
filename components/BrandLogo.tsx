@@ -1,38 +1,15 @@
-import React from "react";
+import Link from "next/link";
+import { Gem } from "lucide-react";
 
-interface BrandLogoProps {
-  size?: number;
-  showText?: boolean;
-  className?: string;
-  withBg?: boolean;
-}
-
-export function BrandLogo({ size = 64, showText = false, className = "", withBg = true }: BrandLogoProps) {
+export function BrandLogo({ className = "", isWhite = false, size = 36 }: { className?: string; isWhite?: boolean; size?: number }) {
   return (
-    <div className={`flex flex-col items-center justify-center ${className}`}>
-      {/* Soft luxury monogram card container */}
-      <div 
-        className={`flex items-center justify-center rounded-[24%] transition-all duration-300 overflow-hidden ${
-          withBg 
-            ? "bg-[#FFF0F5] border border-[#F2C8D3]/50 shadow-[0_8px_25px_-5px_rgba(232,154,170,0.15),_0_3px_10px_-3px_rgba(58,36,40,0.03)]" 
-            : "bg-transparent"
-        }`}
-        style={{ 
-          width: size, 
-          height: size,
-        }}
-      >
-        <img
-          src="/logo-pink.png"
-          alt="Anti Tarnish Jewels Logo"
-          className="w-full h-full object-contain select-none"
-        />
-      </div>
-      {showText && (
-        <span className="mt-3 font-serif text-[clamp(10px,2vw,13px)] font-medium tracking-[0.35em] text-[#3A2428] uppercase text-center">
-          Anti Tarnish Jewels
-        </span>
-      )}
-    </div>
+    <Link href="/" className={`flex items-center gap-2 min-w-0 ${className}`}>
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full" style={{ background: "var(--gradient-gold)" }}>
+        <Gem className="h-4 w-4 text-white" />
+      </span>
+      <span className={`truncate font-display text-xl font-semibold tracking-wide ${isWhite ? "text-white" : "text-ink"}`}>
+        Anti Tarnish
+      </span>
+    </Link>
   );
 }

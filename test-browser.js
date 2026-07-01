@@ -1,33 +1,20 @@
-const { chromium } = require('playwright');
+const puppeteer = require('puppeteer');
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
-
-  page.on('console', msg => console.log(`[CONSOLE] ${msg.type()}: ${msg.text()}`));
-  page.on('pageerror', error => console.log(`[PAGE ERROR] ${error}`));
-
-  console.log('--- Navigating to /sale ---');
-  await page.goto('https://anti-tarnish-jewels-livid.vercel.app/sale', { waitUntil: 'networkidle', timeout: 15000 });
-  const saleHtml = await page.content();
-  if (saleHtml.includes('Loading Sale Items')) {
-    console.log('SALE PAGE IS STUCK ON LOADING!');
-  } else if (saleHtml.includes('No products match')) {
-    console.log('SALE PAGE SAYS NO PRODUCTS MATCH!');
-  } else {
-    console.log('SALE PAGE RENDERED PRODUCTS!');
-  }
-
-  console.log('--- Navigating to /product/premium-anti-tarnish ---');
-  await page.goto('https://anti-tarnish-jewels-livid.vercel.app/product/premium-anti-tarnish', { waitUntil: 'networkidle', timeout: 15000 });
-  const prodHtml = await page.content();
-  if (prodHtml.includes('Product not found')) {
-    console.log('PRODUCT PAGE SAYS NOT FOUND!');
-  } else if (prodHtml.includes('Loading')) {
-    console.log('PRODUCT PAGE IS STUCK LOADING!');
-  } else {
-    console.log('PRODUCT PAGE RENDERED!');
-  }
-
+  
+  // Set viewport to mobile size
+  await page.setViewport({ width: 375, height: 812 });
+  
+  console.log('Navigating to http://localhost:3000...');
+  await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
+  console.log('Page loaded. Waiting 2s...');
+  await new Promise(r => setTimeout(r, 2000));
+  
+  await page.screenshot({ path: 'C:\\Users\\LG GRAM\\.gemini\\antigravity\\brain\\6ca84693-f56c-4c36-b9de-555c8a6212b1\\mobile_hero_banners.png' });
+  console.log('Screenshot saved to mobile_hero_banners.png');
+  
   await browser.close();
+  console.log('Done.');
 })();

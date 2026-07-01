@@ -1,25 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Protected } from "@/components/Protected";
 import { getProducts, deleteProduct, updateProduct, getCategories, uploadImage } from "@/lib/firestore";
 import { Product, Category } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
-import { Edit2, Trash2, X, Check, Search, Plus, Filter, Image as ImageIcon, ToggleLeft, ToggleRight, Sparkles, Upload } from "lucide-react";
-import { PageLoader } from "@/components/ui/PageLoader";
+import { AdminCard, StatusBadge } from "@/components/admin/Bits";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Edit2, Trash2, X, Search, Plus, Filter, Image as ImageIcon, Sparkles, Upload, Star } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
-import { LoadingButton } from "@/components/ui/LoadingButton";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function ManageProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [badgeFilter, setBadgeFilter] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
   // Drawer/Modal State for editing
@@ -67,21 +69,15 @@ export default function ManageProductsPage() {
   const [editIsTrending, setEditIsTrending] = useState(false);
   const [editIsActive, setEditIsActive] = useState(true);
 
-  // Image input
   const [newImageUrl, setNewImageUrl] = useState("");
 
   useEffect(() => {
     loadData();
   }, []);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, categoryFilter, badgeFilter]);
-
   async function loadData() {
     setLoading(true);
-    const prodData = await getProducts();
-    const catData = await getCategories();
+    const [prodData, catData] = await Promise.all([getProducts(), getCategories()]);
     setProducts(prodData);
     setCategories(catData);
     setLoading(false);
@@ -93,9 +89,10 @@ export default function ManageProductsPage() {
     try {
       await deleteProduct(id);
       setProducts(products.filter((p) => p.id !== id));
+      toast.success("Product deleted successfully");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete product.");
+      toast.error("Failed to delete product.");
     } finally {
       setDeletingId(null);
     }
@@ -128,10 +125,8 @@ export default function ManageProductsPage() {
     setEditStoneType(p.stoneType || "");
     setEditBadgesText((p.badges || []).join(", "));
 
-    // Convert specs Record or Array to format safely
     if (p.specifications && typeof p.specifications === "object") {
       if (Array.isArray(p.specifications)) {
-        // Formatted as "Key: Value" or similar
         const list = p.specifications
           .filter(item => typeof item === "string")
           .map((item) => {
@@ -143,7 +138,6 @@ export default function ManageProductsPage() {
           });
         setEditSpecs(list);
       } else {
-        // Record
         const list = Object.entries(p.specifications).map(([k, v]) => ({ key: k, value: String(v || "") }));
         setEditSpecs(list);
       }
@@ -156,7 +150,7 @@ export default function ManageProductsPage() {
     setEditIsNewArrival(!!p.isNewArrival);
     setEditIsFlashDeal(!!p.isFlashDeal);
     setEditIsTrending(!!p.isTrending);
-    setEditIsActive(p.isActive !== false); // default to true
+    setEditIsActive(p.isActive !== false);
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -169,7 +163,7 @@ export default function ManageProductsPage() {
       setEditImages([...editImages, url]);
     } catch (err) {
       console.error(err);
-      alert("Failed to upload image.");
+      toast.error("Failed to upload image.");
     } finally {
       setUploadingImg(false);
     }
@@ -199,23 +193,10 @@ export default function ManageProductsPage() {
   async function handleSaveProduct() {
     if (!editingProduct) return;
     
-    // Safe validation checks
-    if (!editName || !editName.trim()) {
-      alert("Product name is required.");
-      return;
-    }
-    if (!editCategory || !editCategory.trim()) {
-      alert("Category is required.");
-      return;
-    }
-    if (editSalePrice === undefined || editSalePrice === null || Number(editSalePrice) <= 0) {
-      alert("Sale price is required and must be greater than 0.");
-      return;
-    }
-    if (editStock === undefined || editStock === null || Number(editStock) < 0) {
-      alert("Stock availability is required and cannot be negative.");
-      return;
-    }
+    if (!editName || !editName.trim()) return toast.error("Product name is required.");
+    if (!editCategory || !editCategory.trim()) return toast.error("Category is required.");
+    if (editSalePrice === undefined || editSalePrice === null || Number(editSalePrice) <= 0) return toast.error("Sale price must be > 0.");
+    if (editStock === undefined || editStock === null || Number(editStock) < 0) return toast.error("Stock cannot be negative.");
 
     setSaveLoading(true);
     try {
@@ -229,12 +210,10 @@ export default function ManageProductsPage() {
       const finalSalePrice = Number(editSalePrice);
       const finalRegularPrice = Number(editRegularPrice) || finalSalePrice;
       const discountPercentage = finalRegularPrice ? Math.round(((finalRegularPrice - finalSalePrice) / finalRegularPrice) * 100) : 0;
-      const finalImages = editImages && editImages.length > 0 ? editImages : ["/product-placeholder.png"];
+      const finalImages = editImages && editImages.length > 0 ? editImages : ["/placeholder.png"];
 
-      // Safe slug generation
       const baseSlug = slugify(editName);
       const uniqueSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
-
       const finalBadges = editBadgesText.split(",").map(b => b.trim()).filter(Boolean);
 
       const updatedFields: Partial<Product> = {
@@ -253,7 +232,6 @@ export default function ManageProductsPage() {
         warranty: (editWarranty || "").trim(),
         returnPolicy: (editReturnPolicy || "").trim(),
         specifications: specsObj,
-        variants: editingProduct.variants || [],
         badges: finalBadges,
         isFeatured: editIsFeatured,
         isBestSeller: editIsBestSeller,
@@ -277,24 +255,20 @@ export default function ManageProductsPage() {
 
       await updateProduct(editingProduct.id, updatedFields);
       
-      const newProducts = products.map((p) => 
-        p.id === editingProduct.id ? ({ ...p, ...updatedFields } as Product) : p
-      );
+      const newProducts = products.map((p) => p.id === editingProduct.id ? ({ ...p, ...updatedFields } as Product) : p);
       setProducts(newProducts);
       setEditingProduct(null);
-      alert("Product details updated successfully!");
+      toast.success("Product updated successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to save changes.");
+      toast.error("Failed to save changes.");
     } finally {
       setSaveLoading(false);
     }
   }
 
-  // Filter Logic
   const filtered = products.filter((p) => {
-    const matchesSearch = 
-      p.name.toLowerCase().includes(search.toLowerCase()) || 
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
       (p.brand && p.brand.toLowerCase().includes(search.toLowerCase())) ||
       p.category.toLowerCase().includes(search.toLowerCase());
 
@@ -312,733 +286,237 @@ export default function ManageProductsPage() {
     return matchesSearch && matchesCategory && matchesBadge;
   });
 
-  const ITEMS_PER_PAGE = 20;
-  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
   return (
-    <Protected adminOnly>
-      <section className="mx-auto max-w-7xl px-4 py-8">
-        {/* Header Controls */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-goldBeige/40 pb-6 mb-8">
-          <div>
-            <h1 className="text-4xl font-serif font-semibold text-champagne tracking-wide">Products Catalog</h1>
-            <p className="text-sm text-stoneGray mt-1">Manage global inventory items, specification details, and storefront parameters.</p>
-          </div>
-          
-          <Link
-            href="/admin/add-product"
-            className="inline-flex items-center gap-2 rounded-full bg-champagne px-5 py-3 font-semibold text-charcoalBrown shadow-jewel hover:opacity-90 transition-all text-sm self-start sm:self-center"
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Header & Actions */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-3 py-1.5 text-xs rounded-full ring-1 ring-inset bg-card/60 text-foreground/70 ring-border outline-none"
           >
-            <Plus size={16} /> Add Product
-          </Link>
+            <option value="All">All Categories</option>
+            {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+          </select>
+          <select
+            value={badgeFilter}
+            onChange={(e) => setBadgeFilter(e.target.value)}
+            className="px-3 py-1.5 text-xs rounded-full ring-1 ring-inset bg-card/60 text-foreground/70 ring-border outline-none"
+          >
+            <option value="All">All Tags/Status</option>
+            <option value="Active">Active Only</option>
+            <option value="Inactive">Hidden Only</option>
+            <option value="Featured">Featured</option>
+            <option value="BestSeller">Best Sellers</option>
+          </select>
         </div>
-
-        {/* Filters Panel */}
-        <div className="grid gap-4 md:grid-cols-3 mb-8">
-          {/* Search */}
+        
+        <div className="ml-auto flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stoneGray" size={18} />
-            <input
-              type="text"
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, brand, category..."
-              className="w-full rounded-full border border-goldBeige bg-warmwhite py-2.5 pl-11 pr-4 text-charcoalBrown placeholder-stoneGray outline-none focus:border-champagne transition-all text-sm"
+              placeholder="Search products…"
+              className="pl-9 w-48 bg-card/60 rounded-full text-xs"
             />
           </div>
-
-          {/* Category Dropdown */}
-          <div className="relative">
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne text-sm appearance-none cursor-pointer"
-            >
-              <option value="All">All Categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.name}>{c.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Quick Badges Filter */}
-          <div className="relative">
-            <select
-              value={badgeFilter}
-              onChange={(e) => setBadgeFilter(e.target.value)}
-              className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne text-sm appearance-none cursor-pointer"
-            >
-              <option value="All">All Tags/Status</option>
-              <option value="Active">Active Listings Only</option>
-              <option value="Inactive">Hidden Listings Only</option>
-              <option value="Featured">Featured items</option>
-              <option value="BestSeller">Best sellers</option>
-              <option value="NewArrival">New arrivals</option>
-              <option value="FlashDeal">Flash deals</option>
-              <option value="Trending">Trending items</option>
-            </select>
-          </div>
+          <Button asChild className="rounded-full bg-[var(--gradient-rose,linear-gradient(135deg,#d8a7b1,#3a2428))] text-white border-none hover:opacity-90">
+            <Link href="/admin/add-product"><Plus className="h-4 w-4 mr-1" />Add Product</Link>
+          </Button>
         </div>
+      </div>
 
-        {/* Products Table Grid */}
-        <div className="overflow-x-auto rounded-[2rem] border border-goldBeige bg-warmwhite shadow-jewel">
-          {loading ? (
-            <div className="p-12"><PageLoader text="Fetching inventory items..." /></div>
-          ) : filtered.length === 0 ? (
-            <EmptyStateCard 
-              icon={Sparkles} 
-              text="No products available" 
-              subtext="Try adjusting your filter or add a new product." 
-            />
-          ) : (
-            <table className="w-full min-w-[1000px] text-left text-sm text-charcoalBrown">
-              <thead className="bg-beige text-champagne uppercase tracking-wider text-xs border-b border-goldBeige/60">
-                <tr>
-                  <th className="p-5 font-serif font-semibold">Product Details</th>
-                  <th className="font-serif font-semibold">Pricing</th>
-                  <th className="font-serif font-semibold">Stock Levels</th>
-                  <th className="font-serif font-semibold">Store Tags</th>
-                  <th className="font-serif font-semibold">Status</th>
-                  <th className="text-right p-5 font-serif font-semibold">Actions</th>
+      {/* Main Table */}
+      <AdminCard>
+        {loading ? (
+          <div className="p-12 text-center text-muted-foreground animate-pulse">Loading catalog...</div>
+        ) : filtered.length === 0 ? (
+          <EmptyStateCard 
+            icon={Sparkles} 
+            text="No products available" 
+            subtext="Try adjusting your filter or add a new product." 
+          />
+        ) : (
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-sm min-w-[800px]">
+              <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+                <tr className="text-left">
+                  <th className="px-2 py-2 font-medium">Product</th>
+                  <th className="px-2 py-2 font-medium">Category</th>
+                  <th className="px-2 py-2 font-medium">Price</th>
+                  <th className="px-2 py-2 font-medium">Sale</th>
+                  <th className="px-2 py-2 font-medium">Stock</th>
+                  <th className="px-2 py-2 font-medium">Tags</th>
+                  <th className="px-2 py-2 font-medium">Status</th>
+                  <th className="px-2 py-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-goldBeige/40">
-                {paginated.map((p) => {
-                  const hasDiscount = p.salePrice < p.regularPrice;
-                  return (
-                    <tr key={p.id} className="hover:bg-beige/35 transition-all">
-                      {/* Image & Title */}
-                      <td className="p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-beige border border-goldBeige overflow-hidden flex items-center justify-center shrink-0">
-                          {p.images?.[0] ? (
-                            <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <ImageIcon className="text-champagne/30" size={20} />
-                          )}
+              <tbody className="divide-y divide-border/60">
+                {filtered.map((p) => (
+                  <tr key={p.id} className="hover:bg-secondary/40 transition-colors">
+                    <td className="px-2 py-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-11 w-11 shrink-0 rounded-lg bg-secondary grid place-items-center overflow-hidden">
+                          {p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" /> : <ImageIcon className="h-5 w-5 text-muted-foreground" />}
                         </div>
-                        <div>
-                          <p className="font-serif font-semibold text-charcoalBrown leading-tight">{p.name}</p>
-                          <div className="flex gap-2 items-center mt-1 text-xs text-stoneGray">
-                            <span>{p.category}</span>
-                            {p.subCategory && (
-                              <>
-                                <span>•</span>
-                                <span>{p.subCategory}</span>
-                              </>
-                            )}
-                            {p.brand && (
-                              <>
-                                <span>•</span>
-                                <span className="text-champagne font-semibold">{p.brand}</span>
-                              </>
-                            )}
-                          </div>
+                        <div className="min-w-0">
+                          <div className="font-medium truncate">{p.name}</div>
+                          <div className="text-[11px] text-muted-foreground">SKU #{p.id.slice(-6).toUpperCase()}</div>
                         </div>
-                      </td>
-
-                      {/* Prices */}
-                      <td>
-                        {hasDiscount ? (
-                          <div>
-                            <span className="font-semibold text-champagne">{formatPrice(p.salePrice)}</span>
-                            <span className="text-xs line-through text-stoneGray ml-2">{formatPrice(p.regularPrice)}</span>
-                          </div>
-                        ) : (
-                          <span className="font-semibold text-charcoalBrown">{formatPrice(p.regularPrice)}</span>
-                        )}
-                      </td>
-
-                      {/* Stock levels */}
-                      <td>
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          p.stock <= 0 ? "bg-dustyRose/10 text-dustyRose" :
-                          p.stock < 10 ? "bg-amber-500/10 text-amber-600" : "bg-emerald-500/10 text-emerald-600"
-                        }`}>
-                          {p.stock} units ({p.stock <= 0 ? "Out of Stock" : p.stock < 10 ? "Low Stock" : "In Stock"})
-                        </span>
-                      </td>
-
-                      {/* Badges/Tags */}
-                      <td>
-                        <div className="flex flex-wrap gap-1">
-                          {p.isFeatured && <span className="text-[9px] font-semibold bg-emerald-500/15 text-emerald-600 border border-emerald-500/25 px-2 py-0.5 rounded-full uppercase tracking-wider">Featured</span>}
-                          {p.isBestSeller && <span className="text-[9px] font-semibold bg-champagne/15 text-champagne border border-champagne/25 px-2 py-0.5 rounded-full uppercase tracking-wider">Best Seller</span>}
-                          {p.isNewArrival && <span className="text-[9px] font-semibold bg-indigo-500/15 text-indigo-600 border border-indigo-500/25 px-2 py-0.5 rounded-full uppercase tracking-wider">New</span>}
-                          {p.isFlashDeal && <span className="text-[9px] font-semibold bg-dustyRose/15 text-dustyRose border border-dustyRose/25 px-2 py-0.5 rounded-full uppercase tracking-wider font-mono">Flash Deal</span>}
-                          {p.isTrending && <span className="text-[9px] font-semibold bg-cyan-500/15 text-cyan-600 border border-cyan-500/25 px-2 py-0.5 rounded-full uppercase tracking-wider">Trending</span>}
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td>
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${p.isActive !== false ? "text-emerald-600" : "text-stoneGray"}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${p.isActive !== false ? "bg-emerald-500" : "bg-stoneGray/40"}`} />
-                          {p.isActive !== false ? "Active" : "Hidden"}
-                        </span>
-                      </td>
-
-                      {/* Action buttons */}
-                      <td className="p-5 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => openEditDrawer(p)}
-                            className="p-2.5 rounded-full bg-champagne/15 text-champagne hover:bg-champagne hover:text-charcoalBrown transition-colors"
-                            title="Edit Details"
-                          >
-                            <Edit2 size={15} />
-                          </button>
-                          <button
-                            disabled={deletingId === p.id}
-                            onClick={() => handleDelete(p.id)}
-                            className="p-2.5 rounded-full bg-dustyRose/15 text-dustyRose hover:bg-dustyRose hover:text-charcoalBrown transition-colors disabled:opacity-50"
-                            title="Delete Product"
-                          >
-                            {deletingId === p.id ? (
-                              <HeartLoader size="sm" text="" />
-                            ) : (
-                              <Trash2 size={15} />
-                            )}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3 text-xs">{p.category}</td>
+                    <td className="px-2 py-3 tabular-nums text-muted-foreground line-through text-xs">
+                      {formatPrice(p.regularPrice)}
+                    </td>
+                    <td className="px-2 py-3 tabular-nums font-semibold text-charcoalBrown">
+                      {formatPrice(p.salePrice)}
+                    </td>
+                    <td className="px-2 py-3">
+                      <span className={`tabular-nums text-xs font-medium ${p.stock < 10 ? "text-amber-600" : "text-emerald-600"}`}>
+                        {p.stock}
+                      </span>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="flex gap-1 flex-wrap">
+                        {p.isFeatured && <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-500/20 inline-flex items-center gap-0.5"><Star className="h-2.5 w-2.5" />Featured</span>}
+                        {p.isBestSeller && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[rgba(184,149,94,0.1)] text-[rgba(184,149,94,1)] ring-1 ring-[rgba(184,149,94,0.3)]">Bestseller</span>}
+                        {p.isFlashDeal && <span className="text-[10px] px-1.5 py-0.5 rounded bg-dustyRose/10 text-dustyRose ring-1 ring-dustyRose/30">Flash Deal</span>}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3"><StatusBadge status={p.isActive !== false ? "Active" : "Inactive"} /></td>
+                    <td className="px-2 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button size="icon" variant="ghost" onClick={() => openEditDrawer(p)}><Edit2 className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" disabled={deletingId === p.id} onClick={() => handleDelete(p.id)}>
+                          {deletingId === p.id ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-4 w-4 text-dustyRose" />}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-          )}
-        </div>
-
-        {/* Pagination Controls */}
-        {filtered.length > ITEMS_PER_PAGE && (
-          <div className="flex items-center justify-between border-t border-goldBeige/40 pt-6 mt-6">
-            <span className="text-xs text-stoneGray">
-              Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} products
-            </span>
-            <div className="flex gap-2">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="rounded-full border border-goldBeige bg-warmwhite px-4 py-2 text-xs font-semibold text-charcoalBrown hover:border-champagne disabled:opacity-50 transition-all"
-              >
-                Previous
-              </button>
-              <button
-                disabled={currentPage * ITEMS_PER_PAGE >= filtered.length}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="rounded-full border border-goldBeige bg-warmwhite px-4 py-2 text-xs font-semibold text-charcoalBrown hover:border-champagne disabled:opacity-50 transition-all"
-              >
-                Next
-              </button>
-            </div>
           </div>
         )}
+      </AdminCard>
 
-        {/* Edit Product Drawer Overlay */}
-        {editingProduct && (
-          <div className="fixed inset-0 z-50 bg-black/70 flex justify-end">
-            <div className="fixed inset-0" onClick={() => setEditingProduct(null)} />
-            <div className="relative w-full max-w-3xl bg-warmwhite shadow-2xl h-screen overflow-hidden p-4 sm:p-6 md:p-8 flex flex-col justify-between border-l border-goldBeige">
-              
-              {/* Drawer Header */}
-              <div className="flex justify-between items-center border-b border-goldBeige/40 pb-5 mb-6">
-                <div>
-                  <span className="text-[10px] text-champagne uppercase tracking-[0.2em] font-mono block">Product Customizer</span>
-                  <h3 className="text-2xl font-serif font-semibold text-charcoalBrown mt-0.5">Edit: {editingProduct.name}</h3>
-                </div>
-                <button
-                  onClick={() => setEditingProduct(null)}
-                  className="rounded-full border border-goldBeige p-2 text-champagne hover:bg-champagne/10 transition-colors"
-                  aria-label="Close customizer"
-                >
-                  <X size={18} />
-                </button>
+      {/* Edit Drawer (retained from old UI, just visually updated a bit to match) */}
+      {editingProduct && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex justify-end">
+          <div className="fixed inset-0" onClick={() => setEditingProduct(null)} />
+          <div className="relative w-full max-w-2xl bg-[var(--background)] shadow-2xl h-screen flex flex-col border-l border-border/60 animate-in slide-in-from-right">
+            
+            <div className="flex justify-between items-center border-b border-border/60 p-5 bg-card/40 backdrop-blur-sm">
+              <div>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Product Customizer</span>
+                <h3 className="text-xl font-display font-semibold text-foreground mt-1 truncate max-w-md">Edit: {editingProduct.name}</h3>
               </div>
+              <button onClick={() => setEditingProduct(null)} className="rounded-full p-2 text-muted-foreground hover:bg-secondary transition-colors">
+                <X size={18} />
+              </button>
+            </div>
 
-              {/* Drawer Body - Scrollable Fields */}
-              <div className="flex-1 space-y-6 pr-1 overflow-y-auto scrollbar-thin">
-                
-                {/* Section 1: Basic Info */}
-                <div className="space-y-4">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest flex items-center gap-1.5"><Sparkles size={14} /> Basic Product Details</h4>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs text-stoneGray">Product Name</label>
-                    <input
-                      type="text"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                    />
+            <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-thin">
+              {/* Basic Details */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Basic Details</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Product Name</label>
+                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="rounded-xl" />
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-stoneGray block mb-1">Brand Name</label>
-                      <input
-                        type="text"
-                        value={editBrand}
-                        onChange={(e) => setEditBrand(e.target.value)}
-                        placeholder="e.g. Samsung"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Parent Category</label>
+                      <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Category</label>
                       <select
                         value={editCategory}
                         onChange={(e) => setEditCategory(e.target.value)}
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne text-sm appearance-none cursor-pointer"
+                        className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
                       >
-                        <option value="">Select Category</option>
-                        {categories.map((c) => (
-                          <option key={c.id} value={c.name}>{c.name}</option>
-                        ))}
+                        <option value="">Select</option>
+                        {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs text-stoneGray block mb-1">Subcategory</label>
-                      <input
-                        type="text"
-                        value={editSubCategory}
-                        onChange={(e) => setEditSubCategory(e.target.value)}
-                        placeholder="e.g. Headphones"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Stock Availability</label>
-                      <input
-                        type="number"
-                        value={editStock}
-                        onChange={(e) => setEditStock(Number(e.target.value))}
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
+                      <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Subcategory</label>
+                      <Input value={editSubCategory} onChange={(e) => setEditSubCategory(e.target.value)} className="rounded-xl" />
                     </div>
                   </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs text-stoneGray">Description Wording</label>
-                    <textarea
-                      rows={3}
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      className="w-full rounded-2xl border border-goldBeige bg-warmwhite px-4 py-3 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                    />
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Description</label>
+                    <textarea rows={3} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring resize-none" />
                   </div>
                 </div>
-
-                {/* Section 2: Pricing Details */}
-                <div className="space-y-4 pt-4 border-t border-goldBeige/40">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest">Inventory Pricing Structure</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Regular Price</label>
-                      <input
-                        type="number"
-                        value={editRegularPrice}
-                        onChange={(e) => setEditRegularPrice(Number(e.target.value))}
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Sale Discounted Price</label>
-                      <input
-                        type="number"
-                        value={editSalePrice}
-                        onChange={(e) => setEditSalePrice(Number(e.target.value))}
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 3: Multiple Images Upload */}
-                <div className="space-y-4 pt-4 border-t border-goldBeige/40">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest flex items-center gap-1.5"><ImageIcon size={14} /> Product Images Grid</h4>
-                  
-                  {/* Selected images list */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {editImages.map((img, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-xl bg-beige border border-goldBeige overflow-hidden group">
-                        <img src={img} alt="Product Thumb" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(idx)}
-                          className="absolute top-1 right-1 rounded-full p-1 bg-black/60 text-dustyRose hover:bg-black/95 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={12} />
-                        </button>
-                        {idx === 0 && (
-                          <span className="absolute bottom-1 left-1 text-[8px] bg-champagne text-charcoalBrown font-semibold uppercase px-1.5 py-0.5 rounded">Primary</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add Image Inputs */}
-                  <div className="grid gap-3 pt-2">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newImageUrl}
-                        onChange={(e) => setNewImageUrl(e.target.value)}
-                        placeholder="Add imageUrl (HTTP URL)"
-                        className="flex-1 rounded-full border border-goldBeige bg-warmwhite px-4 py-2 text-charcoalBrown outline-none focus:border-champagne transition-all text-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddImageUrl}
-                        className="rounded-full bg-champagne/15 border border-goldBeige px-4 py-2 text-champagne text-xs font-semibold hover:bg-champagne hover:text-charcoalBrown transition-all"
-                      >
-                        Add URL
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <label className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-goldBeige bg-beige px-4 py-2.5 text-champagne text-xs font-semibold hover:bg-champagne/10 transition-all">
-                        {uploadingImg ? (
-                          <>
-                            <HeartLoader size="sm" text="Uploading Image..." />
-                          </>
-                        ) : (
-                          <>
-                            <Upload size={14} /> Replace Image
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          disabled={uploadingImg}
-                          className="hidden"
-                        />
-                      </label>
-                      <span className="text-[10px] text-stoneGray">Supports JPG, PNG formats.</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 4: Specifications */}
-                <div className="space-y-4 pt-4 border-t border-goldBeige/40">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest">Technical Specifications</h4>
-                  
-                  {/* Current specs list */}
-                  <div className="space-y-2">
-                    {editSpecs.map((spec, idx) => (
-                      <div key={idx} className="flex gap-2 items-center bg-beige p-2 rounded-full border border-goldBeige text-xs">
-                        <span className="font-semibold text-champagne pl-3">{spec.key}:</span>
-                        <span className="text-charcoalBrown flex-1">{spec.value}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSpec(idx)}
-                          className="text-dustyRose hover:bg-dustyRose/10 p-1.5 rounded-full"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add Spec Input */}
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newSpecKey}
-                      onChange={(e) => setNewSpecKey(e.target.value)}
-                      placeholder="Spec Parameter (e.g. Battery)"
-                      className="w-1/2 rounded-full border border-goldBeige bg-warmwhite px-4 py-2 text-charcoalBrown outline-none focus:border-champagne transition-all text-xs"
-                    />
-                    <input
-                      type="text"
-                      value={newSpecValue}
-                      onChange={(e) => setNewSpecValue(e.target.value)}
-                      placeholder="Spec Detail Value (e.g. 5000 mAh)"
-                      className="w-1/2 rounded-full border border-goldBeige bg-warmwhite px-4 py-2 text-charcoalBrown outline-none focus:border-champagne transition-all text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddSpec}
-                      className="rounded-full bg-champagne px-4 py-2 text-charcoalBrown text-xs font-semibold hover:opacity-90 transition-all shrink-0"
-                    >
-                      Add Spec
-                    </button>
-                  </div>
-                </div>
-
-                {/* Section 5: Store Policies & Warranty */}
-                <div className="space-y-4 pt-4 border-t border-goldBeige/40">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest">Warranty & Return Policies</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Warranty Period</label>
-                      <input
-                        type="text"
-                        value={editWarranty}
-                        onChange={(e) => setEditWarranty(e.target.value)}
-                        placeholder="e.g. 1 Year Brand Warranty"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Return Policy Override</label>
-                      <input
-                        type="text"
-                        value={editReturnPolicy}
-                        onChange={(e) => setEditReturnPolicy(e.target.value)}
-                        placeholder="e.g. 7 Days Replacement Only"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section: Jewellery Specific Details */}
-                <div className="space-y-4 pt-4 border-t border-goldBeige/40">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest flex items-center gap-1.5"><Sparkles size={14} /> Jewellery Specific Details</h4>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Collection</label>
-                      <input
-                        type="text"
-                        value={editCollection}
-                        onChange={(e) => setEditCollection(e.target.value)}
-                        placeholder="e.g. Daily Wear, Bridal"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Material Base</label>
-                      <input
-                        type="text"
-                        value={editMaterial}
-                        onChange={(e) => setEditMaterial(e.target.value)}
-                        placeholder="e.g. 316L Stainless Steel"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Plating Polish</label>
-                      <input
-                        type="text"
-                        value={editPlating}
-                        onChange={(e) => setEditPlating(e.target.value)}
-                        placeholder="e.g. 18K Gold Plated"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Color / Finish</label>
-                      <input
-                        type="text"
-                        value={editColor}
-                        onChange={(e) => setEditColor(e.target.value)}
-                        placeholder="e.g. Rose Gold, Silver"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Size / Fit</label>
-                      <input
-                        type="text"
-                        value={editSize}
-                        onChange={(e) => setEditSize(e.target.value)}
-                        placeholder="e.g. Adjustable, 6, 7"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Occasion</label>
-                      <input
-                        type="text"
-                        value={editOccasion}
-                        onChange={(e) => setEditOccasion(e.target.value)}
-                        placeholder="e.g. Festive, Workwear"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Stone / Gem Type</label>
-                      <input
-                        type="text"
-                        value={editStoneType}
-                        onChange={(e) => setEditStoneType(e.target.value)}
-                        placeholder="e.g. AAA+ Cubic Zirconia"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Jewellery Sub-Type</label>
-                      <input
-                        type="text"
-                        value={editJewelleryType}
-                        onChange={(e) => setEditJewelleryType(e.target.value)}
-                        placeholder="e.g. Studs, Hoops, Chokers"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-stoneGray block mb-1">Custom Badges (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={editBadgesText}
-                        onChange={(e) => setEditBadgesText(e.target.value)}
-                        placeholder="e.g. Hot Seller, Daily Wear"
-                        className="w-full rounded-full border border-goldBeige bg-warmwhite px-4 py-2.5 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Waterproof Toggle */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">💧 Waterproof / Shower Proof</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditWaterproof(!editWaterproof)}
-                        className={`text-champagne ${editWaterproof ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editWaterproof ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-
-                    {/* Anti-Tarnish Toggle */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">✨ Anti-Tarnish Guaranteed</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditAntiTarnish(!editAntiTarnish)}
-                        className={`text-champagne ${editAntiTarnish ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editAntiTarnish ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs text-stoneGray">Jewellery Care Instructions</label>
-                    <textarea
-                      rows={2}
-                      value={editCareInstructions}
-                      onChange={(e) => setEditCareInstructions(e.target.value)}
-                      placeholder="Provide recommended care, cleaning cloth, chemical storage guidelines..."
-                      className="w-full rounded-2xl border border-goldBeige bg-warmwhite px-4 py-3 text-charcoalBrown outline-none focus:border-champagne transition-all text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Section 6: Promo Toggles */}
-                <div className="space-y-4 pt-4 border-t border-goldBeige/40">
-                  <h4 className="text-xs font-semibold text-champagne uppercase tracking-widest">Storefront Marketing Parameters</h4>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Featured */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">Featured Item</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditIsFeatured(!editIsFeatured)}
-                        className={`text-champagne ${editIsFeatured ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editIsFeatured ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-
-                    {/* Best Seller */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">Best Seller Badge</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditIsBestSeller(!editIsBestSeller)}
-                        className={`text-champagne ${editIsBestSeller ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editIsBestSeller ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-
-                    {/* New Arrival */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">New Arrival Flag</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditIsNewArrival(!editIsNewArrival)}
-                        className={`text-champagne ${editIsNewArrival ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editIsNewArrival ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-
-                    {/* Flash Deal */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">Flash Deals Slider</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditIsFlashDeal(!editIsFlashDeal)}
-                        className={`text-champagne ${editIsFlashDeal ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editIsFlashDeal ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-
-                    {/* Trending */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">Trending Feed list</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditIsTrending(!editIsTrending)}
-                        className={`text-champagne ${editIsTrending ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editIsTrending ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-
-                    {/* Listing Status */}
-                    <div className="flex items-center justify-between bg-beige px-4 py-3 rounded-full border border-goldBeige/40">
-                      <span className="text-xs text-charcoalBrown font-medium">Listings Active status</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditIsActive(!editIsActive)}
-                        className={`text-champagne ${editIsActive ? "text-champagne" : "text-stoneGray/30"}`}
-                      >
-                        {editIsActive ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
-              {/* Drawer Footer Actions */}
-              <div className="flex gap-3 justify-end items-center mt-6">
-                <button type="button" onClick={() => setEditingProduct(null)} className="px-5 py-2.5 text-stoneGray font-semibold hover:text-charcoalBrown transition-all text-sm">
-                  Cancel
-                </button>
-                <LoadingButton
-                  type="button"
-                  loading={saveLoading}
-                  loadingText="Saving Customizations..."
-                  onClick={handleSaveProduct}
-                  className="rounded-full bg-champagne px-6 py-2.5 text-charcoalBrown font-semibold hover:opacity-90 transition-all text-sm shadow-jewel"
-                >
-                  Save Product Details
-                </LoadingButton>
+              {/* Pricing & Stock */}
+              <div className="space-y-4 pt-2">
+                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Pricing & Inventory</h4>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Regular (MRP)</label>
+                    <Input type="number" value={editRegularPrice} onChange={(e) => setEditRegularPrice(Number(e.target.value))} className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Sale Price</label>
+                    <Input type="number" value={editSalePrice} onChange={(e) => setEditSalePrice(Number(e.target.value))} className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Stock</label>
+                    <Input type="number" value={editStock} onChange={(e) => setEditStock(Number(e.target.value))} className="rounded-xl" />
+                  </div>
+                </div>
               </div>
 
+              {/* Flags / Status */}
+              <div className="space-y-4 pt-2">
+                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Flags & Status</h4>
+                <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editIsActive} onChange={(e) => setEditIsActive(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Active (Visible)
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editIsFeatured} onChange={(e) => setEditIsFeatured(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Featured
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editIsBestSeller} onChange={(e) => setEditIsBestSeller(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Best Seller
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editIsFlashDeal} onChange={(e) => setEditIsFlashDeal(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Flash Deal
+                  </label>
+                </div>
+              </div>
+
+              {/* Images */}
+              <div className="space-y-4 pt-2">
+                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Images</h4>
+                <div className="grid grid-cols-4 gap-3">
+                  {editImages.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg border border-border overflow-hidden group bg-secondary/50">
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => handleRemoveImage(idx)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"><X size={12}/></button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Image URL..." className="rounded-xl flex-1" />
+                  <Button type="button" variant="secondary" onClick={handleAddImageUrl} className="rounded-xl">Add URL</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-border/60 p-5 bg-card/40 backdrop-blur-sm flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setEditingProduct(null)} className="rounded-full">Cancel</Button>
+              <Button onClick={handleSaveProduct} disabled={saveLoading} className="rounded-full bg-[var(--gradient-rose)] text-white hover:opacity-90 border-none">
+                {saveLoading ? "Saving..." : "Save Product"}
+              </Button>
             </div>
           </div>
-        )}
-
-      </section>
-    </Protected>
+        </div>
+      )}
+    </div>
   );
 }
