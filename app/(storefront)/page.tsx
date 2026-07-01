@@ -255,12 +255,31 @@ function CategoryTile({
   category, className, featured = false,
 }: { category: any; className?: string; featured?: boolean }) {
   if (!category) return null;
+  
+  // Provide beautiful fallback images based on category name if none exists in Firestore
+  const fallbackImages: Record<string, string> = {
+    ring: "https://images.unsplash.com/photo-1605100804763-247f66126e28?w=800",
+    earring: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800",
+    necklace: "https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=800",
+    bracelet: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800",
+    bangle: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800",
+    daily: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800",
+    bridal: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800",
+  };
+
+  let imageSrc = category.image || category.imageUrl;
+  if (!imageSrc) {
+    const nameLower = (category.name || "").toLowerCase();
+    const matchedKey = Object.keys(fallbackImages).find(k => nameLower.includes(k));
+    imageSrc = matchedKey ? fallbackImages[matchedKey] : "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800";
+  }
+
   return (
     <Link
       href={`/shop?category=${category.slug}`}
       className={`category-card block cursor-pointer ${className ?? ""}`}
     >
-      <img src={category.image} alt={category.name} className="h-full w-full object-cover" />
+      <img src={imageSrc} alt={category.name} className="h-full w-full object-cover" />
       <div className="absolute bottom-3 left-4 z-10 text-white">
         <h3 className={`font-serif ${featured ? "text-2xl md:text-3xl" : "text-xl"}`}>{category.name}</h3>
         <p className="text-xs opacity-90">Explore collection</p>
