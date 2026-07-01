@@ -27,10 +27,10 @@ export function StatusBadge({ status }: { status: string }) {
 
 export function AdminCard({ children, className = "", title, action }: { children: ReactNode; className?: string; title?: string; action?: ReactNode }) {
   return (
-    <section className={`glass-card p-5 ${className}`}>
+    <section className={`bg-white shadow-sm border border-[color:var(--color-border)] rounded-2xl p-5 sm:p-6 ${className}`}>
       {(title || action) && (
-        <header className="flex items-center justify-between gap-3 mb-4">
-          {title && <h2 className="font-display text-lg">{title}</h2>}
+        <header className="flex items-center justify-between gap-3 mb-6">
+          {title && <h2 className="font-serif text-xl text-[color:var(--color-espresso)] font-semibold">{title}</h2>}
           {action}
         </header>
       )}

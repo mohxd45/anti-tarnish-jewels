@@ -49,10 +49,12 @@ export default function AnnouncementsPage() {
         getAnnouncements(),
         getAnnouncementsList()
       ]);
-      setSettings(data);
-      setAnnouncements(list.sort((a, b) => a.order - b.order));
+      setSettings(data || {} as AnnouncementSettings);
+      setAnnouncements(Array.isArray(list) ? list.sort((a, b) => (a.order || 0) - (b.order || 0)) : []);
     } catch {
       toast.error("Failed to fetch settings.");
+      setSettings({} as AnnouncementSettings);
+      setAnnouncements([]);
     }
     setLoading(false);
   }
@@ -281,8 +283,23 @@ export default function AnnouncementsPage() {
                     <Field label="Flash Sale Countdown Timer (Optional)" hint="Countdown timer triggers homepage ticking panels. Leave empty to disable.">
                       <Input 
                         type="datetime-local"
-                        value={settings.countdownTimer ? new Date(settings.countdownTimer).toISOString().slice(0, 16) : ""}
-                        onChange={(e) => setSettings({ ...settings, countdownTimer: e.target.value ? new Date(e.target.value).toISOString() : "" })}
+                        value={(() => {
+                          if (!settings.countdownTimer) return "";
+                          try {
+                            const d = new Date(settings.countdownTimer);
+                            return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 16);
+                          } catch { return ""; }
+                        })()}
+                        onChange={(e) => {
+                          let val = "";
+                          if (e.target.value) {
+                            try {
+                              const d = new Date(e.target.value);
+                              if (!isNaN(d.getTime())) val = d.toISOString();
+                            } catch {}
+                          }
+                          setSettings({ ...settings, countdownTimer: val });
+                        }}
                         className="bg-card/40 font-mono text-xs"
                       />
                     </Field>

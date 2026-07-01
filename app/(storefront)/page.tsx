@@ -55,10 +55,6 @@ export default async function HomePage() {
       <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden px-4">
         {/* soft floating decorations */}
         <div className="pointer-events-none absolute inset-0 select-none opacity-20">
-          <span className="float-anim absolute left-[5%] top-[10%] text-6xl">💍</span>
-          <span className="float-slow absolute right-[8%] top-[18%] text-5xl">✨</span>
-          <span className="float-reverse absolute bottom-[28%] left-[10%] text-5xl">💎</span>
-          <span className="float-anim absolute bottom-[18%] right-[6%] text-6xl">👑</span>
         </div>
 
         <div className="absolute inset-0 z-0">
@@ -113,10 +109,10 @@ export default async function HomePage() {
                 <Link
                   key={b.id || i}
                   href={`/shop?category=${b.title?.toLowerCase()}`}
-                  className={`glass-dark absolute cursor-pointer rounded-2xl p-3 transition hover:z-10 hover:-translate-y-2 hover:scale-105 ${pos.anim}`}
+                  className={`glass bg-white/90 border border-[color:var(--color-border)] shadow-sm absolute cursor-pointer rounded-2xl p-3 transition hover:z-10 hover:-translate-y-2 hover:scale-105 hover:shadow-md ${pos.anim}`}
                   style={style}
                 >
-                  <img src={b.imageUrl} alt={b.title} className="mb-3 h-32 w-full rounded-xl object-cover" />
+                  <img src={b.imageUrl || (b as any).image || "https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=500"} alt={b.title} className="mb-3 h-32 w-full rounded-xl object-cover" />
                   <h3 className="font-serif text-lg text-pink-900">{b.title}</h3>
                   <p className="text-xs text-pink-600">{b.subtitle}</p>
                 </Link>
@@ -153,7 +149,7 @@ export default async function HomePage() {
 
       {/* WHY ANTI-TARNISH */}
       <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="glass-dark rounded-3xl p-6 md:p-12">
+        <div className="glass bg-gradient-to-br from-pink-50/80 to-white shadow-sm border border-[color:var(--color-border)] rounded-3xl p-6 md:p-12">
           <div className="mb-10 text-center">
             <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-5xl">Why Anti-Tarnish?</h2>
             <p className="mx-auto max-w-2xl text-pink-600">
@@ -219,7 +215,7 @@ export default async function HomePage() {
 
       {/* NEWSLETTER */}
       <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="glass-dark mx-auto max-w-3xl rounded-3xl p-8 text-center md:p-12">
+        <div className="glass bg-white/90 shadow-sm border border-[color:var(--color-border)] mx-auto max-w-3xl rounded-3xl p-8 text-center md:p-12">
           <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-4xl">Join our list</h2>
           <p className="mb-6 text-pink-600">Get 10% off your first order and early access to new drops.</p>
           <form
@@ -290,20 +286,20 @@ function CategoryTile({
 
 function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
-    <div className="trust-badge">
-      <div className="mb-3 flex justify-center text-pink-600">{icon}</div>
-      <h3 className="mb-2 font-serif text-xl text-pink-900">{title}</h3>
-      <p className="text-sm text-pink-700">{text}</p>
+    <div className="glass bg-white/80 rounded-2xl p-6 text-center border border-[color:var(--color-border)] shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-pink-50 text-[color:var(--color-gold)]">{icon}</div>
+      <h3 className="mb-2 font-serif text-xl text-[color:var(--color-espresso)]">{title}</h3>
+      <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
     </div>
   );
 }
 
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="trust-badge">
-      <div className="mb-2 flex justify-center text-pink-600">{icon}</div>
-      <h4 className="text-sm font-semibold text-pink-900">{title}</h4>
-      <p className="text-xs text-pink-600">{sub}</p>
+    <div className="glass bg-white/80 p-5 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm border border-[color:var(--color-border)] transition hover:bg-white hover:-translate-y-1 hover:shadow-md">
+      <div className="mb-3 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
+      <h4 className="text-[13px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider">{title}</h4>
+      <p className="mt-1 text-xs text-[color:var(--color-muted-text)]">{sub}</p>
     </div>
   );
 }

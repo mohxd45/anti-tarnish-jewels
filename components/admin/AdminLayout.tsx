@@ -45,17 +45,17 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-border/60">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white" style={{ background: "var(--gradient-rose, linear-gradient(135deg, #d8a7b1, #3a2428))" }}>
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-[color:var(--color-border)] bg-white">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white" style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-gold-deep))" }}>
           <Gem className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="font-display text-lg leading-tight truncate">Anti Tarnish</p>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Jewels Admin</p>
+          <p className="font-serif text-lg leading-tight truncate text-[color:var(--color-espresso)] font-bold">Anti Tarnish</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-muted-text)] font-semibold">Jewels Admin</p>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5 scrollbar-thin">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin bg-white">
         {nav.map((item) => {
           const Icon = item.icon;
           const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
@@ -64,27 +64,27 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
               key={item.to}
               href={item.to}
               onClick={onNavigate}
-              className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+              className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all duration-200 ${
                 active
-                  ? "bg-[rgba(232,154,170,0.1)] text-[#3a2428] font-medium shadow-[inset_0_0_0_1px_rgba(184,149,94,0.3)]"
-                  : "text-foreground/75 hover:bg-secondary hover:text-foreground"
+                  ? "bg-pink-50 text-[color:var(--color-espresso)] font-semibold shadow-sm border border-pink-100"
+                  : "text-[color:var(--color-muted-text)] hover:bg-pink-50/50 hover:text-[color:var(--color-espresso)] border border-transparent"
               }`}
             >
-              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[#b8955e]" : ""}`} />
+              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[color:var(--color-gold)]" : "opacity-70 group-hover:text-[color:var(--color-gold)]"}`} />
               <span className="truncate">{item.label}</span>
-              {active && <ChevronRight className="ml-auto h-3.5 w-3.5 text-[#b8955e]" />}
+              {active && <ChevronRight className="ml-auto h-3.5 w-3.5 text-[color:var(--color-gold)]" />}
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t border-border/60 p-3">
+      <div className="border-t border-[color:var(--color-border)] p-3 bg-white">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/70 hover:bg-secondary"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-[color:var(--color-muted-text)] hover:bg-red-50 hover:text-red-600 transition-colors"
         >
           <LogOut className="h-4 w-4" />
-          Logout
+          <span className="font-medium">Logout</span>
         </button>
       </div>
     </div>
@@ -103,50 +103,50 @@ export function AdminLayout({
   const title = currentNavItem.label;
 
   return (
-    <div className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="relative min-h-screen bg-[color:var(--color-main-bg)] text-[color:var(--color-espresso)]">
       <div className="relative z-10 flex">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:block w-64 shrink-0 sticky top-0 h-screen border-r border-border/60 bg-[rgba(255,255,255,0.7)] backdrop-blur-xl">
+        <aside className="hidden lg:block w-64 shrink-0 sticky top-0 h-screen border-r border-[color:var(--color-border)] bg-white shadow-sm z-30">
           <SidebarBody />
         </aside>
 
         {/* Main column */}
         <div className="flex-1 min-w-0 flex flex-col">
           {/* Topbar */}
-          <header className="sticky top-0 z-20 border-b border-border/60 bg-[rgba(255,255,255,0.7)] backdrop-blur-xl">
-            <div className="flex items-center gap-3 px-4 sm:px-6 py-3">
+          <header className="sticky top-0 z-20 border-b border-[color:var(--color-border)] bg-white/90 backdrop-blur-md shadow-sm">
+            <div className="flex items-center gap-3 px-4 sm:px-6 py-3 h-16">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden">
+                  <Button variant="ghost" size="icon" className="lg:hidden text-[color:var(--color-espresso)] hover:bg-pink-50">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-72 p-0">
+                <SheetContent side="left" className="w-72 p-0 border-r border-[color:var(--color-border)]">
                   <SheetHeader className="sr-only"><SheetTitle>Navigation</SheetTitle></SheetHeader>
                   <SidebarBody onNavigate={() => setOpen(false)} />
                 </SheetContent>
               </Sheet>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-muted-text)] font-semibold mb-0.5">
                   <span>Admin</span>
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronRight className="h-3 w-3 opacity-50" />
                   <span className="truncate">{title}</span>
                 </div>
-                <h1 className="font-display text-xl sm:text-2xl leading-tight truncate text-[#3a2428] font-bold">{title}</h1>
+                <h1 className="font-serif text-xl sm:text-2xl leading-none truncate text-[color:var(--color-espresso)] font-bold">{title}</h1>
               </div>
 
               <div className="hidden md:flex items-center relative">
-                <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search…" className="pl-9 w-56 bg-card/60" />
+                <Search className="absolute left-3 h-4 w-4 text-[color:var(--color-muted-text)]" />
+                <Input placeholder="Search…" className="pl-9 w-64 bg-[color:var(--color-card-bg)] border-[color:var(--color-border)] focus-visible:ring-[color:var(--color-gold)] rounded-xl" />
               </div>
 
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative text-[color:var(--color-espresso)] hover:bg-pink-50 rounded-full">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#b8955e]" />
+                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[color:var(--color-warning)]" />
               </Button>
 
-              <div className="h-9 w-9 shrink-0 rounded-full grid place-items-center text-sm font-semibold text-white" style={{ background: "var(--gradient-gold, linear-gradient(135deg, #b8955e, #d8a7b1))" }}>
+              <div className="h-9 w-9 shrink-0 rounded-full grid place-items-center text-sm font-semibold text-white shadow-sm ml-2" style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-gold-deep))" }}>
                 AJ
               </div>
             </div>

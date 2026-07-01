@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Search, ShoppingBag, User, Menu } from "lucide-react";
+import { Heart, Search, ShoppingBag, User, Menu, Shield } from "lucide-react";
 import { useState } from "react";
 import { MobileNav } from "./MobileNav";
 import { useCart } from "@/context/CartContext";
@@ -12,7 +12,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const { items: cart } = useCart();
   const { items: wishlist } = useWishlist();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -76,6 +76,11 @@ export function Navbar() {
             <Link href={user ? "/account" : "/login"} className="rounded-full p-2 text-pink-900 transition hover:bg-pink-100/60" aria-label="Profile">
               <User className="h-5 w-5" />
             </Link>
+            {isAdmin && (
+              <Link href="/admin" className="rounded-full p-2 text-[color:var(--color-gold)] transition hover:bg-pink-100/60" aria-label="Admin Dashboard">
+                <Shield className="h-5 w-5" />
+              </Link>
+            )}
           </div>
         </div>
       </nav>
