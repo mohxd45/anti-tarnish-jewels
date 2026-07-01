@@ -394,6 +394,29 @@ nav.fixed {
     width: max-content;
   }
   .liquid-glass {
+    background: rgba(255, 240, 245, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .btn-primary-gold {
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(184, 149, 94, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-primary-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(184, 149, 94, 0.4);
+  }
   .btn-liquid {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
