@@ -98,6 +98,26 @@ export default async function HomePage() {
             </div>
           </div>
 
+          {/* Mobile Hero Cards (Compact) */}
+          <div className="mt-10 grid grid-cols-3 gap-2 sm:gap-3 md:hidden">
+            {safeHeroBanners.slice(0, 3).map((b, i) => (
+              <Link
+                key={b.id || i}
+                href={`/shop?category=${b.title?.toLowerCase()}`}
+                className={`relative h-36 sm:h-44 overflow-hidden rounded-2xl shadow-sm border border-white/40 transition hover:-translate-y-1 ${
+                  i === 1 ? "-translate-y-2" : ""
+                }`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-pink-950/90 via-pink-900/20 to-transparent z-10" />
+                <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
+                <div className="relative z-20 h-full w-full flex flex-col justify-end p-2.5 sm:p-3">
+                  <h3 className="font-serif text-sm sm:text-base text-white drop-shadow-md leading-tight">{b.title}</h3>
+                  <p className="text-[10px] sm:text-xs text-pink-100 drop-shadow-md leading-tight mt-0.5 opacity-90">{b.subtitle}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
           {/* floating hero cards — visible from md up so mobile stays clean */}
           <div className="relative mt-4 hidden h-72 md:block lg:h-96">
             {safeHeroBanners.slice(0, 3).map((b, i) => {
