@@ -22,18 +22,18 @@ export default async function HomePage() {
 
   // Fallback banners if none exist in firestore
   const safeHeroBanners = heroBanners.length >= 3 ? heroBanners : [
-    { id: '1', title: 'Rings', subtitle: 'Timeless elegance', imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f66126e28?w=500', placement: "hero" as const, createdAt: "", updatedAt: "" },
-    { id: '2', title: 'Earrings', subtitle: 'Radiant shine', imageUrl: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500', placement: "hero" as const, createdAt: "", updatedAt: "" },
-    { id: '3', title: 'Necklaces', subtitle: 'Everyday luxury', imageUrl: 'https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=500', placement: "hero" as const, createdAt: "", updatedAt: "" },
+    { id: '1', title: 'Rings', subtitle: 'Timeless elegance', imageUrl: '/product-ring.jpg', placement: "hero" as const, createdAt: "", updatedAt: "" },
+    { id: '2', title: 'Earrings', subtitle: 'Radiant shine', imageUrl: '/product-earrings.jpg', placement: "hero" as const, createdAt: "", updatedAt: "" },
+    { id: '3', title: 'Necklaces', subtitle: 'Everyday luxury', imageUrl: '/product-necklace.jpg', placement: "hero" as const, createdAt: "", updatedAt: "" },
   ];
 
   // Fallback categories if empty
   const safeCategories = categories.length >= 5 ? categories : [
-    { name: "Rings", slug: "rings", image: "https://images.unsplash.com/photo-1605100804763-247f66126e28?w=800" },
-    { name: "Earrings", slug: "earrings", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800" },
-    { name: "Necklaces", slug: "necklaces", image: "https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=800" },
-    { name: "Bracelets", slug: "bracelets", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800" },
-    { name: "Daily Wear", slug: "daily-wear", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800" },
+    { name: "Rings", slug: "rings", image: "/product-ring.jpg" },
+    { name: "Earrings", slug: "earrings", image: "/product-earrings.jpg" },
+    { name: "Necklaces", slug: "necklaces", image: "/product-necklace.jpg" },
+    { name: "Bracelets", slug: "bracelets", image: "/product-bracelet.jpg" },
+    { name: "Daily Wear", slug: "daily-wear", image: "/hero-showroom.jpg" },
   ];
 
   const catRing = safeCategories.find(c => c.slug.toLowerCase().includes('ring')) || safeCategories[0];
@@ -59,7 +59,7 @@ export default async function HomePage() {
 
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920"
+            src="/hero-showroom.jpg"
             alt=""
             className="h-full w-full object-cover opacity-20"
           />
@@ -82,12 +82,19 @@ export default async function HomePage() {
               Discover jewellery that stays as radiant as you. Crafted with anti-tarnish technology for everyday luxury.
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
-              <Link href="/shop" className="btn-primary-gold px-8 py-4 text-base md:text-lg">
+              <Link href="/shop" className="btn-primary-gold px-8 py-4 text-base md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
                 Shop Collection
               </Link>
               <Link href="/shop?category=daily-wear" className="btn-liquid px-8 py-4 text-base md:text-lg">
                 Daily Wear
               </Link>
+            </div>
+            
+            <div className="mt-8 flex justify-center">
+              <div className="glass-premium flex items-center gap-3 rounded-full px-5 py-2 shadow-sm border border-white/60 mx-auto max-w-max">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pink-100 text-pink-700 text-xs">✨</span>
+                <p className="text-sm font-medium text-pink-950">Discover our new premium collection. <Link href="/sale" className="underline hover:text-pink-700 font-semibold ml-1">Shop Sale</Link></p>
+              </div>
             </div>
           </div>
 
@@ -109,12 +116,15 @@ export default async function HomePage() {
                 <Link
                   key={b.id || i}
                   href={`/shop?category=${b.title?.toLowerCase()}`}
-                  className={`glass bg-white/90 border border-[color:var(--color-border)] shadow-sm absolute cursor-pointer rounded-2xl p-3 transition hover:z-10 hover:-translate-y-2 hover:scale-105 hover:shadow-md ${pos.anim}`}
+                  className={`absolute cursor-pointer overflow-hidden rounded-2xl shadow-sm border border-white/40 transition hover:z-10 hover:-translate-y-2 hover:scale-105 hover:shadow-md ${pos.anim}`}
                   style={style}
                 >
-                  <img src={b.imageUrl || (b as any).image || "https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=500"} alt={b.title} className="mb-3 h-32 w-full rounded-xl object-cover" />
-                  <h3 className="font-serif text-lg text-pink-900">{b.title}</h3>
-                  <p className="text-xs text-pink-600">{b.subtitle}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-pink-950/80 via-pink-900/20 to-transparent z-10" />
+                  <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
+                  <div className="relative z-20 h-full w-full flex flex-col justify-end p-4">
+                    <h3 className="font-serif text-lg text-white drop-shadow-md">{b.title}</h3>
+                    <p className="text-xs text-pink-100 drop-shadow-md">{b.subtitle}</p>
+                  </div>
                 </Link>
               );
             })}
@@ -128,12 +138,12 @@ export default async function HomePage() {
           <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-5xl">Shop by Category</h2>
           <p className="text-pink-600">Find your perfect piece</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          <CategoryTile category={catRing} className="col-span-2 row-span-2 h-64 md:h-80" featured />
-          <CategoryTile category={catEar} className="h-40" />
-          <CategoryTile category={catNeck} className="h-40" />
-          <CategoryTile category={catBrac} className="h-40" />
-          <CategoryTile category={catDaily} className="h-40" />
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 md:gap-4">
+          <CategoryTile category={catRing} className="col-span-1 h-48 sm:h-64 md:h-80" featured />
+          <CategoryTile category={catEar} className="col-span-1 h-48 sm:h-64 md:h-80" />
+          <CategoryTile category={catNeck} className="col-span-1 h-48 sm:h-64 md:h-80" />
+          <CategoryTile category={catBrac} className="col-span-1 h-48 sm:h-64 md:h-80" />
+          <CategoryTile category={catDaily} className="col-span-2 md:col-span-4 lg:col-span-1 h-48 sm:h-64 md:h-80" />
         </div>
       </section>
 
@@ -149,7 +159,7 @@ export default async function HomePage() {
 
       {/* WHY ANTI-TARNISH */}
       <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="glass bg-gradient-to-br from-pink-50/80 to-white shadow-sm border border-[color:var(--color-border)] rounded-3xl p-6 md:p-12">
+        <div className="glass-premium border border-white/60 rounded-3xl p-6 md:p-12">
           <div className="mb-10 text-center">
             <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-5xl">Why Anti-Tarnish?</h2>
             <p className="mx-auto max-w-2xl text-pink-600">
@@ -186,7 +196,7 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
           {safeReviews.slice(0, 3).map((r) => (
-            <div key={r.id} className="glass rounded-2xl p-6">
+            <div key={r.id} className="glass-premium rounded-2xl p-6 border border-white/60">
               <div className="mb-4 flex items-center gap-3">
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-full font-bold text-white"
@@ -208,14 +218,14 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           <Trust icon={<Truck className="h-6 w-6" />} title="Free Delivery" sub="Above ₹999" />
           <Trust icon={<RotateCcw className="h-6 w-6" />} title="7-Day Returns" sub="Easy exchange" />
-          <Trust icon={<ShieldCheck className="h-6 w-6" />} title="Anti-Tarnish" sub="Lifetime guarantee" />
+          <Trust icon={<ShieldCheck className="h-6 w-6" />} title="Anti-Tarnish" sub="Verified quality" />
           <Trust icon={<Lock className="h-6 w-6" />} title="Secure Payment" sub="COD available" />
         </div>
       </section>
 
       {/* NEWSLETTER */}
       <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="glass bg-white/90 shadow-sm border border-[color:var(--color-border)] mx-auto max-w-3xl rounded-3xl p-8 text-center md:p-12">
+        <div className="glass-premium border border-white/60 mx-auto max-w-3xl rounded-3xl p-8 text-center md:p-12">
           <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-4xl">Join our list</h2>
           <p className="mb-6 text-pink-600">Get 10% off your first order and early access to new drops.</p>
           <form
@@ -254,31 +264,32 @@ function CategoryTile({
   
   // Provide beautiful fallback images based on category name if none exists in Firestore
   const fallbackImages: Record<string, string> = {
-    ring: "https://images.unsplash.com/photo-1605100804763-247f66126e28?w=800",
-    earring: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800",
-    necklace: "https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=800",
-    bracelet: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800",
-    bangle: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800",
-    daily: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800",
-    bridal: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800",
+    ring: "/product-ring.jpg",
+    earring: "/product-earrings.jpg",
+    necklace: "/product-necklace.jpg",
+    bracelet: "/product-bracelet.jpg",
+    bangle: "/product-bracelet.jpg",
+    daily: "/hero-showroom.jpg",
+    bridal: "/product-stack.jpg",
   };
 
   let imageSrc = category.image || category.imageUrl;
   if (!imageSrc) {
     const nameLower = (category.name || "").toLowerCase();
     const matchedKey = Object.keys(fallbackImages).find(k => nameLower.includes(k));
-    imageSrc = matchedKey ? fallbackImages[matchedKey] : "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800";
+    imageSrc = matchedKey ? fallbackImages[matchedKey] : "/hero-showroom.jpg";
   }
 
   return (
     <Link
       href={`/shop?category=${category.slug}`}
-      className={`category-card block cursor-pointer ${className ?? ""}`}
+      className={`category-card relative block cursor-pointer overflow-hidden rounded-2xl ${className ?? ""}`}
     >
-      <img src={imageSrc} alt={category.name} className="h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-pink-950/80 via-pink-900/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
+      <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 hover:scale-105" />
       <div className="absolute bottom-3 left-4 z-10 text-white">
-        <h3 className={`font-serif ${featured ? "text-2xl md:text-3xl" : "text-xl"}`}>{category.name}</h3>
-        <p className="text-xs opacity-90">Explore collection</p>
+        <h3 className={`relative z-20 font-serif drop-shadow-md ${featured ? "text-xl sm:text-2xl md:text-3xl" : "text-lg sm:text-xl"}`}>{category.name}</h3>
+        <p className="relative z-20 text-xs opacity-90 drop-shadow-md">Explore collection</p>
       </div>
     </Link>
   );
@@ -286,7 +297,7 @@ function CategoryTile({
 
 function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
-    <div className="glass bg-white/80 rounded-2xl p-6 text-center border border-[color:var(--color-border)] shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <div className="glass-premium rounded-2xl p-6 border border-white/60 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
       <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-pink-50 text-[color:var(--color-gold)]">{icon}</div>
       <h3 className="mb-2 font-serif text-xl text-[color:var(--color-espresso)]">{title}</h3>
       <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
@@ -296,7 +307,7 @@ function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; 
 
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="glass bg-white/80 p-5 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm border border-[color:var(--color-border)] transition hover:bg-white hover:-translate-y-1 hover:shadow-md">
+    <div className="glass-premium p-5 rounded-2xl flex flex-col items-center border border-white/60 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md">
       <div className="mb-3 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
       <h4 className="text-[13px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider">{title}</h4>
       <p className="mt-1 text-xs text-[color:var(--color-muted-text)]">{sub}</p>

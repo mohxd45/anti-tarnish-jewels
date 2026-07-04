@@ -318,11 +318,11 @@ nav.fixed {
     box-shadow: var(--shadow-glass);
   }
 
-  .glass-dark {
-    background: linear-gradient(135deg, oklch(0.25 0.05 20 / 0.6), oklch(0.2 0.04 20 / 0.4));
+  .glass-premium {
+    background: linear-gradient(135deg, rgba(255, 250, 252, 0.9), rgba(253, 242, 248, 0.7));
     backdrop-filter: blur(24px) saturate(140%);
-    border: 1px solid oklch(1 0 0 / 0.15);
-    box-shadow: var(--shadow-glass);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px rgba(230, 190, 200, 0.15);
   }
 
   .text-gold {

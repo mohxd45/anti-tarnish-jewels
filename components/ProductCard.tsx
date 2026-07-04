@@ -39,13 +39,13 @@ export function ProductCard({ product }: { product: Product }) {
     null;
 
   return (
-    <div className="glass-dark card-hover hover-tilt group flex flex-col overflow-hidden rounded-2xl shine-sweep">
+    <div className="glass-premium card-hover hover-tilt group flex flex-col overflow-hidden rounded-2xl shine-sweep">
       <Link
         href={`/product/${product.slug || product.id}`}
         className="relative block aspect-square overflow-hidden"
       >
         <img
-          src={product.images[0]}
+          src={product.images?.[0] || (product as any).image || (product as any).imageUrl || "/product-stack.jpg"}
           alt={product.name}
           loading="lazy"
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
@@ -69,7 +69,7 @@ export function ProductCard({ product }: { product: Product }) {
         </p>
         <Link
           href={`/product/${product.slug || product.id}`}
-          className="line-clamp-2 font-serif text-sm text-pink-900 hover:text-pink-700 sm:text-base"
+          className="line-clamp-2 font-serif text-sm text-pink-950 hover:text-pink-800 sm:text-base font-medium"
         >
           {product.name}
         </Link>
