@@ -1,12 +1,21 @@
-import { getAnnouncements } from "@/lib/firestore";
+import { getSiteSettings, getAnnouncements } from "@/lib/firestore";
 
 export async function WhatsAppButton() {
-  const announcements = await getAnnouncements();
-  const phone = announcements.whatsAppSupport || "919876543210";
+  const [settings, announcements] = await Promise.all([
+    getSiteSettings(),
+    getAnnouncements()
+  ]);
+
+  if (announcements?.showWhatsAppButton === false) return null;
+
+  const phone = announcements?.whatsAppSupport || settings?.whatsAppNumber || "919876543210";
+  const message = announcements?.whatsAppMessage || "";
   
+  const href = `https://wa.me/${phone}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
+
   return (
     <a
-      href={`https://wa.me/${phone}`}
+      href={href}
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"

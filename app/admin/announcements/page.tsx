@@ -1,11 +1,13 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
 import { 
   getAnnouncements, saveAnnouncements, 
   getAnnouncementsList, addAnnouncement, updateAnnouncement, deleteAnnouncement 
-} from "@/lib/firestore";
+, logActivity } from "@/lib/firestore";
 import { AnnouncementSettings, Announcement } from "@/types";
 import { Save, AlertCircle, Plus, Trash2, Edit2, Check, X, GripVertical } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
@@ -27,6 +29,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 export default function AnnouncementsPage() {
+  const { user } = useAuth();
   const [settings, setSettings] = useState<AnnouncementSettings | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +69,18 @@ export default function AnnouncementsPage() {
     setSaving(true);
     try {
       await saveAnnouncements(settings);
+      if (user) {
+        await logActivity({
+          actorUid: user.uid,
+          actorEmail: user.email || "Unknown",
+          actorName: user.displayName || user.email || "Unknown",
+          actorRole: (user as any).role || "staff",
+          action: "update_announcements",
+          documentChanged: "global",
+          section: "announcement",
+          newValue: "Updated global announcements"
+        });
+      }
       toast.success("Settings updated successfully!");
     } catch {
       toast.error("Failed to save settings.");
@@ -349,50 +364,6 @@ export default function AnnouncementsPage() {
                 </div>
               </AdminCard>
 
-              <AdminCard title="COD & Shipping Settings">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-4">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Cash on Delivery (COD)</p>
-                      <p className="text-xs text-muted-foreground">Enable Cash on Delivery payment option</p>
-                    </div>
-                    <Switch 
-                      checked={settings.codEnabled ?? true} 
-                      onCheckedChange={(checked) => setSettings({ ...settings, codEnabled: checked })} 
-                    />
-                  </div>
-
-                  <Field label="COD Risk Warning / Safety Message">
-                    <Input 
-                      value={settings.codRiskWarningText || ""}
-                      onChange={(e) => setSettings({ ...settings, codRiskWarningText: e.target.value })}
-                      className="bg-card/40"
-                      placeholder="e.g. COD orders may be verified by phone..."
-                    />
-                  </Field>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Field label="Shipping Fee (₹)">
-                      <Input 
-                        type="number"
-                        value={settings.shippingFee ?? 79}
-                        onChange={(e) => setSettings({ ...settings, shippingFee: e.target.value ? Number(e.target.value) : 0 })}
-                        className="bg-card/40 font-mono text-xs"
-                        placeholder="e.g. 79"
-                      />
-                    </Field>
-                    <Field label="Free Shipping Threshold (₹)" hint="Leave empty to disable free shipping">
-                      <Input 
-                        type="number"
-                        value={settings.freeShippingThreshold ?? ""}
-                        onChange={(e) => setSettings({ ...settings, freeShippingThreshold: e.target.value ? Number(e.target.value) : undefined })}
-                        className="bg-card/40 font-mono text-xs"
-                        placeholder="e.g. 999"
-                      />
-                    </Field>
-                  </div>
-                </div>
-              </AdminCard>
             </div>
 
             <div className="space-y-6">

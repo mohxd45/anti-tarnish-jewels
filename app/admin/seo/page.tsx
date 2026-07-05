@@ -1,8 +1,10 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
-import { getSEOSettings, saveSEOSettings, uploadImage } from "@/lib/firestore";
+import { getSEOSettings, saveSEOSettings, uploadImage , logActivity } from "@/lib/firestore";
 import { SEOSettings } from "@/types";
 import { Save, Upload, Image as ImageIcon } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
@@ -24,6 +26,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 export default function SEOPage() {
+  const { user } = useAuth();
   const [seo, setSeo] = useState<SEOSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

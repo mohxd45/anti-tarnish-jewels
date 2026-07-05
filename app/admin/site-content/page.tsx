@@ -1,7 +1,9 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState } from "react";
-import { getSiteContent, saveSiteContent } from "@/lib/firestore";
+import { getSiteContent, saveSiteContent , logActivity } from "@/lib/firestore";
 import { SiteContent } from "@/types";
 import { Save, AlertCircle, CheckCircle } from "lucide-react";
 import { PageLoader } from "@/components/ui/PageLoader";
@@ -10,6 +12,7 @@ import { LoadingButton } from "@/components/ui/LoadingButton";
 type TabId = "home" | "about" | "faq" | "policies";
 
 export default function SiteContentPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [form, setForm] = useState<SiteContent>({});
   const [loading, setLoading] = useState(true);
@@ -112,10 +115,19 @@ export default function SiteContentPage() {
         {activeTab === "home" && (
           <div className="space-y-6">
             <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Homepage Hero Title</label>
+              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Hero Small Title (Above Main)</label>
               <input
-                value={form.heroTitle || ""}
-                onChange={(e) => setForm({ ...form, heroTitle: e.target.value })}
+                value={form.heroSmallTitle || ""}
+                onChange={(e) => setForm({ ...form, heroSmallTitle: e.target.value })}
+                className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
+                placeholder="e.g. Timeless Elegance"
+              />
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Homepage Main Heading (H1)</label>
+              <input
+                value={form.heroMainHeading || form.heroTitle || ""}
+                onChange={(e) => setForm({ ...form, heroMainHeading: e.target.value, heroTitle: e.target.value })}
                 className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
                 placeholder="e.g. Next-Gen Tech & Premium Devices"
               />
@@ -137,9 +149,20 @@ export default function SiteContentPage() {
                   value={form.heroCtaText || ""}
                   onChange={(e) => setForm({ ...form, heroCtaText: e.target.value })}
                   className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
-                  placeholder="e.g. Shop Electronics"
+                  placeholder="e.g. Shop Now"
                 />
               </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Hero Button CTA Link</label>
+                <input
+                  value={form.heroCtaLink || ""}
+                  onChange={(e) => setForm({ ...form, heroCtaLink: e.target.value })}
+                  className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
+                  placeholder="e.g. /shop"
+                />
+              </div>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Promotional Section text</label>
                 <input
@@ -162,7 +185,7 @@ export default function SiteContentPage() {
             </div>
 
             <LoadingButton
-              onClick={() => handleSave("home", ["heroTitle", "heroSubtitle", "heroCtaText", "promotionalText", "footerText"])}
+              onClick={() => handleSave("home", ["heroSmallTitle", "heroTitle", "heroMainHeading", "heroSubtitle", "heroCtaText", "heroCtaLink", "promotionalText", "footerText"])}
               loading={saving}
               loadingText="Saving..."
               className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"

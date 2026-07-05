@@ -8,13 +8,17 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 
-export function Navbar() {
+export function Navbar({ settings }: { settings?: any }) {
   const [open, setOpen] = useState(false);
   const { items: cart } = useCart();
   const { items: wishlist } = useWishlist();
   const { user, isAdmin } = useAuth();
   
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  
+  const brandName = settings?.brandName || "Anti Tarnish Jewels";
+  const logoText = settings?.logoText || brandName.charAt(0);
+  const subtitle = settings?.subtitle || "Jewels";
 
   return (
     <>
@@ -23,18 +27,18 @@ export function Navbar() {
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setOpen(true)}
-              className="text-pink-900 lg:hidden"
+              className="text-charcoalBrown lg:hidden"
               aria-label="Open menu"
             >
               <Menu className="h-6 w-6" />
             </button>
             <Link href="/" className="flex min-w-0 items-center gap-2">
               <div className="gold-trim flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-                <span className="font-serif text-lg font-bold text-white">A</span>
+                <span className="font-serif text-lg font-bold text-white">{logoText}</span>
               </div>
               <div className="hidden min-w-0 sm:block">
-                <h1 className="truncate font-serif text-lg leading-tight text-pink-900 md:text-xl">Anti Tarnish</h1>
-                <p className="-mt-1 text-xs text-pink-600">Jewels</p>
+                <h1 className="truncate font-serif text-lg leading-tight text-charcoalBrown md:text-xl">{brandName}</h1>
+                {subtitle && <p className="-mt-1 text-xs text-stoneGray">{subtitle}</p>}
               </div>
             </Link>
           </div>
@@ -47,7 +51,7 @@ export function Navbar() {
             <NavItem href="/shop?category=Bracelets">Bracelets</NavItem>
             <Link
               href="/sale"
-              className="text-sm font-semibold text-pink-600 transition hover:text-pink-700"
+              className="text-sm font-semibold text-stoneGray transition hover:text-stoneGray"
             >
               Sale
             </Link>
@@ -56,15 +60,15 @@ export function Navbar() {
 
           <div className="flex items-center gap-1">
             <IconBtn label="Search"><Search className="h-5 w-5" /></IconBtn>
-            <Link href="/wishlist" className="relative rounded-full p-2 text-pink-900 transition hover:bg-pink-100/60" aria-label="Wishlist">
+            <Link href="/wishlist" className="relative rounded-full p-2 text-charcoalBrown transition hover:bg-beige/50/60" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
               {wishlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-beige0 px-1 text-[10px] font-bold text-white">
                   {wishlist.length}
                 </span>
               )}
             </Link>
-            <Link href="/cart" className="relative rounded-full p-2 text-pink-900 transition hover:bg-pink-100/60" aria-label="Cart">
+            <Link href="/cart" className="relative rounded-full p-2 text-charcoalBrown transition hover:bg-beige/50/60" aria-label="Cart">
               <ShoppingBag className="h-5 w-5" />
               <span
                 className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
@@ -73,11 +77,11 @@ export function Navbar() {
                 {cartCount}
               </span>
             </Link>
-            <Link href={user ? "/account" : "/login"} className="rounded-full p-2 text-pink-900 transition hover:bg-pink-100/60" aria-label="Profile">
+            <Link href={user ? "/account" : "/login"} className="rounded-full p-2 text-charcoalBrown transition hover:bg-beige/50/60" aria-label="Profile">
               <User className="h-5 w-5" />
             </Link>
             {isAdmin && (
-              <Link href="/admin" className="rounded-full p-2 text-[color:var(--color-gold)] transition hover:bg-pink-100/60" aria-label="Admin Dashboard">
+              <Link href="/admin" className="rounded-full p-2 text-[color:var(--color-gold)] transition hover:bg-beige/50/60" aria-label="Admin Dashboard">
                 <Shield className="h-5 w-5" />
               </Link>
             )}
@@ -94,7 +98,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="text-sm font-medium text-pink-900 transition hover:text-pink-600"
+      className="text-sm font-medium text-charcoalBrown transition hover:text-stoneGray"
     >
       {children}
     </Link>
@@ -104,7 +108,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
 function IconBtn({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <button
-      className="rounded-full p-2 text-pink-900 transition hover:bg-pink-100/60"
+      className="rounded-full p-2 text-charcoalBrown transition hover:bg-beige/50/60"
       aria-label={label}
     >
       {children}

@@ -71,8 +71,8 @@ function ShopContent() {
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 pt-4">
-        <h1 className="font-serif text-4xl text-pink-900 md:text-5xl">{displayTitle}</h1>
-        <p className="mt-2 text-pink-600">{activeCategory.blurb}</p>
+        <h1 className="font-serif text-4xl text-charcoalBrown md:text-5xl">{displayTitle}</h1>
+        <p className="mt-2 text-stoneGray">{activeCategory.blurb}</p>
       </div>
 
       <div className="mx-auto mt-6 max-w-7xl px-4">
@@ -92,12 +92,12 @@ function ShopContent() {
         </div>
 
         <div className="flex justify-between items-center mb-6">
-          <p className="text-pink-600 text-sm font-medium">{products.length} Products</p>
+          <p className="text-stoneGray text-sm font-medium">{products.length} Products</p>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-3 py-1.5 glass-dark rounded-lg text-pink-900 text-xs font-medium hover:bg-pink-100 transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 glass bg-white/80 shadow-sm border border-goldBeige rounded-lg text-charcoalBrown text-xs font-medium hover:bg-beige/50 transition-colors">
               <Filter className="w-3 h-3" /> Filter
             </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 glass-dark rounded-lg text-pink-900 text-xs font-medium hover:bg-pink-100 transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 glass bg-white/80 shadow-sm border border-goldBeige rounded-lg text-charcoalBrown text-xs font-medium hover:bg-beige/50 transition-colors">
               <SlidersHorizontal className="w-3 h-3" /> Sort
             </button>
           </div>
@@ -106,7 +106,7 @@ function ShopContent() {
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="aspect-[4/5] bg-pink-100/50 animate-pulse rounded-2xl" />
+              <div key={i} className="aspect-[4/5] bg-beige/30 animate-pulse rounded-2xl" />
             ))}
           </div>
         ) : products.length > 0 ? (
@@ -116,8 +116,8 @@ function ShopContent() {
             ))}
           </div>
         ) : (
-          <div className="glass-dark rounded-2xl p-10 text-center text-pink-700">
-            No products found. <Link href="/shop?category=all" className="text-pink-600 underline">View all</Link>
+          <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-2xl p-10 text-center text-stoneGray">
+            No products found. <Link href="/shop?category=all" className="text-stoneGray underline">View all</Link>
           </div>
         )}
       </div>
@@ -129,7 +129,7 @@ export default function ShopPage() {
   return (
     <Suspense fallback={
       <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-goldBeige/50 border-t-champagne rounded-full animate-spin"></div>
       </div>
     }>
       <ShopContent />

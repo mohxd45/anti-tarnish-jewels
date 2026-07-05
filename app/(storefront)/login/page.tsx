@@ -44,7 +44,16 @@ export default function LoginPage() {
       toast.success("Signed in with Google!");
       router.push("/account");
     } catch (err: any) {
-      toast.error(err.message || "Google sign-in failed");
+      console.error("Google login error:", err);
+      if (err.code === "auth/unauthorized-domain") {
+        toast.error("Firebase Error: This domain is not authorized in Firebase Console.");
+      } else if (err.code === "auth/account-exists-with-different-credential") {
+        toast.error("An account already exists with the same email address but different sign-in credentials. Please sign in using a password instead.");
+      } else if (err.code === "auth/popup-closed-by-user") {
+        toast.error("Sign-in cancelled. Please try again.");
+      } else {
+        toast.error(err.message || "Google sign-in failed. Check console for details.");
+      }
     } finally {
       setLoading(false);
     }
@@ -52,11 +61,11 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 pt-16 pb-32">
-      <div className="glass-dark rounded-3xl p-8">
-        <h1 className="mb-2 text-center font-serif text-3xl text-pink-900">
+      <div className="glass bg-white/80 border border-goldBeige shadow-sm rounded-3xl p-8">
+        <h1 className="mb-2 text-center font-serif text-3xl text-charcoalBrown">
           {mode === "login" ? "Welcome back" : "Create account"}
         </h1>
-        <p className="mb-6 text-center text-sm text-pink-600">
+        <p className="mb-6 text-center text-sm text-stoneGray">
           {mode === "login" ? "Log in to continue" : "Join Anti Tarnish Jewels"}
         </p>
         
@@ -116,10 +125,10 @@ export default function LoginPage() {
 
         <div className="mt-8 relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-pink-200"></div>
+            <div className="w-full border-t border-goldBeige/50"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-[#fcf2f8] text-pink-600">Or</span>
+            <span className="px-4 bg-transparent text-stoneGray">Or</span>
           </div>
         </div>
 
@@ -127,7 +136,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="mt-6 w-full py-3 rounded-xl bg-white border border-pink-200 text-pink-900 font-semibold hover:bg-pink-50 transition-colors flex items-center justify-center gap-3 shadow-sm"
+          className="mt-6 w-full py-3 rounded-xl bg-white border border-goldBeige text-charcoalBrown font-semibold hover:bg-beige/50 transition-colors flex items-center justify-center gap-3 shadow-sm"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -138,16 +147,16 @@ export default function LoginPage() {
           Google
         </button>
 
-        <div className="mt-6 text-center text-sm text-pink-700">
+        <div className="mt-6 text-center text-sm text-stoneGray">
           {mode === "login" ? (
             <>New here?{" "}
-              <button onClick={() => setMode("signup")} className="font-semibold text-pink-600 hover:underline">
+              <button onClick={() => setMode("signup")} className="font-semibold text-champagne hover:underline">
                 Sign up
               </button>
             </>
           ) : (
             <>Already have an account?{" "}
-              <button onClick={() => setMode("login")} className="font-semibold text-pink-600 hover:underline">
+              <button onClick={() => setMode("login")} className="font-semibold text-champagne hover:underline">
                 Log in
               </button>
             </>
@@ -156,14 +165,14 @@ export default function LoginPage() {
         
         {mode === "login" && (
           <div className="mt-2 text-center text-sm">
-            <Link href="/reset-password" className="text-pink-600 hover:underline">
+            <Link href="/reset-password" className="text-stoneGray hover:text-champagne transition-colors">
               Forgot Password?
             </Link>
           </div>
         )}
         
-        <p className="mt-4 text-center text-xs text-pink-600">
-          By continuing you agree to our <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
+        <p className="mt-4 text-center text-xs text-stoneGray/80">
+          By continuing you agree to our <Link href="/privacy-policy" className="underline hover:text-champagne transition-colors">Privacy Policy</Link>.
         </p>
       </div>
     </div>

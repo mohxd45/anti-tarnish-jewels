@@ -13,29 +13,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean; adminOnly?: boolean; devOnly?: boolean };
 const nav: NavItem[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/admin/analytics", label: "Analytics", icon: LineChart },
-  { to: "/admin/site-content", label: "Website Text", icon: FileText },
-  { to: "/admin/banners", label: "Banner & Ads", icon: ImageIcon },
-  { to: "/admin/homepage-sections", label: "Home Layout", icon: LayoutGrid },
+  { to: "/admin/analytics", label: "Analytics", icon: LineChart, adminOnly: true },
+  { to: "/admin/site-content", label: "Website Text", icon: FileText, adminOnly: true },
+  { to: "/admin/banners", label: "Banner & Ads", icon: ImageIcon, adminOnly: true },
+  { to: "/admin/homepage-sections", label: "Home Layout", icon: LayoutGrid, adminOnly: true },
   { to: "/admin/products", label: "Product Catalog", icon: Package },
   { to: "/admin/add-product", label: "Add Product", icon: Plus },
-  { to: "/admin/categories", label: "Categories", icon: FolderTree },
+  { to: "/admin/categories", label: "Categories", icon: FolderTree, adminOnly: true },
   { to: "/admin/orders", label: "Orders Tracking", icon: ShoppingBag },
-  { to: "/admin/users", label: "Users & Customers", icon: Users },
-  { to: "/admin/coupons", label: "Coupons", icon: Ticket },
+  { to: "/admin/users", label: "Users & Customers", icon: Users, adminOnly: true },
+  { to: "/admin/staff", label: "Staff Management", icon: Users, adminOnly: true },
+  { to: "/admin/coupons", label: "Coupons", icon: Ticket, adminOnly: true },
   { to: "/admin/reviews", label: "Reviews", icon: Star },
   { to: "/admin/messages", label: "Messages", icon: MessageSquare },
-  { to: "/admin/seo", label: "SEO Settings", icon: Search },
-  { to: "/admin/announcements", label: "Announcements", icon: Megaphone },
-  { to: "/admin/settings", label: "System Settings", icon: Settings },
+  { to: "/admin/seo", label: "SEO Settings", icon: Search, adminOnly: true },
+  { to: "/admin/announcements", label: "Announcements", icon: Megaphone, adminOnly: true },
+  { to: "/admin/audit-logs", label: "Activity Logs", icon: FileText, adminOnly: true },
+  { to: "/admin/settings", label: "System Settings", icon: Settings, adminOnly: true },
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { logout, isAdmin, userRole } = useAuth();
   const router = useRouter();
 
   async function handleLogout() {
@@ -56,7 +58,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin bg-white">
-        {nav.map((item) => {
+        {nav.filter(item => {
+          if (item.adminOnly && !isAdmin) return false;
+          if (item.devOnly && userRole !== "developer_admin") return false;
+          return true;
+        }).map((item) => {
           const Icon = item.icon;
           const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
           return (
@@ -66,8 +72,8 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
               className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all duration-200 ${
                 active
-                  ? "bg-pink-50 text-[color:var(--color-espresso)] font-semibold shadow-sm border border-pink-100"
-                  : "text-[color:var(--color-muted-text)] hover:bg-pink-50/50 hover:text-[color:var(--color-espresso)] border border-transparent"
+                  ? "bg-beige text-[color:var(--color-espresso)] font-semibold shadow-sm border border-pink-100"
+                  : "text-[color:var(--color-muted-text)] hover:bg-beige/50 hover:text-[color:var(--color-espresso)] border border-transparent"
               }`}
             >
               <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[color:var(--color-gold)]" : "opacity-70 group-hover:text-[color:var(--color-gold)]"}`} />
@@ -117,7 +123,7 @@ export function AdminLayout({
             <div className="flex items-center gap-3 px-4 sm:px-6 py-3 h-16">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden text-[color:var(--color-espresso)] hover:bg-pink-50">
+                  <Button variant="ghost" size="icon" className="lg:hidden text-[color:var(--color-espresso)] hover:bg-beige">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
@@ -141,7 +147,7 @@ export function AdminLayout({
                 <Input placeholder="Search…" className="pl-9 w-64 bg-[color:var(--color-card-bg)] border-[color:var(--color-border)] focus-visible:ring-[color:var(--color-gold)] rounded-xl" />
               </div>
 
-              <Button variant="ghost" size="icon" className="relative text-[color:var(--color-espresso)] hover:bg-pink-50 rounded-full">
+              <Button variant="ghost" size="icon" className="relative text-[color:var(--color-espresso)] hover:bg-beige rounded-full">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[color:var(--color-warning)]" />
               </Button>

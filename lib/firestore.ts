@@ -14,7 +14,11 @@ import {
   ContactMessage,
   CartItem,
   Address,
-  Announcement
+  Announcement,
+  UserProfile,
+  UserRole,
+  UserStatus,
+  AuditLog
 } from "@/types";
 import {
   addDoc,
@@ -30,7 +34,8 @@ import {
   deleteField,
   where,
   limit,
-  onSnapshot
+  onSnapshot,
+  serverTimestamp
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -1205,6 +1210,7 @@ export async function getSiteContent(id: string): Promise<any> {
     return sessionCached;
   }
   const defaults = defaultSiteContent[id] || {};
+    if (!hasFirebaseConfig || !db) return defaults;
   
   try {
     const d = await withTimeout(getDoc(doc(db, "siteContent", id)));
@@ -1236,7 +1242,7 @@ const defaultBanners: Banner[] = [
     subtitle: "Premium anti-tarnish, waterproof, non-fading jewellery",
     imageUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200&auto=format&fit=crop",
     link: "/shop",
-    placement: "hero",
+    placement: "hero-banner",
     isActive: true,
     priority: 1,
     createdAt: new Date().toISOString(),
@@ -1836,4 +1842,82 @@ export async function updateAnnouncement(id: string, data: Partial<Announcement>
 export async function deleteAnnouncement(id: string) {
   clearAllCaches();
   await deleteDoc(doc(db, "announcementsList", id));
+}
+
+
+export async function getStaffUsers(): Promise<UserProfile[]> {
+  if (!db) return [];
+  const q = query(
+    collection(db, "users"),
+    where("role", "in", ["admin", "owner_admin", "partner_admin", "developer_admin", "staff"])
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
+}
+
+export async function getStaffInvites(): Promise<any[]> {
+  if (!db) return [];
+  const q = query(collection(db, "staffInvites"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ email: doc.id, ...doc.data() }));
+}
+
+export async function addStaffInvite(email: string, role: UserRole, addedBy: string): Promise<void> {
+  if (!db) return;
+  await setDoc(doc(db, "staffInvites", email.toLowerCase()), {
+    role,
+    addedBy,
+    createdAt: serverTimestamp()
+  });
+}
+
+export async function revokeStaffInvite(email: string): Promise<void> {
+  if (!db) return;
+  await deleteDoc(doc(db, "staffInvites", email.toLowerCase()));
+}
+
+export async function updateStaffRole(uid: string, role: UserRole, status: UserStatus): Promise<void> {
+  if (!db) return;
+  await updateDoc(doc(db, "users", uid), {
+    role,
+    status,
+    updatedAt: new Date().toISOString()
+  });
+}
+
+export async function logActivity(log: Omit<AuditLog, "id" | "createdAt">): Promise<void> {
+  if (!db) return;
+  await addDoc(collection(db, "auditLogs"), {
+    ...log,
+    createdAt: serverTimestamp()
+  });
+}
+
+export async function getAuditLogs(actorRoleFilter?: string): Promise<AuditLog[]> {
+  if (!db) return [];
+  let q;
+  if (actorRoleFilter === "staff") {
+    q = query(collection(db, "auditLogs"), where("actorRole", "==", "staff"), orderBy("createdAt", "desc"), limit(100));
+  } else {
+    q = query(collection(db, "auditLogs"), orderBy("createdAt", "desc"), limit(100));
+  }
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AuditLog));
+}
+
+// Wishlist functions
+export async function getWishlist(userId: string): Promise<Product[]> {
+  if (!db) return [];
+  const docRef = doc(db, "users", userId);
+  const snap = await getDoc(docRef);
+  if (snap.exists() && snap.data().wishlist) {
+    return snap.data().wishlist as Product[];
+  }
+  return [];
+}
+
+export async function saveWishlist(userId: string, wishlist: Product[]): Promise<void> {
+  if (!db) return;
+  const docRef = doc(db, "users", userId);
+  await updateDoc(docRef, { wishlist });
 }

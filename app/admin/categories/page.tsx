@@ -1,7 +1,8 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
-import { getCategories, addCategory, updateCategory, deleteCategory, uploadImage } from "@/lib/firestore";
+import { getCategories, addCategory, updateCategory, deleteCategory, uploadImage , logActivity } from "@/lib/firestore";
 import { Category } from "@/types";
 import { Save, Trash2, Edit2, Plus, X, Upload, Loader } from "lucide-react";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";

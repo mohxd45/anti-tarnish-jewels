@@ -2,7 +2,7 @@
 
 import { CartItem, Product, Coupon } from "@/types";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { getCoupons, getAnnouncements, validateCoupon } from "@/lib/firestore";
+import { getCoupons, getAnnouncements, validateCoupon, getSiteSettings } from "@/lib/firestore";
 
 type CartContextType = {
   items: CartItem[];
@@ -62,7 +62,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function loadShippingSettings() {
       try {
-        const config = await getAnnouncements();
+        const config = await getSiteSettings();
         if (config) {
           if (config.shippingFee !== undefined && config.shippingFee !== null) {
             setShippingFee(Number(config.shippingFee));

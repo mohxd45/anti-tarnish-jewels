@@ -1,8 +1,9 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
-import { getContactMessages, updateContactMessage, deleteContactMessage } from "@/lib/firestore";
+import { getContactMessages, updateContactMessage, deleteContactMessage , logActivity } from "@/lib/firestore";
 import { ContactMessage } from "@/types";
 import { Mail, Trash2, CheckCheck, Undo2, Check } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";

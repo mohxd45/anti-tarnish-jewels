@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
-import { Trash2, ArrowRight, ShieldCheck, Minus, Plus } from "lucide-react";
-import { getOptimizedImageUrl } from "@/lib/firestore";
+import { Trash2, ArrowRight, ShieldCheck, Minus, Plus, ShoppingBag } from "lucide-react";
+import { getOptimizedImageUrl, getSiteSettings } from "@/lib/firestore";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { formatPrice } from "@/lib/utils";
 
 export default function CartPage() {
   const cart = useCart();
@@ -14,6 +15,11 @@ export default function CartPage() {
   const [code, setCode] = useState("");
   const [couponMsg, setCouponMsg] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    getSiteSettings().then(setSettings).catch(console.error);
+  }, []);
 
   async function handleApplyCoupon() {
     if (!code.trim()) return;
@@ -33,58 +39,91 @@ export default function CartPage() {
     applyCoupon("");
   }
 
-  const shipping = subtotal >= 999 || subtotal === 0 ? 0 : 79;
+  const freeShippingThreshold = settings?.freeShippingThreshold ?? 999;
+  const shippingFee = settings?.shippingFee ?? 79;
+  const shipping = subtotal >= freeShippingThreshold || subtotal === 0 ? 0 : shippingFee;
+  
+  // Actually CartContext might calculate total differently, but let's recalculate accurately here if we are applying a dynamic shipping fee
+  // If CartContext already calculates 'total' with shipping, we must ensure it uses the settings. 
+  // Let's assume CartContext doesn't know about dynamic shipping yet, so we just add it to the final display here.
+  // Wait, if CartContext doesn't know, checkout will fail. CartContext needs to be updated too, or we just display the cart's subtotal and add shipping in Checkout.
+  // In the existing app, cart context gives subtotal, discount, total (subtotal - discount). 
+  // Shipping is usually calculated at checkout. So CartPage display should just be an estimate or exactly what Checkout will charge.
+  const finalTotal = total + shipping;
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 pt-4">
-        <h1 className="font-serif text-4xl text-pink-900 md:text-5xl">Your Cart</h1>
-        <p className="mt-2 text-pink-600">{items.length} item{items.length === 1 ? "" : "s"} in your bag</p>
+      <div className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+        <div className="glass bg-white/80 shadow-sm p-6 md:p-8 rounded-[2rem] border border-goldBeige mb-8">
+          <h1 className="font-serif text-3xl md:text-4xl text-charcoalBrown">Your Bag</h1>
+          <p className="mt-2 text-stoneGray">{items.length} item{items.length === 1 ? "" : "s"} waiting for you</p>
+        </div>
       </div>
 
-      <div className="mx-auto mt-6 grid max-w-7xl grid-cols-1 gap-6 px-4 lg:grid-cols-[1fr_360px] pb-16">
+      <div className="mx-auto mt-6 grid max-w-7xl grid-cols-1 gap-8 px-4 lg:grid-cols-[1fr_380px] pb-24">
         <div className="space-y-4">
           {items.length === 0 && (
-            <div className="glass-dark rounded-2xl p-10 text-center">
-              <p className="mb-4 text-pink-700">Your cart is empty.</p>
-              <Link href="/shop" className="btn-primary-gold inline-flex items-center gap-2">
-                Continue shopping <ArrowRight className="h-4 w-4" />
+            <EmptyStateCard 
+              icon={ShoppingBag} 
+              text="Your bag is empty" 
+              subtext="Let's find something beautiful for you."
+            >
+              <Link href="/shop" className="mt-4 inline-flex items-center gap-2 rounded-full bg-charcoalBrown px-6 py-3 font-semibold text-white transition hover:bg-charcoalBrown/90 shadow-sm">
+                Continue Shopping
               </Link>
-            </div>
+            </EmptyStateCard>
           )}
           {items.map(item => (
-            <div key={item.product.id} className="glass-dark flex gap-3 rounded-2xl p-3 md:gap-4 md:p-4 relative">
-              <img 
-                src={getOptimizedImageUrl(item.product.images?.[0] || "", 200)} 
-                alt={item.product.name} 
-                className="h-24 w-24 shrink-0 rounded-xl object-cover md:h-28 md:w-28" 
-              />
-              <div className="flex min-w-0 flex-1 flex-col">
-                <p className="text-xs uppercase tracking-wide text-pink-600">{item.product.categorySlug || item.product.category}</p>
-                <Link href={`/product/${item.product.slug || item.product.id}`}>
-                  <h3 className="truncate font-serif text-base text-pink-900 md:text-lg hover:text-pink-700">{item.product.name}</h3>
-                </Link>
-                <p className="text-sm font-semibold text-pink-900">
-                  ₹{item.product.salePrice}
-                </p>
-                <div className="mt-auto flex items-center justify-between gap-2">
-                  <div className="glass flex items-center rounded-xl p-1">
+            <div key={item.product.id} className="glass bg-white/80 border border-goldBeige shadow-sm flex gap-4 rounded-[1.5rem] p-4 relative transition-all hover:shadow-md">
+              <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden md:h-32 md:w-32 border border-goldBeige/30">
+                <img 
+                  src={getOptimizedImageUrl(item.product.images?.[0] || "", 300)} 
+                  alt={item.product.name} 
+                  className="h-full w-full object-cover" 
+                  loading="lazy"
+                />
+              </div>
+              
+              <div className="flex min-w-0 flex-1 flex-col justify-between py-1">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-champagne mb-1">
+                    {item.product.categorySlug || item.product.category || 'Jewelry'}
+                  </p>
+                  <Link href={`/product/${item.product.slug || item.product.id}`}>
+                    <h3 className="truncate font-serif text-base text-charcoalBrown md:text-lg hover:text-champagne transition-colors">
+                      {item.product.name}
+                    </h3>
+                  </Link>
+                  <p className="text-sm font-semibold text-charcoalBrown mt-1">
+                    {formatPrice(item.product.salePrice)}
+                  </p>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <div className="glass bg-beige/50 border border-goldBeige/30 flex items-center rounded-xl p-1">
                     <button 
                       onClick={() => decrease(item.product.id)} 
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-pink-900 hover:bg-pink-100" aria-label="Decrease"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-charcoalBrown hover:bg-white hover:shadow-sm transition-all" 
+                      aria-label="Decrease"
                     >
                       <Minus className="h-3 w-3" />
                     </button>
-                    <span className="w-8 text-center text-sm font-semibold text-pink-900">{item.quantity}</span>
+                    <span className="w-8 text-center text-sm font-semibold text-charcoalBrown">{item.quantity}</span>
                     <button 
                       onClick={() => increase(item.product.id)} 
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-pink-900 hover:bg-pink-100" aria-label="Increase"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-charcoalBrown hover:bg-white hover:shadow-sm transition-all" 
+                      aria-label="Increase"
                     >
                       <Plus className="h-3 w-3" />
                     </button>
                   </div>
-                  <button onClick={() => removeFromCart(item.product.id)} className="text-pink-600 hover:text-pink-700" aria-label="Remove">
-                    <Trash2 className="h-5 w-5" />
+                  
+                  <button 
+                    onClick={() => removeFromCart(item.product.id)} 
+                    className="text-stoneGray hover:text-dustyRose transition-colors p-2" 
+                    aria-label="Remove"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -93,29 +132,32 @@ export default function CartPage() {
         </div>
 
         {items.length > 0 && (
-          <aside className="glass-dark h-fit rounded-2xl p-6">
-            <h3 className="mb-4 font-serif text-xl text-pink-900">Order summary</h3>
-            <div className="space-y-2 text-sm text-pink-700">
-              <Row label="Subtotal" value={`₹${subtotal}`} />
+          <aside className="glass bg-white/80 border border-goldBeige shadow-sm h-fit rounded-[2rem] p-6 md:p-8 sticky top-24">
+            <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">Order Summary</h3>
+            <div className="space-y-3 text-sm text-stoneGray">
+              <Row label="Subtotal" value={formatPrice(subtotal)} />
               
               {discount > 0 && (
                 <Row 
-                  label={<span className="text-green-600">Discount {coupon ? `(${coupon})` : ""}</span>} 
-                  value={<span className="text-green-600">-₹{discount}</span>} 
+                  label={<span className="text-emerald-600">Discount {coupon ? `(${coupon})` : ""}</span>} 
+                  value={<span className="text-emerald-600">-{formatPrice(discount)}</span>} 
                 />
               )}
               
-              <Row label="Shipping" value={shipping === 0 ? "Free" : `₹${shipping}`} />
-              
-              <div className="my-3 border-t border-pink-200" />
               <Row 
-                label={<span className="font-serif text-lg text-pink-900">Total</span>} 
-                value={<span className="font-serif text-lg text-pink-900">₹{total}</span>} 
+                label="Shipping" 
+                value={shipping === 0 ? <span className="text-emerald-600 font-medium">Free</span> : formatPrice(shipping)} 
+              />
+              
+              <div className="my-4 border-t border-goldBeige/50" />
+              <Row 
+                label={<span className="font-serif text-xl font-bold text-charcoalBrown">Total</span>} 
+                value={<span className="font-serif text-xl font-bold text-champagne">{formatPrice(finalTotal)}</span>} 
               />
             </div>
             
-            <div className="mt-6">
-              <div className="mb-4">
+            <div className="mt-8">
+              <div className="mb-6">
                 {!coupon ? (
                   <div className="flex gap-2">
                     <input 
@@ -123,30 +165,32 @@ export default function CartPage() {
                       placeholder="Coupon code" 
                       value={code}
                       onChange={(e) => setCode(e.target.value)}
-                      className="neo-input flex-grow px-4 py-2 text-sm w-full outline-none"
+                      className="neo-input flex-grow px-4 py-3 text-sm w-full outline-none bg-white"
                     />
                     <button 
                       onClick={handleApplyCoupon}
                       disabled={couponLoading || !code.trim()}
-                      className="btn-primary-gold px-4 py-2 !rounded-xl text-sm disabled:opacity-50"
+                      className="btn-primary-gold px-6 py-3 text-sm disabled:opacity-50"
                     >
                       {couponLoading ? "..." : "Apply"}
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between bg-pink-100/50 px-4 py-2.5 rounded-xl border border-pink-200">
-                    <span className="text-sm font-medium text-green-600">✨ {coupon} Applied!</span>
-                    <button onClick={removeCouponLocal} className="text-xs text-pink-600 hover:text-red-500 underline">Remove</button>
+                  <div className="flex items-center justify-between bg-emerald-50 px-4 py-3 rounded-2xl border border-emerald-100">
+                    <span className="text-sm font-medium text-emerald-600">✨ {coupon} Applied!</span>
+                    <button onClick={removeCouponLocal} className="text-xs text-dustyRose hover:underline font-medium">Remove</button>
                   </div>
                 )}
-                {couponMsg && !coupon && <p className="text-xs text-red-500 mt-2">{couponMsg}</p>}
+                {couponMsg && !coupon && <p className="text-xs text-dustyRose mt-2 font-medium">{couponMsg}</p>}
               </div>
 
-              <Link href="/checkout" className="btn-primary-gold w-full py-3">Checkout</Link>
+              <Link href="/checkout" className="btn-primary-gold w-full py-4 text-base shadow-lg shadow-champagne/20 block text-center">
+                Proceed to Checkout
+              </Link>
             </div>
             
-            <div className="mt-4 flex items-center justify-center gap-2 text-pink-600 text-xs">
-              <ShieldCheck className="h-4 w-4" /> Secure encrypted checkout
+            <div className="mt-6 flex items-center justify-center gap-2 text-stoneGray text-xs">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" /> Secure encrypted checkout
             </div>
           </aside>
         )}

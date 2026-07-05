@@ -1,7 +1,9 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState } from "react";
-import { getCoupons, addCoupon, updateCoupon, deleteCoupon } from "@/lib/firestore";
+import { getCoupons, addCoupon, updateCoupon, deleteCoupon , logActivity } from "@/lib/firestore";
 import { Coupon } from "@/types";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export default function CouponsPage() {
+  const { user } = useAuth();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -77,6 +80,18 @@ export default function CouponsPage() {
     setDeletingId(id);
     try {
       await deleteCoupon(id);
+      if (user) {
+        await logActivity({
+          actorUid: user.uid,
+          actorEmail: user.email || "Unknown",
+          actorName: user.displayName || user.email || "Unknown",
+          actorRole: (user as any).role || "staff",
+          action: "delete_coupon",
+          documentChanged: id,
+          section: "coupon",
+          newValue: "Deleted coupon " + id
+        });
+      }
       setCoupons(coupons.filter((c) => c.id !== id));
       if (editingCoupon && editingCoupon.id === id) {
         handleCancelEdit();

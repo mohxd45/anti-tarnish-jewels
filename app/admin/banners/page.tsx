@@ -1,7 +1,9 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState, useRef } from "react";
-import { getBanners, addBanner, updateBanner, deleteBanner, uploadImage, getCategories, getProducts } from "@/lib/firestore";
+import { getBanners, addBanner, updateBanner, deleteBanner, uploadImage, getCategories, getProducts , logActivity } from "@/lib/firestore";
 import { Banner, BannerPlacement, Category, Product } from "@/types";
 import { Save, Trash2, Edit2, Upload, Plus, X } from "lucide-react";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -23,6 +25,7 @@ function Field({ label, children, required }: { label: string; children: React.R
 }
 
 export default function BannersPage() {
+  const { user } = useAuth();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -66,7 +69,7 @@ export default function BannersPage() {
       mobileImageUrl: "",
       ctaText: "Shop Now",
       linkType: "category",
-      placement: "hero",
+      placement: "hero-banner",
       active: true,
       isActive: true,
       order: 1,
@@ -282,12 +285,10 @@ export default function BannersPage() {
                       onChange={(e) => setEditingBanner({ ...editingBanner, placement: e.target.value as BannerPlacement })}
                       className="w-full h-9 rounded-md border border-input bg-card/60 px-3 text-sm outline-none focus:ring-1 focus:ring-ring"
                     >
-                      <option value="hero">Hero Slider</option>
-                      <option value="hero-floating">Hero Floating Card</option>
-                      <option value="promo">Promo Grid</option>
-                      <option value="sale">Flash Sale</option>
-                      <option value="category">Category Highlight</option>
-                      <option value="footer-promo">Footer Row</option>
+                      <option value="hero-banner">Hero Banner</option>
+                      <option value="hero-floating-card">Hero Floating Card</option>
+                      <option value="homepage-banner">Homepage Banner</option>
+                      <option value="category-banner">Category Banner</option>
                     </select>
                   </Field>
                   <Field label="Sort Order">

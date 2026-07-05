@@ -42,7 +42,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Gallery */}
           <div>
-            <div className="glass-dark mb-4 overflow-hidden rounded-3xl">
+            <div className="glass bg-white/80 shadow-sm border border-goldBeige mb-4 overflow-hidden rounded-3xl">
               <img
                 src={images[activeImg]}
                 alt={p.name}
@@ -69,41 +69,41 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
             <div className="mb-4 flex flex-wrap gap-2">
               {p.tags?.[0] && <span className="rounded-full bg-pink-900 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">{p.tags[0]}</span>}
               {p.isBestSeller && <span className="clay-badge px-3 py-1 text-[10px] font-bold uppercase tracking-wide">Bestseller</span>}
-              {isSale && <span className="rounded-full bg-pink-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sale</span>}
+              {isSale && <span className="rounded-full bg-beige0 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sale</span>}
               <span className="anti-tarnish-badge">Anti-Tarnish</span>
             </div>
-            <p className="mb-2 text-xs uppercase tracking-widest text-pink-600">{(p.categorySlug || p.category || "").replace("-", " ")}</p>
-            <h1 className="mb-4 font-serif text-3xl text-pink-900 md:text-4xl">{p.name}</h1>
+            <p className="mb-2 text-xs uppercase tracking-widest text-stoneGray">{(p.categorySlug || p.category || "").replace("-", " ")}</p>
+            <h1 className="mb-4 font-serif text-3xl text-charcoalBrown md:text-4xl">{p.name}</h1>
             
             <div className="mb-6 flex items-baseline gap-3">
               {isSale ? (
                 <>
-                  <span className="text-3xl font-bold text-pink-900">₹{p.salePrice}</span>
-                  <span className="text-lg text-pink-600 line-through">₹{p.regularPrice}</span>
-                  <span className="rounded-full bg-pink-100 px-2 py-0.5 text-xs font-semibold text-pink-700">
+                  <span className="text-3xl font-bold text-charcoalBrown">₹{p.salePrice}</span>
+                  <span className="text-lg text-stoneGray line-through">₹{p.regularPrice}</span>
+                  <span className="rounded-full bg-beige/50 px-2 py-0.5 text-xs font-semibold text-stoneGray">
                     {Math.round(((p.regularPrice! - p.salePrice) / p.regularPrice!) * 100)}% off
                   </span>
                 </>
               ) : (
-                <span className="text-3xl font-bold text-pink-900">₹{p.salePrice}</span>
+                <span className="text-3xl font-bold text-charcoalBrown">₹{p.salePrice}</span>
               )}
             </div>
             
-            <p className="mb-6 text-sm leading-relaxed text-pink-700">
+            <p className="mb-6 text-sm leading-relaxed text-stoneGray">
               {p.description || "Discover waterproof, sweatproof, and life-proof luxury pieces designed for your everyday elegance."}
             </p>
 
             <div className="mb-6 flex items-center gap-4">
               <div className="glass flex items-center gap-1 rounded-xl p-1">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-pink-900 hover:bg-pink-100" aria-label="Decrease">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoalBrown hover:bg-beige/50" aria-label="Decrease">
                   <Minus className="h-4 w-4" />
                 </button>
-                <span className="w-8 text-center font-semibold text-pink-900">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(p.stock || 10, q + 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-pink-900 hover:bg-pink-100" aria-label="Increase">
+                <span className="w-8 text-center font-semibold text-charcoalBrown">{qty}</span>
+                <button onClick={() => setQty((q) => Math.min(p.stock || 10, q + 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoalBrown hover:bg-beige/50" aria-label="Increase">
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
-              <span className="text-xs text-pink-600">{p.stock || "In"} stock</span>
+              <span className="text-xs text-stoneGray">{p.stock || "In"} stock</span>
             </div>
 
             <div className="mb-8 flex flex-col gap-3 sm:flex-row">
@@ -124,8 +124,8 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
             </div>
 
             <div className="glass rounded-2xl p-5">
-              <h4 className="mb-3 font-serif text-lg text-pink-900">Care instructions</h4>
-              <ul className="space-y-1 text-sm text-pink-700">
+              <h4 className="mb-3 font-serif text-lg text-charcoalBrown">Care instructions</h4>
+              <ul className="space-y-1 text-sm text-stoneGray">
                 <li>• Wipe with a soft dry cloth after use.</li>
                 <li>• Avoid direct contact with perfume or lotion.</li>
                 <li>• Store in the provided pouch to preserve shine.</li>
@@ -144,7 +144,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
         {/* Related */}
         {initialSimilar && initialSimilar.length > 0 && (
           <div className="mt-16 pb-16">
-            <h2 className="mb-6 font-serif text-2xl text-pink-900 md:text-3xl">You may also like</h2>
+            <h2 className="mb-6 font-serif text-2xl text-charcoalBrown md:text-3xl">You may also like</h2>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
               {initialSimilar.map((prod) => <ProductCard key={prod.id} product={prod} />)}
             </div>
@@ -158,8 +158,8 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
 function MiniTrust({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div className="trust-badge !p-3">
-      <div className="mb-1 flex justify-center text-pink-600">{icon}</div>
-      <p className="text-xs font-semibold text-pink-900">{label}</p>
+      <div className="mb-1 flex justify-center text-stoneGray">{icon}</div>
+      <p className="text-xs font-semibold text-charcoalBrown">{label}</p>
     </div>
   );
 }

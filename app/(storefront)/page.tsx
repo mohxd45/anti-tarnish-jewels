@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
-import { getProducts, getBanners, getCategories, getReviews } from "@/lib/firestore";
+import { getProducts, getBanners, getCategories, getReviews, getSiteContent, getSiteSettings } from "@/lib/firestore";
 import { Sparkles, Droplets, Gem, Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
 
 export const metadata = {
@@ -9,22 +9,25 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [products, banners, categories, reviews] = await Promise.all([
+  const [products, banners, categories, reviews, content, settings] = await Promise.all([
     getProducts(),
     getBanners(),
     getCategories(),
     getReviews(),
+    getSiteContent("home"),
+    getSiteSettings()
   ]);
 
   const bestsellers = products.filter(p => p.isBestSeller || (p.rating && p.rating >= 4.5)).slice(0, 8);
   const newArrivals = products.sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()).slice(0, 8);
-  const heroBanners = banners.filter((b) => b.placement === "hero" && b.active);
+  const heroBanners = banners.filter((b) => b.placement === "hero-banner" && b.active);
+  const promoBanners = banners.filter((b) => b.placement === "homepage-banner" && b.active);
 
   // Fallback banners if none exist in firestore
   const safeHeroBanners = heroBanners.length >= 3 ? heroBanners : [
-    { id: '1', title: 'Rings', subtitle: 'Timeless elegance', imageUrl: '/product-ring.jpg', placement: "hero" as const, createdAt: "", updatedAt: "" },
-    { id: '2', title: 'Earrings', subtitle: 'Radiant shine', imageUrl: '/product-earrings.jpg', placement: "hero" as const, createdAt: "", updatedAt: "" },
-    { id: '3', title: 'Necklaces', subtitle: 'Everyday luxury', imageUrl: '/product-necklace.jpg', placement: "hero" as const, createdAt: "", updatedAt: "" },
+    { id: '1', title: 'Rings', subtitle: 'Timeless elegance', imageUrl: '/product-ring.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
+    { id: '2', title: 'Earrings', subtitle: 'Radiant shine', imageUrl: '/product-earrings.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
+    { id: '3', title: 'Necklaces', subtitle: 'Everyday luxury', imageUrl: '/product-necklace.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
   ];
 
   // Fallback categories if empty
@@ -49,6 +52,19 @@ export default async function HomePage() {
     { id: '3', name: "Neha R.", initial: "N", color: "#F9A8D4", text: "Fast delivery and beautiful packaging. The rings are true to size and so elegant." }
   ];
 
+  const heroSmallTitle = content?.heroSmallTitle || "Premium Anti-Tarnish Collection";
+  const heroMainHeading = content?.heroMainHeading || content?.heroTitle || "Timeless Elegance";
+  
+  // Split title if possible, or just render it
+  const titleWords = heroMainHeading.split(" ");
+  const titleFirstPart = titleWords.length > 1 ? titleWords.slice(0, -1).join(" ") : heroMainHeading;
+  const titleLastPart = titleWords.length > 1 ? titleWords[titleWords.length - 1] : "";
+
+  const heroSubtitle = content?.heroSubtitle || "Discover jewellery that stays as radiant as you. Crafted with anti-tarnish technology for everyday luxury.";
+  const heroCtaText = content?.heroCtaText || "Shop Collection";
+  const heroCtaLink = content?.heroCtaLink || "/shop";
+  const promotionalText = content?.promotionalText || "Discover our new premium collection.";
+
   return (
     <>
       {/* HERO */}
@@ -71,19 +87,19 @@ export default async function HomePage() {
 
         <div className="relative z-10 mx-auto w-full max-w-7xl">
           <div className="mb-10 text-center">
-            <p className="mb-4 text-xs font-medium uppercase tracking-widest text-pink-600 sm:text-sm">
-              Premium Anti-Tarnish Collection
+            <p className="mb-4 text-xs font-medium uppercase tracking-widest text-stoneGray sm:text-sm">
+              {heroSmallTitle}
             </p>
-            <h1 className="mb-6 font-serif text-5xl leading-tight text-pink-900 md:text-7xl lg:text-8xl">
-              Timeless<br />
-              <span className="gold-text italic">Elegance</span>
+            <h1 className="mb-6 font-serif text-5xl leading-tight text-charcoalBrown md:text-7xl lg:text-8xl">
+              {titleFirstPart}<br />
+              <span className="gold-text italic">{titleLastPart}</span>
             </h1>
-            <p className="mx-auto mb-8 max-w-2xl text-base text-pink-700 md:text-xl">
-              Discover jewellery that stays as radiant as you. Crafted with anti-tarnish technology for everyday luxury.
+            <p className="mx-auto mb-8 max-w-2xl text-base text-stoneGray md:text-xl">
+              {heroSubtitle}
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
-              <Link href="/shop" className="btn-primary-gold px-8 py-4 text-base md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
-                Shop Collection
+              <Link href={heroCtaLink} className="btn-primary-gold px-8 py-4 text-base md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
+                {heroCtaText}
               </Link>
               <Link href="/shop?category=daily-wear" className="btn-liquid px-8 py-4 text-base md:text-lg">
                 Daily Wear
@@ -92,8 +108,8 @@ export default async function HomePage() {
             
             <div className="mt-8 flex justify-center">
               <div className="glass-premium flex items-center gap-3 rounded-full px-5 py-2 shadow-sm border border-white/60 mx-auto max-w-max">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pink-100 text-pink-700 text-xs">✨</span>
-                <p className="text-sm font-medium text-pink-950">Discover our new premium collection. <Link href="/sale" className="underline hover:text-pink-700 font-semibold ml-1">Shop Sale</Link></p>
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-beige/50 text-stoneGray text-xs">✨</span>
+                <p className="text-sm font-medium text-pink-950">{promotionalText} <Link href="/sale" className="underline hover:text-stoneGray font-semibold ml-1">Shop Sale</Link></p>
               </div>
             </div>
           </div>
@@ -139,7 +155,7 @@ export default async function HomePage() {
                   className={`absolute cursor-pointer overflow-hidden rounded-2xl shadow-sm border border-white/40 transition hover:z-10 hover:-translate-y-2 hover:scale-105 hover:shadow-md ${pos.anim}`}
                   style={style}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-pink-950/80 via-pink-900/20 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C2121]/80 via-[#2C2121]/20 to-transparent z-10" />
                   <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
                   <div className="relative z-20 h-full w-full flex flex-col justify-end p-4">
                     <h3 className="font-serif text-lg text-white drop-shadow-md">{b.title}</h3>
@@ -155,8 +171,8 @@ export default async function HomePage() {
       {/* SHOP BY CATEGORY (bento) */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="mb-10 text-center">
-          <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-5xl">Shop by Category</h2>
-          <p className="text-pink-600">Find your perfect piece</p>
+          <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-5xl">Shop by Category</h2>
+          <p className="text-stoneGray">Find your perfect piece</p>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 md:gap-4">
           <CategoryTile category={catRing} className="col-span-1 h-48 sm:h-64 md:h-80" featured />
@@ -181,8 +197,8 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="glass-premium border border-white/60 rounded-3xl p-6 md:p-12">
           <div className="mb-10 text-center">
-            <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-5xl">Why Anti-Tarnish?</h2>
-            <p className="mx-auto max-w-2xl text-pink-600">
+            <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-5xl">Why Anti-Tarnish?</h2>
+            <p className="mx-auto max-w-2xl text-stoneGray">
               Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
             </p>
           </div>
@@ -207,12 +223,12 @@ export default async function HomePage() {
       {/* REVIEWS */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="mb-10 text-center">
-          <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-5xl">Loved by Thousands</h2>
+          <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-5xl">Loved by Thousands</h2>
           <div className="mb-1 flex items-center justify-center gap-2">
             <span className="text-2xl" style={{ color: "#D4AF37" }}>★★★★★</span>
-            <span className="font-semibold text-pink-700">4.9/5</span>
+            <span className="font-semibold text-stoneGray">4.9/5</span>
           </div>
-          <p className="text-pink-600">Based on 2,847 reviews</p>
+          <p className="text-stoneGray">Based on 2,847 reviews</p>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
           {safeReviews.slice(0, 3).map((r) => (
@@ -223,11 +239,11 @@ export default async function HomePage() {
                   style={{ background: r.color || "#FBCFE8" }}
                 >{r.initial || r.name?.charAt(0) || "U"}</div>
                 <div>
-                  <h4 className="font-semibold text-pink-900">{r.name}</h4>
+                  <h4 className="font-semibold text-charcoalBrown">{r.name}</h4>
                   <div className="text-sm" style={{ color: "#D4AF37" }}>★★★★★</div>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-pink-700">"{r.text}"</p>
+              <p className="text-sm leading-relaxed text-stoneGray">"{r.text}"</p>
             </div>
           ))}
         </div>
@@ -246,8 +262,8 @@ export default async function HomePage() {
       {/* NEWSLETTER */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="glass-premium border border-white/60 mx-auto max-w-3xl rounded-3xl p-8 text-center md:p-12">
-          <h2 className="mb-3 font-serif text-3xl text-pink-900 md:text-4xl">Join our list</h2>
-          <p className="mb-6 text-pink-600">Get 10% off your first order and early access to new drops.</p>
+          <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-4xl">Join our list</h2>
+          <p className="mb-6 text-stoneGray">Get 10% off your first order and early access to new drops.</p>
           <form
             className="mx-auto flex max-w-lg flex-col gap-3 sm:flex-row"
           >
@@ -269,8 +285,8 @@ function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: st
   return (
     <div className="mb-8 flex items-end justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="mb-1 font-serif text-3xl text-pink-900 md:text-5xl">{title}</h2>
-        <p className="text-sm text-pink-600 md:text-base">{subtitle}</p>
+        <h2 className="mb-1 font-serif text-3xl text-charcoalBrown md:text-5xl">{title}</h2>
+        <p className="text-sm text-stoneGray md:text-base">{subtitle}</p>
       </div>
       <Link href={ctaTo} className="btn-liquid hidden md:inline-flex">View All</Link>
     </div>
@@ -305,7 +321,7 @@ function CategoryTile({
       href={`/shop?category=${category.slug}`}
       className={`category-card relative block cursor-pointer overflow-hidden rounded-2xl ${className ?? ""}`}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-pink-950/80 via-pink-900/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2121]/80 via-[#2C2121]/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
       <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 hover:scale-105" />
       <div className="absolute bottom-3 left-4 z-10 text-white">
         <h3 className={`relative z-20 font-serif drop-shadow-md ${featured ? "text-xl sm:text-2xl md:text-3xl" : "text-lg sm:text-xl"}`}>{category.name}</h3>
@@ -318,7 +334,7 @@ function CategoryTile({
 function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
     <div className="glass-premium rounded-2xl p-6 border border-white/60 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-pink-50 text-[color:var(--color-gold)]">{icon}</div>
+      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-beige text-[color:var(--color-gold)]">{icon}</div>
       <h3 className="mb-2 font-serif text-xl text-[color:var(--color-espresso)]">{title}</h3>
       <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
     </div>

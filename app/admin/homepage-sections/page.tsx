@@ -1,7 +1,8 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
-import { getHomepageSections, saveHomepageSections, getProducts, getCategories } from "@/lib/firestore";
+import { getHomepageSections, saveHomepageSections, getProducts, getCategories , logActivity } from "@/lib/firestore";
 import { HomepageSection, Product, Category } from "@/types";
 import { Save, Loader, ArrowUp, ArrowDown, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 

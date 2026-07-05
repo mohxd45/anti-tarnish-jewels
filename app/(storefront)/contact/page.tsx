@@ -36,11 +36,11 @@ export default function ContactPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-16 pb-32">
       <div className="text-center mb-16">
-        <span className="text-xs font-semibold tracking-widest text-pink-600 uppercase">Get In Touch</span>
-        <h1 className="mt-2 text-4xl sm:text-5xl font-serif text-pink-900 tracking-tight">
+        <span className="text-xs font-semibold tracking-widest text-stoneGray uppercase">Get In Touch</span>
+        <h1 className="mt-2 text-4xl sm:text-5xl font-serif text-charcoalBrown tracking-tight">
           Contact Support
         </h1>
-        <p className="mt-4 text-sm text-pink-700 max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-4 text-sm text-stoneGray max-w-2xl mx-auto leading-relaxed">
           Have a question about our anti-tarnish waterproof collection, or need assistance with your order? 
           Our dedicated team is ready to help you.
         </p>
@@ -60,10 +60,10 @@ export default function ContactPage() {
                   <MessageSquare className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-serif text-pink-900 group-hover:text-[color:var(--color-gold)] transition-colors">
+                  <h3 className="text-lg font-serif text-charcoalBrown group-hover:text-[color:var(--color-gold)] transition-colors">
                     WhatsApp Support
                   </h3>
-                  <p className="text-sm text-pink-700 mt-1">
+                  <p className="text-sm text-stoneGray mt-1">
                     Get instant replies for orders, custom sizes, or shipping status.
                   </p>
                   <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-green-600">
@@ -75,14 +75,14 @@ export default function ContactPage() {
             </a>
           )}
 
-          <div className="p-6 rounded-3xl glass-dark">
+          <div className="p-6 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-pink-100 rounded-2xl border border-pink-200">
-                <Mail className="w-6 h-6 text-pink-900" />
+              <div className="p-3 bg-beige/50 rounded-2xl border border-goldBeige">
+                <Mail className="w-6 h-6 text-charcoalBrown" />
               </div>
               <div>
-                <h3 className="text-lg font-serif text-pink-900">Email Inquiries</h3>
-                <p className="text-sm text-pink-700 mt-1">
+                <h3 className="text-lg font-serif text-charcoalBrown">Email Inquiries</h3>
+                <p className="text-sm text-stoneGray mt-1">
                   For bulk orders, custom gifting, or partnership inquiries.
                 </p>
                 <a
@@ -95,17 +95,17 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-3xl glass-dark">
+          <div className="p-6 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-pink-100 rounded-2xl border border-pink-200">
-                <Clock className="w-6 h-6 text-pink-900" />
+              <div className="p-3 bg-beige/50 rounded-2xl border border-goldBeige">
+                <Clock className="w-6 h-6 text-charcoalBrown" />
               </div>
               <div>
-                <h3 className="text-lg font-serif text-pink-900">Business Hours</h3>
-                <p className="text-sm text-pink-700 mt-1">
+                <h3 className="text-lg font-serif text-charcoalBrown">Business Hours</h3>
+                <p className="text-sm text-stoneGray mt-1">
                   Our support team is active during these hours:
                 </p>
-                <p className="mt-2 text-sm text-pink-900 font-medium">
+                <p className="mt-2 text-sm text-charcoalBrown font-medium">
                   Monday – Saturday: 10:00 AM – 7:00 PM (IST)
                 </p>
               </div>
@@ -122,13 +122,13 @@ export default function ContactPage() {
         </div>
 
         <div className="lg:col-span-7">
-          <div className="p-6 sm:p-10 rounded-3xl glass-dark">
-            <h2 className="text-2xl font-serif text-pink-900 mb-2">Send Us a Message</h2>
-            <p className="text-sm text-pink-700 mb-8">Fill out the form below and we will get back to you within 24 hours.</p>
+          <div className="p-6 sm:p-10 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige">
+            <h2 className="text-2xl font-serif text-charcoalBrown mb-2">Send Us a Message</h2>
+            <p className="text-sm text-stoneGray mb-8">Fill out the form below and we will get back to you within 24 hours.</p>
 
             <form onSubmit={submit} className="space-y-5">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-pink-900 mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-charcoalBrown mb-2">
                   Full Name *
                 </label>
                 <input
@@ -143,7 +143,7 @@ export default function ContactPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-pink-900 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-charcoalBrown mb-2">
                     Email Address *
                   </label>
                   <input
@@ -156,7 +156,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-pink-900 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-charcoalBrown mb-2">
                     Phone Number *
                   </label>
                   <input
@@ -173,7 +173,7 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-pink-900 mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-charcoalBrown mb-2">
                   Message Details *
                 </label>
                 <textarea

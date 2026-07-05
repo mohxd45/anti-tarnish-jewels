@@ -2,28 +2,51 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Admin check helper. If the doc doesn't exist, this evaluates to false.
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
     function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      let role = getRole();
+      return role in ['owner_admin', 'partner_admin', 'developer_admin', 'admin'];
     }
 
-    // Products — anyone can read, only admin can write
+    function isDevAdmin() {
+      return getRole() == 'developer_admin';
+    }
+
+    function isStaff() {
+      return getRole() == 'staff';
+    }
+
+    function isAnyAdminOrStaff() {
+      return isAdmin() || isStaff();
+    }
+
+    function hasValidInvite() {
+      let email = request.auth.token.email.lower();
+      return exists(/databases/$(database)/documents/staffInvites/$(email));
+    }
+
+    function getInviteRole() {
+      let email = request.auth.token.email.lower();
+      return get(/databases/$(database)/documents/staffInvites/$(email)).data.role;
+    }
+
+    // Products — anyone can read, admin & staff can write
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null && isAdmin();
+      allow write: if request.auth != null && isAnyAdminOrStaff();
     }
 
-    // Orders — customers can create/read their own, admin can read/write all
+    // Orders — customers can create/read their own, admin & staff can read/write all
     match /orders/{orderId} {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow read: if request.auth != null && 
-        (resource.data.userId == request.auth.uid || isAdmin());
-      allow update, delete: if request.auth != null && isAdmin();
+        (resource.data.userId == request.auth.uid || isAnyAdminOrStaff());
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
     }
 
-    // Public Tracking Orders
-    // - Public can only GET by specific ID
-    // - Authenticated customers can create strictly matching safe structures during checkout
     match /publicTrackingOrders/{docId} {
       allow get: if true;
       allow list: if false;
@@ -37,12 +60,9 @@ service cloud.firestore {
           'courierName', 'trackingNumber', 'trackingUrl', 'customerPhoneLast4', 'timeline', 'createdAt', 'updatedAt'
         ]) &&
         request.resource.data.customerPhoneLast4.size() <= 4;
-      allow update, delete: if request.auth != null && isAdmin();
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
     }
 
-    // Order Lookups
-    // - Public can only GET by specific ID
-    // - Authenticated customers can create strictly matching safe lookup structures
     match /orderLookups/{docId} {
       allow get: if true;
       allow list: if false;
@@ -50,113 +70,111 @@ service cloud.firestore {
         request.resource.data.keys().hasAll(['orderId', 'orderNumber', 'customerPhoneLast4', 'createdAt']) &&
         request.resource.data.keys().hasOnly(['orderId', 'orderNumber', 'customerPhoneLast4', 'createdAt']) &&
         request.resource.data.customerPhoneLast4.size() <= 4;
-      allow update, delete: if request.auth != null && isAdmin();
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
     }
 
-    // Users — users can read their own, admin can read/write all. Users can safely create/update own without restricted fields.
+    // Users — users can read their own, admin can read/write all. 
     match /users/{userId} {
       allow read: if request.auth != null && (userId == request.auth.uid || isAdmin());
-      allow create: if request.auth != null && userId == request.auth.uid && !request.resource.data.keys().hasAny(['role', 'isAdmin', 'permissions', 'admin', 'claims']);
+      
+      allow create: if request.auth != null && userId == request.auth.uid && (
+        !request.resource.data.keys().hasAny(['role', 'status', 'permissions', 'isAdmin', 'admin', 'claims']) ||
+        (
+          hasValidInvite() &&
+          !request.resource.data.keys().hasAny(['permissions', 'isAdmin', 'admin', 'claims']) &&
+          request.resource.data.role == getInviteRole()
+        )
+      );
+
       allow update: if request.auth != null && (
         isAdmin() || 
-        (userId == request.auth.uid && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin', 'permissions', 'admin', 'claims']))
+        (
+          userId == request.auth.uid && 
+          (
+            (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status', 'permissions', 'isAdmin', 'admin', 'claims'])) ||
+            (
+              hasValidInvite() &&
+              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['permissions', 'isAdmin', 'admin', 'claims']) &&
+              (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || request.resource.data.role == getInviteRole())
+            )
+          )
+        )
       );
+
       allow delete: if request.auth != null && isAdmin();
     }
 
-    // Settings — public read, admin write
+    // Staff Invites - only admins can write, user can read their own
+    match /staffInvites/{email} {
+      allow read: if request.auth != null && (isAdmin() || request.auth.token.email.lower() == email);
+      allow write: if request.auth != null && isAdmin();
+      // Allow users to delete their own invite once claimed
+      allow delete: if request.auth != null && (isAdmin() || request.auth.token.email.lower() == email);
+    }
+
+    // Audit Logs
+    match /auditLogs/{logId} {
+      allow read: if request.auth != null && (
+        isDevAdmin() || 
+        (isAdmin() && resource.data.actorRole == 'staff')
+      );
+      // Append only: user can only log for themselves, no updating/deleting except dev admin
+      allow create: if request.auth != null && isAnyAdminOrStaff() && request.resource.data.actorUid == request.auth.uid;
+      allow update: if false; // Strict append-only
+      allow delete: if request.auth != null && isDevAdmin();
+    }
+
+    // Settings — public read, admin write (NO STAFF)
     match /siteSettings/{document} {
       allow read: if true;
       allow write: if request.auth != null && isAdmin();
     }
-
-    // Categories — public read, admin write
     match /categories/{categoryId} {
       allow read: if true;
       allow write: if request.auth != null && isAdmin();
     }
-
-    // Banners — public read, admin write
     match /banners/{bannerId} {
       allow read: if true;
       allow write: if request.auth != null && isAdmin();
     }
-
-    // Announcements — public read, admin write
+    match /homepageSections/{sectionId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /siteContent/{contentId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
     match /announcements/{announcementId} {
       allow read: if true;
       allow write: if request.auth != null && isAdmin();
     }
-
-    // Site Content — public read, admin write
-    match /siteContent/{document} {
+    match /announcementsList/{announcementId} {
       allow read: if true;
       allow write: if request.auth != null && isAdmin();
     }
 
-    // Settings — only admin can read/write
-    match /settings/{document} {
-      allow read, write: if request.auth != null && isAdmin();
-    }
-
-    // Coupons — customers can ONLY increment usage counts by exactly 1
-    match /coupons/{couponId} {
-      allow read: if true;
-      allow create, delete: if request.auth != null && isAdmin();
-      allow update: if request.auth != null && 
-        (
-          isAdmin() ||
-          (
-            // Ensure no other fields are being altered
-            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedCount', 'usageCount']) &&
-            // If usedCount is being altered, it MUST be exactly old + 1
-            (
-              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['usedCount']) ||
-              request.resource.data.usedCount == (('usedCount' in resource.data) ? resource.data.usedCount : 0) + 1
-            ) &&
-            // If usageCount is being altered, it MUST be exactly old + 1
-            (
-              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['usageCount']) ||
-              request.resource.data.usageCount == (('usageCount' in resource.data) ? resource.data.usageCount : 0) + 1
-            )
-          )
-        );
-    }
-
-    // Contact Messages — public create, admin read/write
+    // Messages - admin and staff
     match /contactMessages/{messageId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null && isAdmin();
+      allow read, update, delete: if request.auth != null && isAnyAdminOrStaff();
     }
 
-    match /homepageSections/{sectionId} {
+    // Newsletters
+    match /newsletterSubscribers/{subId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+    
+    // Reviews
+    match /reviews/{reviewId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null && isAdmin();
-    }
-
-    match /homepageLayout/{document} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && isAdmin();
-    }
-
-    match /seoSettings/{document} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && isAdmin();
-    }
-
-    match /seo/{document} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && isAdmin();
-    }
-
-    match /pageSeo/{document} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && isAdmin();
-    }
-
-    // Block everything else
-    match /{document=**} {
-      allow read, write: if false;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
     }
   }
 }

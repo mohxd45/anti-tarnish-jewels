@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { getSiteSettings, getSiteContent } from "@/lib/firestore";
 
-export function Footer() {
+export async function Footer() {
+  const settings = await getSiteSettings();
+  const content = await getSiteContent("home");
+
+  const brandName = settings?.brandName || "Anti Tarnish Jewels";
+  const logoText = settings?.logoText || brandName.charAt(0);
+  const footerText = content?.footerText || "Premium anti-tarnish jewellery crafted for everyday elegance. Stay radiant, always.";
+
   return (
     <footer
       className="px-4 pb-8 pt-16"
@@ -12,15 +20,15 @@ export function Footer() {
           <div>
             <div className="mb-4 flex items-center gap-2">
               <div className="gold-trim flex h-10 w-10 items-center justify-center rounded-full">
-                <span className="font-serif text-lg font-bold text-white">A</span>
+                <span className="font-serif text-lg font-bold text-white">{logoText}</span>
               </div>
               <div>
-                <h3 className="font-serif text-lg text-pink-900">Anti Tarnish</h3>
-                <p className="-mt-1 text-xs text-pink-600">Jewels</p>
+                <h3 className="font-serif text-lg text-charcoalBrown">{brandName}</h3>
+                {settings?.subtitle && <p className="-mt-1 text-xs text-stoneGray">{settings.subtitle}</p>}
               </div>
             </div>
-            <p className="text-sm text-pink-700">
-              Premium anti-tarnish jewellery crafted for everyday elegance. Stay radiant, always.
+            <p className="text-sm text-stoneGray whitespace-pre-wrap">
+              {footerText}
             </p>
           </div>
           <FooterCol title="Shop" links={[
@@ -36,20 +44,28 @@ export function Footer() {
             { href: "/return-policy", label: "Returns" },
           ]}/>
           <div>
-            <h4 className="mb-4 font-semibold text-pink-900">Connect</h4>
-            <ul className="space-y-2 text-sm text-pink-700">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4" />hello@antitarnishjewels.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4" />+91 98765 43210</li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4" />Mumbai, India</li>
+            <h4 className="mb-4 font-semibold text-charcoalBrown">Connect</h4>
+            <ul className="space-y-2 text-sm text-stoneGray">
+              {settings?.email && <li className="flex items-center gap-2"><Mail className="h-4 w-4" />{settings.email}</li>}
+              {settings?.whatsAppNumber && <li className="flex items-center gap-2"><Phone className="h-4 w-4" />{settings.whatsAppNumber}</li>}
+              {settings?.businessAddress && <li className="flex items-center gap-2"><MapPin className="h-4 w-4" />{settings.businessAddress}</li>}
+              {(!settings?.email && !settings?.whatsAppNumber && !settings?.businessAddress) && (
+                <>
+                  <li className="flex items-center gap-2"><Mail className="h-4 w-4" />hello@antitarnishjewels.com</li>
+                  <li className="flex items-center gap-2"><Phone className="h-4 w-4" />+91 98765 43210</li>
+                  <li className="flex items-center gap-2"><MapPin className="h-4 w-4" />Mumbai, India</li>
+                </>
+              )}
             </ul>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-pink-300 pt-6 md:flex-row">
-          <p className="text-sm text-pink-700">© {new Date().getFullYear()} Anti Tarnish Jewels. All rights reserved.</p>
-          <div className="flex gap-4 text-sm text-pink-700">
-            <Link href="/privacy-policy" className="hover:text-pink-900">Privacy</Link>
-            <Link href="/return-policy" className="hover:text-pink-900">Returns</Link>
-            <Link href="/contact" className="hover:text-pink-900">Contact</Link>
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-goldBeige/50 pt-6 md:flex-row">
+          <p className="text-sm text-stoneGray">© {new Date().getFullYear()} {brandName}. All rights reserved.</p>
+          <div className="flex gap-4 text-sm text-stoneGray">
+            {settings?.deliveryText && <span className="mr-2 border-r border-pink-400 pr-4">{settings.deliveryText}</span>}
+            <Link href="/privacy-policy" className="hover:text-charcoalBrown">Privacy</Link>
+            <Link href="/return-policy" className="hover:text-charcoalBrown">Returns</Link>
+            <Link href="/contact" className="hover:text-charcoalBrown">Contact</Link>
           </div>
         </div>
       </div>
@@ -60,11 +76,11 @@ export function Footer() {
 function FooterCol({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
     <div>
-      <h4 className="mb-4 font-semibold text-pink-900">{title}</h4>
-      <ul className="space-y-2 text-sm text-pink-700">
+      <h4 className="mb-4 font-semibold text-charcoalBrown">{title}</h4>
+      <ul className="space-y-2 text-sm text-stoneGray">
         {links.map((l) => (
           <li key={l.label}>
-            <Link href={l.href} className="hover:text-pink-900">{l.label}</Link>
+            <Link href={l.href} className="hover:text-charcoalBrown">{l.label}</Link>
           </li>
         ))}
       </ul>

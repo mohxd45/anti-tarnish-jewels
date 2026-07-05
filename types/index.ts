@@ -132,9 +132,12 @@ export type Coupon = {
 };
 
 export type SiteContent = {
+  heroSmallTitle?: string;
   heroTitle?: string;
+  heroMainHeading?: string;
   heroSubtitle?: string;
   heroCtaText?: string;
+  heroCtaLink?: string;
   footerText?: string;
   aboutText?: string;
   faqText?: string;
@@ -142,16 +145,25 @@ export type SiteContent = {
   privacyPolicyText?: string;
   contactPageText?: string;
   promotionalText?: string;
+  homepageSectionTitles?: {
+    trending?: string;
+    newArrivals?: string;
+    bestSellers?: string;
+    categories?: string;
+  };
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+    whatsapp?: string;
+  };
 };
 
 export type BannerPlacement =
-  | "hero"
-  | "hero-floating"
-  | "promo"
-  | "sale"
-  | "category"
-  | "footer-promo"
-  | "all";
+  | "hero-banner"
+  | "hero-floating-card"
+  | "homepage-banner"
+  | "category-banner";
 
 export type Banner = {
   id: string;
@@ -184,7 +196,33 @@ export type Banner = {
 
 export type SiteSettings = {
   brandName: string;
+  subtitle?: string;
   logoText: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  whatsAppNumber?: string;
+  email?: string;
+  socialLinks?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  footerDescription?: string;
+  businessAddress?: string;
+  trustBadgeText?: string;
+  
+  // Delivery Settings
+  freeDeliveryAmount?: number;
+  freeShippingThreshold?: number;
+  deliveryText?: string;
+  deliveryFee?: number;
+  shippingFee?: number;
+  codEnabled?: boolean;
+  codText?: string;
+  checkoutNote?: string;
+
+  // Theme Settings
   primaryColor?: string;
   secondaryColor?: string;
   accentColor?: string;
@@ -287,3 +325,42 @@ export type Announcement = {
   order: number;
   createdAt: string;
 };
+
+
+export type UserRole = "owner_admin" | "partner_admin" | "developer_admin" | "staff" | "customer";
+export type UserStatus = "active" | "suspended" | "banned";
+
+export type AuditLog = {
+  id: string;
+  actorUid: string;
+  actorName: string;
+  actorEmail: string;
+  actorRole: UserRole;
+  action: string;
+  section: string;
+  documentChanged: string;
+  oldValue?: string;
+  newValue?: string;
+  createdAt: any; // Timestamp or ISO string
+};
+
+export type StaffInvite = {
+  email: string;
+  role: UserRole;
+  addedBy: string;
+  createdAt: any;
+};
+
+export type UserProfile = {
+  uid: string;
+  email: string;
+  name: string;
+  role?: UserRole;
+  status?: UserStatus;
+  permissions?: string[];
+  dateJoined?: string;
+  lastLoginAt?: string;
+  updatedAt?: string;
+};
+
+

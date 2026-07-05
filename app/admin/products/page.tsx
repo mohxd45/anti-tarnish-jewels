@@ -1,7 +1,9 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState } from "react";
-import { getProducts, deleteProduct, updateProduct, getCategories, uploadImage } from "@/lib/firestore";
+import { getProducts, deleteProduct, updateProduct, getCategories, uploadImage , logActivity } from "@/lib/firestore";
 import { Product, Category } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -14,6 +16,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 export default function ManageProductsPage() {
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,6 +91,18 @@ export default function ManageProductsPage() {
     setDeletingId(id);
     try {
       await deleteProduct(id);
+      if (user) {
+        await logActivity({
+          actorUid: user.uid,
+          actorEmail: user.email || "Unknown",
+          actorName: user.displayName || user.email || "Unknown",
+          actorRole: (user as any).role || "staff",
+          action: "delete_product",
+          documentChanged: id,
+          section: "product",
+          newValue: "Deleted product " + id
+        });
+      }
       setProducts(products.filter((p) => p.id !== id));
       toast.success("Product deleted successfully");
     } catch (err) {
@@ -254,6 +269,18 @@ export default function ManageProductsPage() {
       };
 
       await updateProduct(editingProduct.id, updatedFields);
+      if (user) {
+        await logActivity({
+          actorUid: user.uid,
+          actorEmail: user.email || "Unknown",
+          actorName: user.displayName || user.email || "Unknown",
+          actorRole: (user as any).role || "staff",
+          action: "update_product",
+          documentChanged: editingProduct.id,
+          section: "product",
+          newValue: "Updated product " + editingProduct.name
+        });
+      }
       
       const newProducts = products.map((p) => p.id === editingProduct.id ? ({ ...p, ...updatedFields } as Product) : p);
       setProducts(newProducts);

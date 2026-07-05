@@ -34,8 +34,8 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
       >
         <div className="p-6">
           <div className="mb-8 flex items-center justify-between">
-            <h2 className="font-serif text-2xl text-pink-900">Menu</h2>
-            <button onClick={onClose} className="text-pink-900" aria-label="Close menu">
+            <h2 className="font-serif text-2xl text-charcoalBrown">Menu</h2>
+            <button onClick={onClose} className="text-charcoalBrown" aria-label="Close menu">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -45,14 +45,14 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
                 key={l.label}
                 href={l.href}
                 onClick={onClose}
-                className={`block rounded-xl px-4 py-3 text-sm transition hover:bg-pink-100 ${l.sale ? "font-semibold text-pink-600" : "text-pink-900"}`}
+                className={`block rounded-xl px-4 py-3 text-sm transition hover:bg-beige/50 ${l.sale ? "font-semibold text-stoneGray" : "text-charcoalBrown"}`}
               >
                 {l.label}
               </Link>
             ))}
           </nav>
-          <div className="mt-8 space-y-3 border-t border-pink-200 pt-6">
-            <Link href="/login" onClick={onClose} className="block rounded-xl bg-pink-100 py-3 text-center text-pink-900">
+          <div className="mt-8 space-y-3 border-t border-goldBeige pt-6">
+            <Link href="/login" onClick={onClose} className="block rounded-xl bg-beige/50 py-3 text-center text-charcoalBrown">
               Login / Signup
             </Link>
             <Link

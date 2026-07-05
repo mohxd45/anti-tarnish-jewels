@@ -1,7 +1,8 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
-import { getProducts, getAllOrders, getUsers, getContactMessages } from "@/lib/firestore";
+import { getProducts, getAllOrders, getUsers, getContactMessages , logActivity } from "@/lib/firestore";
 import { Product, Order } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";

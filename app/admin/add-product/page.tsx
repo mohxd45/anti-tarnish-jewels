@@ -1,8 +1,9 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
-import { addProduct, getCategories, uploadImage } from "@/lib/firestore";
+import { addProduct, getCategories, uploadImage, logActivity } from "@/lib/firestore";
 import { Product, Category } from "@/types";
 import { slugify } from "@/lib/utils";
 import { X, Upload, Save, Loader } from "lucide-react";
@@ -15,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -27,6 +29,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 export default function AddProductPage() {
   const router = useRouter();
+  const { user, userRole } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -168,6 +171,23 @@ export default function AddProductPage() {
       });
 
       await addProduct(cleanPayload as Omit<Product, "id">);
+      
+      if (user) {
+        try {
+          await logActivity({
+            actorUid: user.uid,
+            actorName: user.displayName || user.email || "Unknown",
+            actorEmail: user.email || "Unknown",
+            actorRole: (userRole as any) || "staff",
+            action: "Added Product",
+            section: "Catalog",
+            documentChanged: `Product: ${name.trim()}`
+          });
+        } catch (e) {
+          console.warn("Failed to log activity", e);
+        }
+      }
+      
       toast.success("Product added successfully!");
       
       router.push("/admin/products");

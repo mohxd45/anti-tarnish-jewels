@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const cart = useCart();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
   const [address, setAddress] = useState<Address>({
     fullName: "",
     phone: "",
@@ -23,6 +24,10 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
   });
+
+  useEffect(() => {
+    import("@/lib/firestore").then(m => m.getSiteSettings().then(setSettings).catch(console.error));
+  }, []);
 
   useEffect(() => {
     if (!cart.items.length) {
@@ -62,14 +67,14 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 pt-4">
-        <div className="flex items-center gap-3">
-          <Link href="/cart" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 text-pink-900 transition hover:bg-pink-100">
+      <div className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/cart" className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 border border-goldBeige text-charcoalBrown transition hover:bg-beige/50 hover:shadow-sm">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="font-serif text-3xl text-pink-900 md:text-4xl">Checkout</h1>
-            <p className="mt-1 text-sm text-pink-600">Almost there — review and place your order</p>
+            <h1 className="font-serif text-3xl md:text-4xl text-charcoalBrown">Checkout</h1>
+            <p className="mt-1 text-sm text-stoneGray">Almost there — review and place your order</p>
           </div>
         </div>
       </div>
@@ -154,65 +159,82 @@ export default function CheckoutPage() {
           </Section>
 
           <Section title="Payment method">
-            <label className="glass flex cursor-pointer items-center gap-3 rounded-xl p-3 border border-[color:var(--color-gold)]">
-              <input type="radio" name="pm" defaultChecked className="accent-[color:var(--color-gold)]" /> 
-              <span className="text-sm text-pink-900 font-medium">Cash on Delivery</span>
+            <label className="glass bg-white/80 flex cursor-pointer items-center gap-4 rounded-2xl p-4 border border-goldBeige hover:bg-beige/30 transition-colors">
+              <input type="radio" name="pm" defaultChecked className="accent-champagne" disabled={settings?.codEnabled === false} /> 
+              <span className={`text-sm font-medium ${settings?.codEnabled === false ? 'text-stoneGray/50' : 'text-charcoalBrown'}`}>
+                Cash on Delivery
+                {settings?.codEnabled === false && " (Currently Disabled)"}
+              </span>
             </label>
-            <label className="glass flex cursor-not-allowed items-center gap-3 rounded-xl p-3 opacity-50">
+            {settings?.codEnabled !== false && settings?.codText && (
+              <p className="text-xs text-stoneGray mt-2 px-2">{settings.codText}</p>
+            )}
+            <label className="glass bg-white/50 flex cursor-not-allowed items-center gap-4 rounded-2xl p-4 opacity-50 border border-goldBeige/50">
               <input type="radio" name="pm" disabled /> 
-              <span className="text-sm text-pink-900">UPI (Coming Soon)</span>
+              <span className="text-sm text-charcoalBrown">UPI (Coming Soon)</span>
             </label>
-            <label className="glass flex cursor-not-allowed items-center gap-3 rounded-xl p-3 opacity-50">
+            <label className="glass bg-white/50 flex cursor-not-allowed items-center gap-4 rounded-2xl p-4 opacity-50 border border-goldBeige/50">
               <input type="radio" name="pm" disabled /> 
-              <span className="text-sm text-pink-900">Credit / Debit Card (Coming Soon)</span>
+              <span className="text-sm text-charcoalBrown">Credit / Debit Card (Coming Soon)</span>
             </label>
           </Section>
-          <button type="submit" disabled={loading} className="btn-primary-gold w-full py-4 text-lg">
+          
+          {settings?.checkoutNote && (
+            <div className="bg-beige/30 p-4 rounded-2xl border border-champagne/30 text-sm text-charcoalBrown/80">
+              {settings.checkoutNote}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading || settings?.codEnabled === false} className="btn-primary-gold w-full py-4 text-lg">
             {loading ? "Processing..." : "Place Order"}
           </button>
         </form>
 
-        <aside className="glass-dark h-fit rounded-2xl p-6 sticky top-24">
-          <h3 className="mb-4 font-serif text-xl text-pink-900">Order summary</h3>
-          <div className="space-y-3 max-h-[40vh] overflow-y-auto no-scrollbar pr-2 mb-4">
+        <aside className="glass bg-white/80 shadow-sm border border-goldBeige h-fit rounded-[2rem] p-6 md:p-8 sticky top-24">
+          <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">Order summary</h3>
+          <div className="space-y-4 max-h-[40vh] overflow-y-auto no-scrollbar pr-2 mb-6">
             {cart.items.map((it) => (
-              <div key={it.product.id} className="flex gap-3">
-                <img 
-                  src={getOptimizedImageUrl(it.product.images?.[0] || "", 150)} 
-                  alt="" 
-                  className="h-14 w-14 rounded-lg object-cover" 
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-pink-900">{it.product.name}</p>
-                  <p className="text-xs text-pink-600">Qty {it.quantity}</p>
+              <div key={it.product.id} className="flex gap-4">
+                <div className="h-16 w-16 rounded-xl border border-goldBeige/30 overflow-hidden shrink-0">
+                  <img 
+                    src={getOptimizedImageUrl(it.product.images?.[0] || "", 150)} 
+                    alt="" 
+                    className="h-full w-full object-cover" 
+                  />
                 </div>
-                <p className="text-sm font-semibold text-pink-900">₹{it.product.salePrice * it.quantity}</p>
+                <div className="min-w-0 flex-1 flex flex-col justify-center">
+                  <p className="truncate text-sm font-medium text-charcoalBrown">{it.product.name}</p>
+                  <p className="text-xs text-stoneGray mt-0.5">Qty {it.quantity}</p>
+                </div>
+                <div className="flex flex-col justify-center text-right">
+                  <p className="text-sm font-semibold text-charcoalBrown">₹{it.product.salePrice * it.quantity}</p>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 border-t border-pink-200 pt-3 space-y-2 text-sm text-pink-700">
+          <div className="mt-4 border-t border-goldBeige/50 pt-4 space-y-3 text-sm text-stoneGray">
             <div className="flex justify-between">
               <span>Subtotal</span><span>₹{cart.subtotal}</span>
             </div>
             {cart.discount > 0 && (
-              <div className="flex justify-between text-green-600">
+              <div className="flex justify-between text-emerald-600">
                 <span>Discount</span><span>-₹{cart.discount}</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span>Shipping</span><span>{cart.shipping === 0 ? "Free" : `₹${cart.shipping}`}</span>
+              <span>Shipping</span><span>{cart.shipping === 0 ? <span className="text-emerald-600 font-medium">Free</span> : `₹${cart.shipping}`}</span>
             </div>
             
-            <div className="my-2 border-t border-pink-200" />
+            <div className="my-4 border-t border-goldBeige/50" />
             
-            <div className="flex justify-between font-serif text-lg text-pink-900 font-bold">
-              <span>Total</span><span>₹{cart.total}</span>
+            <div className="flex justify-between font-serif text-xl text-charcoalBrown font-bold">
+              <span>Total</span><span className="text-champagne">₹{cart.total + (cart.shipping || 0)}</span>
             </div>
           </div>
           
-          <div className="mt-6 flex items-center justify-center gap-2 text-pink-600 text-xs">
-            <ShieldCheck className="h-4 w-4" /> Secure encrypted checkout
+          <div className="mt-8 flex items-center justify-center gap-2 text-stoneGray text-xs">
+            <ShieldCheck className="h-4 w-4 text-emerald-500" /> Secure encrypted checkout
           </div>
         </aside>
       </div>
@@ -222,9 +244,9 @@ export default function CheckoutPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="glass-dark rounded-2xl p-6">
-      <h3 className="mb-4 font-serif text-xl text-pink-900">{title}</h3>
-      <div className="space-y-3">{children}</div>
+    <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-[2rem] p-6 md:p-8">
+      <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">{title}</h3>
+      <div className="space-y-5">{children}</div>
     </div>
   );
 }
@@ -232,7 +254,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold text-pink-900">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-champagne ml-2">{label}</span>
       {children}
     </label>
   );

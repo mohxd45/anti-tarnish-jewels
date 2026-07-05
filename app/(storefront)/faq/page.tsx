@@ -13,15 +13,15 @@ function FAQAccordionItem({ question, answer }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-pink-200 last:border-0 py-4">
+    <div className="border-b border-goldBeige last:border-0 py-4">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between text-left font-serif text-lg text-pink-900 hover:text-[color:var(--color-gold)] transition-colors py-2"
+        className="flex w-full items-center justify-between text-left font-serif text-lg text-charcoalBrown hover:text-[color:var(--color-gold)] transition-colors py-2"
       >
         <span>{question}</span>
         {isOpen ? <ChevronUp className="text-[color:var(--color-gold)] shrink-0 ml-4" size={18} /> : <ChevronDown className="text-[color:var(--color-gold)] shrink-0 ml-4" size={18} />}
       </button>
-      <div className={`mt-3 text-sm md:text-base leading-7 text-pink-700 font-sans pb-2 ${isOpen ? "block" : "hidden"}`}>
+      <div className={`mt-3 text-sm md:text-base leading-7 text-stoneGray font-sans pb-2 ${isOpen ? "block" : "hidden"}`}>
         {answer}
       </div>
     </div>
@@ -83,12 +83,12 @@ export default function FAQPage() {
 
   return (
     <section className="mx-auto max-w-4xl px-4 pt-16 pb-32">
-      <h1 className="text-4xl font-serif text-pink-900 md:text-5xl text-center md:text-left">Frequently Asked Questions</h1>
-      <p className="mt-4 text-pink-600 text-sm md:text-base leading-7 text-center md:text-left">
+      <h1 className="text-4xl font-serif text-charcoalBrown md:text-5xl text-center md:text-left">Frequently Asked Questions</h1>
+      <p className="mt-4 text-stoneGray text-sm md:text-base leading-7 text-center md:text-left">
         {introText}
       </p>
       
-      <div className="mt-8 rounded-3xl glass-dark p-6 md:p-10 shadow-sm border border-[color:var(--glass-border)]">
+      <div className="mt-8 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige p-6 md:p-10 shadow-sm border border-[color:var(--glass-border)]">
         <div className="divide-y divide-pink-200">
           {defaultFaqs.map((faq, idx) => (
             <FAQAccordionItem key={idx} question={faq.question} answer={faq.answer} />

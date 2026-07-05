@@ -24,14 +24,14 @@ export default function ReturnPolicyPage() {
   return (
     <section className="mx-auto max-w-4xl px-4 pt-16 pb-32">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-serif text-pink-900 md:text-5xl">Return & Refund Policy</h1>
+        <h1 className="text-4xl font-serif text-charcoalBrown md:text-5xl">Return & Refund Policy</h1>
       </div>
-      <div className="glass-dark rounded-3xl p-8 md:p-12 leading-relaxed text-pink-700 font-sans text-sm md:text-base border border-[color:var(--glass-border)] shadow-sm">
+      <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-3xl p-8 md:p-12 leading-relaxed text-stoneGray font-sans text-sm md:text-base border border-[color:var(--glass-border)] shadow-sm">
         <p className="mb-8 whitespace-pre-line text-lg font-serif">
           {returnPolicyText}
         </p>
         
-        <h2 className="text-xl font-serif text-pink-900 mt-8 mb-4">Conditions for Returns & exchange window:</h2>
+        <h2 className="text-xl font-serif text-charcoalBrown mt-8 mb-4">Conditions for Returns & exchange window:</h2>
         <ul className="list-disc list-inside space-y-3 mb-8">
           <li>Items must be returned in their original, unopened, and unused condition.</li>
           <li>All original brand packaging, price tags, manuals, and accessories must be intact.</li>
@@ -39,22 +39,22 @@ export default function ReturnPolicyPage() {
           <li>A valid proof of purchase (invoice copy or order confirmation) must accompany the return.</li>
         </ul>
 
-        <h2 className="text-xl font-serif text-pink-900 mt-8 mb-4">Damaged item policy:</h2>
+        <h2 className="text-xl font-serif text-charcoalBrown mt-8 mb-4">Damaged item policy:</h2>
         <p className="mb-8">
           In the rare event that you receive a defective or damaged product, please contact our support team within 24 hours of delivery. A full unboxing video is required to process any claims under our damaged item policy.
         </p>
 
-        <h2 className="text-xl font-serif text-pink-900 mt-8 mb-4">COD cancellation:</h2>
+        <h2 className="text-xl font-serif text-charcoalBrown mt-8 mb-4">COD cancellation:</h2>
         <p className="mb-8">
           If you placed an order via Cash on Delivery, you may cancel it before it is dispatched. However, frequent COD cancellation or rejecting orders at the doorstep may result in the restriction of COD privileges for your account.
         </p>
 
-        <h2 className="text-xl font-serif text-pink-900 mt-8 mb-4">Exclusions:</h2>
+        <h2 className="text-xl font-serif text-charcoalBrown mt-8 mb-4">Exclusions:</h2>
         <p className="mb-8">
           Certain product categories such as personal care goods, innerwear, beauty/cosmetics (if seal is broken), and custom gifts cannot be returned due to hygiene and safety guidelines.
         </p>
 
-        <h2 className="text-xl font-serif text-pink-900 mt-8 mb-4">Support contact:</h2>
+        <h2 className="text-xl font-serif text-charcoalBrown mt-8 mb-4">Support contact:</h2>
         <p className="mb-2">
           If you have any questions regarding our return and refund process, please reach out via our support contact details at <a href="mailto:support@antitarnishjewels.com" className="text-[color:var(--color-gold)] font-semibold hover:underline">support@antitarnishjewels.com</a> or use the WhatsApp chat.
         </p>

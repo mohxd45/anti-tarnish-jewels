@@ -1,8 +1,10 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
-import { getSiteSettings, saveSiteSettings } from "@/lib/firestore";
+import { getSiteSettings, saveSiteSettings , logActivity } from "@/lib/firestore";
 import { SiteSettings } from "@/types";
 import { Save, Store, Link as LinkIcon, User } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
@@ -23,6 +25,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
 }
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -58,6 +61,18 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await saveSiteSettings(settings);
+      if (user) {
+        await logActivity({
+          actorUid: user.uid,
+          actorEmail: user.email || "Unknown",
+          actorName: user.displayName || user.email || "Unknown",
+          actorRole: (user as any).role || "staff",
+          action: "update_settings",
+          documentChanged: "global",
+          section: "settings",
+          newValue: "Updated site settings"
+        });
+      }
       toast.success("System settings updated successfully!");
     } catch {
       toast.error("Failed to save settings.");
@@ -102,11 +117,9 @@ export default function SettingsPage() {
                     <div className="h-16 w-16 rounded-2xl grid place-items-center text-white shadow-sm" style={{ background: "var(--gradient-rose)" }}>
                       <span className="font-display text-2xl">{settings.logoText || (settings.brandName || "A").charAt(0)}</span>
                     </div>
-                    {/* Placeholder upload button since logo image not in schema */}
-                    <Button variant="outline" type="button" disabled className="h-9 rounded-xl text-xs"><Store className="h-3.5 w-3.5 mr-2" />Upload Logo (Pro)</Button>
                   </div>
                   
-                  <Field label="Store Name">
+                  <Field label="Brand Name">
                     <Input 
                       value={settings.brandName || ""}
                       onChange={(e) => setSettings({ ...settings, brandName: e.target.value })}
@@ -115,7 +128,16 @@ export default function SettingsPage() {
                     />
                   </Field>
                   
-                  <Field label="Logo Initial/Text" hint="Used when logo image is not present">
+                  <Field label="Subtitle / Tagline">
+                    <Input 
+                      value={settings.subtitle || ""}
+                      onChange={(e) => setSettings({ ...settings, subtitle: e.target.value })}
+                      className="bg-card/40"
+                      placeholder="e.g. Elegant Anti-Tarnish Jewelry"
+                    />
+                  </Field>
+
+                  <Field label="Logo Initial/Text" hint="Used as logo fallback">
                     <Input 
                       value={settings.logoText || ""}
                       onChange={(e) => setSettings({ ...settings, logoText: e.target.value })}
@@ -123,12 +145,120 @@ export default function SettingsPage() {
                       className="bg-card/40"
                     />
                   </Field>
+                  
+                  <Field label="Trust Badge Text">
+                    <Input 
+                      value={settings.trustBadgeText || ""}
+                      onChange={(e) => setSettings({ ...settings, trustBadgeText: e.target.value })}
+                      placeholder="e.g. Verified quality"
+                      className="bg-card/40"
+                    />
+                  </Field>
+                </div>
+              </AdminCard>
 
-                  <Field label="Currency">
-                    <select disabled className="w-full h-10 rounded-xl border border-input bg-card/60 px-3 text-sm opacity-70 cursor-not-allowed">
-                      <option>₹ INR — Indian Rupee</option>
-                      <option>$ USD</option>
-                    </select>
+              <AdminCard title="Contact & Socials">
+                <div className="space-y-5">
+                  <Field label="WhatsApp Number">
+                    <Input 
+                      value={settings.whatsAppNumber || ""}
+                      onChange={(e) => setSettings({ ...settings, whatsAppNumber: e.target.value })}
+                      placeholder="+91..."
+                      className="bg-card/40"
+                    />
+                  </Field>
+                  
+                  <Field label="Email Address">
+                    <Input 
+                      type="email"
+                      value={settings.email || ""}
+                      onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                      className="bg-card/40"
+                    />
+                  </Field>
+                  
+                  <Field label="Business Address">
+                    <Input 
+                      value={settings.businessAddress || ""}
+                      onChange={(e) => setSettings({ ...settings, businessAddress: e.target.value })}
+                      className="bg-card/40"
+                    />
+                  </Field>
+                  
+                  <Field label="Instagram URL">
+                    <div className="flex items-center gap-2">
+                      <div className="h-10 w-10 rounded-xl bg-secondary grid place-items-center"><LinkIcon className="h-4 w-4" /></div>
+                      <Input 
+                        value={settings.socialLinks?.instagram || ""}
+                        onChange={(e) => setSettings({ ...settings, socialLinks: { ...settings.socialLinks, instagram: e.target.value } })}
+                        placeholder="https://instagram.com/..."
+                        className="bg-card/40"
+                      />
+                    </div>
+                  </Field>
+                </div>
+              </AdminCard>
+
+              <AdminCard title="Store Policies & Delivery">
+                <div className="space-y-5">
+                  <Field label="Free Delivery Threshold (₹)">
+                    <Input 
+                      type="number"
+                      value={settings.freeDeliveryAmount || ""}
+                      onChange={(e) => setSettings({ ...settings, freeDeliveryAmount: Number(e.target.value) })}
+                      placeholder="999"
+                      className="bg-card/40"
+                    />
+                  </Field>
+
+                  <Field label="Standard Delivery Fee (₹)">
+                    <Input 
+                      type="number"
+                      value={settings.deliveryFee || ""}
+                      onChange={(e) => setSettings({ ...settings, deliveryFee: Number(e.target.value) })}
+                      placeholder="100"
+                      className="bg-card/40"
+                    />
+                  </Field>
+
+                  <Field label="Delivery Info Text (Footer)">
+                    <Input 
+                      value={settings.deliveryText || ""}
+                      onChange={(e) => setSettings({ ...settings, deliveryText: e.target.value })}
+                      placeholder="Free delivery on prepaid orders"
+                      className="bg-card/40"
+                    />
+                  </Field>
+
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="codEnabled" 
+                      checked={settings.codEnabled !== false}
+                      onChange={(e) => setSettings({ ...settings, codEnabled: e.target.checked })}
+                      className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-600"
+                    />
+                    <label htmlFor="codEnabled" className="text-sm font-medium text-pink-900">
+                      Enable Cash on Delivery (COD)
+                    </label>
+                  </div>
+
+                  <Field label="COD Risk/Warning Text">
+                    <Input 
+                      value={settings.codText || ""}
+                      onChange={(e) => setSettings({ ...settings, codText: e.target.value })}
+                      placeholder="COD is available. Please keep exact change."
+                      className="bg-card/40"
+                    />
+                  </Field>
+                  
+                  <Field label="Checkout Note">
+                    <Input 
+                      value={settings.checkoutNote || ""}
+                      onChange={(e) => setSettings({ ...settings, checkoutNote: e.target.value })}
+                      placeholder="All orders are final."
+                      className="bg-card/40"
+                    />
                   </Field>
                 </div>
               </AdminCard>
@@ -147,33 +277,6 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">Theme color selection is currently locked to default styling.</p>
-                </div>
-              </AdminCard>
-
-              <AdminCard title="Social Links (Upcoming Feature)">
-                <div className="space-y-4 opacity-70 pointer-events-none">
-                  <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-xl bg-secondary grid place-items-center"><LinkIcon className="h-4 w-4" /></div>
-                    <Input disabled defaultValue="@antitarnishjewels" className="bg-card/40" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-xl bg-secondary grid place-items-center"><LinkIcon className="h-4 w-4" /></div>
-                    <Input disabled defaultValue="facebook.com/atjewels" className="bg-card/40" />
-                  </div>
-                </div>
-              </AdminCard>
-
-              <AdminCard title="Admin Profile">
-                <div className="space-y-5">
-                  <div className="flex items-center gap-3 p-4 rounded-xl border border-border/40 bg-secondary/30">
-                    <div className="h-10 w-10 rounded-full bg-secondary grid place-items-center">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Admin Access</p>
-                      <p className="text-xs text-muted-foreground">Manage user profile from Users tab</p>
-                    </div>
-                  </div>
                 </div>
               </AdminCard>
             </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import { auth, googleProvider, hasFirebaseConfig } from "@/lib/firebase";
+import { auth, db, googleProvider, hasFirebaseConfig } from "@/lib/firebase";
 import { saveUserProfile, getUserProfile } from "@/lib/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import {
   User,
   createUserWithEmailAndPassword,
@@ -19,6 +20,8 @@ type AuthContextType = {
   profile: any | null;
   loading: boolean;
   isAdmin: boolean;
+  userRole: string | null;
+  userStatus: string | null;
   signup: (
     email: string,
     password: string,
@@ -46,12 +49,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const isAdmin = !!user?.email && (
+  const userRole = profile?.role || null;
+  const userStatus = profile?.status || "active";
+
+  const isAdminEmail = !!user?.email && (
     user.email === ADMIN_EMAIL ||
     user.email === ADMIN_ENV_EMAIL ||
-    user.email === ADDITIONAL_ADMIN ||
-    profile?.role === "admin"
+    user.email === ADDITIONAL_ADMIN
   );
+
+  const isAdmin = isAdminEmail || !!(userRole && ["admin", "owner_admin", "partner_admin", "developer_admin"].includes(userRole));
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -100,11 +107,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             current.email === ADDITIONAL_ADMIN;
 
           if (!existingProfile) {
-            profileData.role = isAdminEmail ? "admin" : "customer";
+            profileData.role = isAdminEmail ? "owner_admin" : "customer";
+            profileData.status = "active";
             profileData.createdAt = new Date().toISOString();
-          } else if (isAdminEmail && existingProfile.role !== "admin") {
-            // Force upgrade to admin if they are on the hardcoded list but saved as customer
-            profileData.role = "admin";
+          } else {
+            // For existing profiles missing a role or status, set safe defaults
+            if (!existingProfile.role) profileData.role = "customer";
+            if (!existingProfile.status) profileData.status = "active";
+            
+            if (isAdminEmail && !["owner_admin", "admin", "developer_admin"].includes(existingProfile.role || "")) {
+              // Force upgrade to admin if they are on the hardcoded list but saved as customer
+              profileData.role = "owner_admin";
+            }
+          }
+          
+          // Check for staff invite if role is customer
+          if ((!existingProfile || existingProfile.role === "customer" || !existingProfile.role) && current.email) {
+            try {
+              const inviteRef = doc(db, "staffInvites", current.email.toLowerCase());
+              const inviteSnap = await getDoc(inviteRef);
+              if (inviteSnap.exists()) {
+                profileData.role = inviteSnap.data().role || "staff";
+                profileData.status = inviteSnap.data().status || "active";
+              }
+            } catch (err) {
+              console.warn("Could not check staff invites:", err);
+            }
           }
           
           if (providerName && !existingProfile?.provider) {
@@ -160,6 +188,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     profile,
     loading,
     isAdmin,
+    userRole,
+    userStatus,
     signup: async (email, password, name, phoneCountryCode, phoneNumber) => {
       const phoneClean = (phoneCountryCode + phoneNumber).replace(/[^0-9]/g, "");
       const phoneE164 = phoneCountryCode + phoneNumber;
@@ -232,7 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
 
     updateProfile
-  }), [user, profile, loading, isAdmin]);
+  }), [user, profile, loading, isAdmin, userRole, userStatus]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

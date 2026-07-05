@@ -1,7 +1,9 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+
 
 import { useEffect, useMemo, useState } from "react";
-import { listenToAllOrders, updateOrderStatus, updateOrderTracking } from "@/lib/firestore";
+import { listenToAllOrders, updateOrderStatus, updateOrderTracking , logActivity } from "@/lib/firestore";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -60,6 +62,7 @@ const STATUSES: OrderStatus[] = [
 ];
 
 export default function ManageOrdersPage() {
+  const { user } = useAuth();
   const [list, setList] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
