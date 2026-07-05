@@ -1,11 +1,24 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Helper to check if user is admin in Firestore
+    function getRole() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+
     function isAdmin() {
       return request.auth != null && 
         firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
-        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        getRole() in ['owner_admin', 'partner_admin', 'developer_admin', 'admin'];
+    }
+
+    function isStaff() {
+      return request.auth != null && 
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        getRole() == 'staff';
+    }
+
+    function isAnyAdminOrStaff() {
+      return isAdmin() || isStaff();
     }
 
     // Helper to check if file is a valid image under 5MB
@@ -21,7 +34,7 @@ service firebase.storage {
 
     // Product Images upload rule
     match /product-images/{allPaths=**} {
-      allow write: if isAdmin() && isValidImage();
+      allow write: if isAnyAdminOrStaff() && isValidImage();
     }
 
     // Banner Images upload rule

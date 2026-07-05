@@ -114,10 +114,7 @@ service cloud.firestore {
 
     // Audit Logs
     match /auditLogs/{logId} {
-      allow read: if request.auth != null && (
-        isDevAdmin() || 
-        (isAdmin() && resource.data.actorRole == 'staff')
-      );
+      allow read: if request.auth != null && isAdmin();
       // Append only: user can only log for themselves, no updating/deleting except dev admin
       allow create: if request.auth != null && isAnyAdminOrStaff() && request.resource.data.actorUid == request.auth.uid;
       allow update: if false; // Strict append-only

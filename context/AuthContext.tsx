@@ -101,24 +101,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             updatedAt: new Date().toISOString(),
             lastLoginAt: new Date().toISOString()
           };
-          
-          const isAdminEmail = 
-            current.email === ADMIN_ENV_EMAIL || 
-            current.email === ADDITIONAL_ADMIN;
-
           if (!existingProfile) {
-            profileData.role = isAdminEmail ? "owner_admin" : "customer";
+            profileData.role = "customer";
             profileData.status = "active";
             profileData.createdAt = new Date().toISOString();
           } else {
             // For existing profiles missing a role or status, set safe defaults
             if (!existingProfile.role) profileData.role = "customer";
             if (!existingProfile.status) profileData.status = "active";
-            
-            if (isAdminEmail && !["owner_admin", "admin", "developer_admin"].includes(existingProfile.role || "")) {
-              // Force upgrade to admin if they are on the hardcoded list but saved as customer
-              profileData.role = "owner_admin";
-            }
           }
           
           // Check for staff invite if role is customer
