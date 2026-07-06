@@ -3,7 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Package, Heart, MapPin, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { getAllOrders } from "@/lib/firestore";
+import { getUserOrders } from "@/lib/firestore";
 import { Order } from "@/types";
 import { formatPrice } from "@/lib/utils";
 
@@ -16,9 +16,13 @@ export default function AccountDashboard() {
     async function loadRecentOrders() {
       if (!user) return;
       try {
-        const allOrders = await getAllOrders();
-        // filter by userId or contactEmail
-        const myOrders = allOrders.filter(o => o.userId === user.uid || (o.address && o.address.fullName === profile?.name));
+        const fetchedOrders = await getUserOrders(user.uid, user.email || undefined);
+        // Additional client-side filter to ensure we get orders matching the profile name/phone if needed
+        const myOrders = fetchedOrders.filter(o => 
+          o.userId === user.uid || 
+          (user.email && o.customerEmail === user.email) ||
+          (profile?.phone && o.address?.phone === profile.phone)
+        );
         // Sort by date descending and take top 3
         myOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setRecentOrders(myOrders.slice(0, 3));

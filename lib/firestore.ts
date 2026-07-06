@@ -1921,3 +1921,20 @@ export async function saveWishlist(userId: string, wishlist: Product[]): Promise
   const docRef = doc(db, "users", userId);
   await updateDoc(docRef, { wishlist });
 }
+
+// Cart functions
+export async function getCart(userId: string): Promise<CartItem[]> {
+  if (!db) return [];
+  const docRef = doc(db, "users", userId);
+  const snap = await getDoc(docRef);
+  if (snap.exists() && snap.data().cart) {
+    return snap.data().cart as CartItem[];
+  }
+  return [];
+}
+
+export async function saveCart(userId: string, cart: CartItem[]): Promise<void> {
+  if (!db) return;
+  const docRef = doc(db, "users", userId);
+  await updateDoc(docRef, { cart });
+}

@@ -2,7 +2,8 @@
 
 import { CartItem, Product, Coupon } from "@/types";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { getCoupons, getAnnouncements, validateCoupon, getSiteSettings } from "@/lib/firestore";
+import { getCoupons, getAnnouncements, validateCoupon, getSiteSettings, getCart, saveCart } from "@/lib/firestore";
+import { useAuth } from "./AuthContext";
 
 type CartContextType = {
   items: CartItem[];
@@ -26,6 +27,8 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -38,23 +41,68 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {
-      // Corrupt cart data — start fresh
       try { localStorage.removeItem("atj-cart"); } catch {}
     }
+    setMounted(true);
   }, []);
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
+  // Sync with Firestore if logged in
   useEffect(() => {
-    if (!mounted) return; // Don't overwrite storage before reading
+    if (!mounted || !user) return;
+
+    const syncCart = async () => {
+      try {
+        const remoteItems = await getCart(user.uid);
+        
+        if (remoteItems.length > 0) {
+          const merged = [...remoteItems];
+          let updated = false;
+          
+          items.forEach(localItem => {
+            const existing = merged.find(r => r.product.id === localItem.product.id);
+            if (existing) {
+              if (localItem.quantity > existing.quantity) {
+                existing.quantity = localItem.quantity;
+                updated = true;
+              }
+            } else {
+              merged.push(localItem);
+              updated = true;
+            }
+          });
+
+          setItems(merged);
+          
+          if (updated) {
+            await saveCart(user.uid, merged);
+          }
+        } else if (items.length > 0) {
+          await saveCart(user.uid, items);
+        }
+      } catch (err) {
+        console.error("Failed to sync cart with cloud:", err);
+      }
+    };
+
+    syncCart();
+  }, [user, mounted]);
+
+  // Persist to local storage AND firestore on any change
+  useEffect(() => {
+    if (!mounted) return;
     if (typeof window === "undefined") return;
     try {
       localStorage.setItem("atj-cart", JSON.stringify(items));
     } catch {
-      // Storage quota exceeded — ignore silently
+      // ignore
     }
-  }, [items, mounted]);
+
+    if (user) {
+      saveCart(user.uid, items).catch(err => {
+        console.error("Failed to save cart to cloud:", err);
+      });
+    }
+  }, [items, mounted, user]);
 
   const [shippingFee, setShippingFee] = useState(79); // safe temporary default
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(999); // default threshold
