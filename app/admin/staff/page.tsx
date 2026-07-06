@@ -81,7 +81,7 @@ export default function StaffManagementPage() {
         }),
       });
 
-      const data = await res.json();
+      let data; try { data = await res.json(); } catch { throw new Error("Server error " + res.status); }
       
       if (!res.ok) {
         throw new Error(data.error || "Failed to create staff.");

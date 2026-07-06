@@ -93,6 +93,7 @@ export function withTimeout<T>(promise: Promise<T>, timeoutMs = 15000): Promise<
 }
 
 // Memory Cache Store
+const isServer = typeof window === undefined;
 let cachedProducts: Product[] | null = null;
 let cachedProductBySlug: Record<string, Product> = {};
 let cachedCategories: Category[] | null = null;
@@ -158,7 +159,7 @@ export function clearAllCaches() {
 // PRODUCTS
 export async function getProducts(forceRefresh = false): Promise<Product[]> {
   if (!forceRefresh) {
-    if (cachedProducts) return cachedProducts;
+    if (!isServer && cachedProducts) return cachedProducts;
 
     const sessionCached = getSessionCache<Product[]>("atj_cache_products");
     if (sessionCached) {
@@ -195,7 +196,7 @@ export async function getProducts(forceRefresh = false): Promise<Product[]> {
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  if (cachedProductBySlug[slug]) return cachedProductBySlug[slug];
+  if (!isServer && cachedProductBySlug[slug]) return cachedProductBySlug[slug];
   const sessionCached = getSessionCache<Product>(`atj_cache_product_slug_${slug}`);
   if (sessionCached) {
     cachedProductBySlug[slug] = sessionCached;
@@ -730,7 +731,7 @@ export async function getAdminOrders(): Promise<Order[]> {
 
 export async function getAllOrders(forceRefresh = false): Promise<Order[]> {
   if (!forceRefresh) {
-    if (cachedOrders) return cachedOrders;
+    if (!isServer && cachedOrders) return cachedOrders;
 
     const sessionCached = getSessionCache<Order[]>("atj_cache_orders");
     if (sessionCached) {
@@ -1027,7 +1028,7 @@ const defaultCoupons: Coupon[] = [
 ];
 
 export async function getCoupons(): Promise<Coupon[]> {
-  if (cachedCoupons) return cachedCoupons;
+  if (!isServer && cachedCoupons) return cachedCoupons;
   const sessionCached = getSessionCache<Coupon[]>("atj_cache_coupons");
   if (sessionCached) {
     cachedCoupons = sessionCached;
@@ -1204,7 +1205,7 @@ const defaultSiteContent: Record<string, any> = {
 };
 
 export async function getSiteContent(id: string): Promise<any> {
-  if (cachedSiteContent[id]) return cachedSiteContent[id];
+  if (!isServer && cachedSiteContent[id]) return cachedSiteContent[id];
   const sessionCached = getSessionCache<any>(`atj_cache_siteContent_${id}`);
   if (sessionCached) {
     cachedSiteContent[id] = sessionCached;
@@ -1252,7 +1253,7 @@ const defaultBanners: Banner[] = [
 ];
 
 export async function getBanners(): Promise<Banner[]> {
-  if (cachedBanners) return cachedBanners;
+  if (!isServer && cachedBanners) return cachedBanners;
   const sessionCached = getSessionCache<Banner[]>("atj_cache_banners");
   if (sessionCached) {
     cachedBanners = sessionCached;
@@ -1331,7 +1332,7 @@ const defaultSiteSettings: SiteSettings = {
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  if (cachedSiteSettings) return cachedSiteSettings;
+  if (!isServer && cachedSiteSettings) return cachedSiteSettings;
   const sessionCached = getSessionCache<SiteSettings>("atj_cache_site_settings");
   if (sessionCached) {
     cachedSiteSettings = sessionCached;
@@ -1376,7 +1377,7 @@ const defaultHomepageSections: HomepageSection[] = [
 ];
 
 export async function getHomepageSections(): Promise<HomepageSection[]> {
-  if (cachedHomepageSections) return cachedHomepageSections;
+  if (!isServer && cachedHomepageSections) return cachedHomepageSections;
   const sessionCached = getSessionCache<HomepageSection[]>("atj_cache_homepage_sections");
   if (sessionCached) {
     cachedHomepageSections = sessionCached;
@@ -1425,7 +1426,7 @@ const defaultCategories: Category[] = [
 ];
 
 export async function getCategories(): Promise<Category[]> {
-  if (cachedCategories) return cachedCategories;
+  if (!isServer && cachedCategories) return cachedCategories;
   const sessionCached = getSessionCache<Category[]>("atj_cache_categories");
   if (sessionCached) {
     cachedCategories = sessionCached;
@@ -1489,7 +1490,7 @@ const defaultSEOSettings: SEOSettings = {
 };
 
 export async function getSEOSettings(): Promise<SEOSettings> {
-  if (cachedSEOSettings) return cachedSEOSettings;
+  if (!isServer && cachedSEOSettings) return cachedSEOSettings;
   const sessionCached = getSessionCache<SEOSettings>("atj_cache_seoSettings");
   if (sessionCached) {
     cachedSEOSettings = sessionCached;
@@ -1528,7 +1529,7 @@ const defaultAnnouncements: AnnouncementSettings = {
 };
 
 export async function getAnnouncements(): Promise<AnnouncementSettings> {
-  if (cachedAnnouncements) return cachedAnnouncements;
+  if (!isServer && cachedAnnouncements) return cachedAnnouncements;
   const sessionCached = getSessionCache<AnnouncementSettings>("atj_cache_announcements");
   if (sessionCached) {
     cachedAnnouncements = sessionCached;
@@ -1566,7 +1567,7 @@ const defaultReviews = [
 ];
 
 export async function getReviews(): Promise<any[]> {
-  if (cachedReviews) return cachedReviews;
+  if (!isServer && cachedReviews) return cachedReviews;
   const sessionCached = getSessionCache<any[]>("atj_cache_reviews");
   if (sessionCached) {
     cachedReviews = sessionCached;
@@ -1635,7 +1636,7 @@ export async function saveContactMessage(msg: { name: string; email: string; pho
 }
 
 export async function getContactMessages(): Promise<ContactMessage[]> {
-  if (cachedContactMessages) return cachedContactMessages;
+  if (!isServer && cachedContactMessages) return cachedContactMessages;
   const sessionCached = getSessionCache<ContactMessage[]>("atj_cache_contact_messages");
   if (sessionCached) {
     cachedContactMessages = sessionCached;
@@ -1685,7 +1686,7 @@ const defaultUsers = [
 
 export async function getUsers(forceRefresh = false): Promise<any[]> {
   if (!forceRefresh) {
-    if (cachedUsers) return cachedUsers;
+    if (!isServer && cachedUsers) return cachedUsers;
     const sessionCached = getSessionCache<any[]>("atj_cache_users");
     if (sessionCached) {
       cachedUsers = sessionCached;
@@ -1722,7 +1723,7 @@ export async function updateUser(uid: string, data: any): Promise<void> {
 
 // COLLECTIONS HELPER
 export async function getCollections(): Promise<string[]> {
-  if (cachedCollections) return cachedCollections;
+  if (!isServer && cachedCollections) return cachedCollections;
   const sessionCached = getSessionCache<string[]>("atj_cache_collections");
   if (sessionCached) {
     cachedCollections = sessionCached;
@@ -1750,7 +1751,7 @@ export async function getHomepageProducts(): Promise<Product[]> {
 
 // PRODUCTS CACHE ONLY HELPER
 export function getProductsFromCacheOnly(): Product[] {
-  if (cachedProducts) return cachedProducts;
+  if (!isServer && cachedProducts) return cachedProducts;
   const sessionCached = getSessionCache<Product[]>("atj_cache_products");
   if (sessionCached) {
     cachedProducts = sessionCached;
