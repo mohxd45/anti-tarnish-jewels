@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { getSiteContent } from "@/lib/firestore";
 
+import Link from "next/link";
+
 export default function ReturnPolicyPage() {
   const [returnPolicyText, setReturnPolicyText] = useState("At Anti Tarnish Jewels, customer satisfaction is our top priority. We offer a 7-day easy return and replacement policy for eligible products.");
 
@@ -23,10 +25,13 @@ export default function ReturnPolicyPage() {
 
   return (
     <section className="mx-auto max-w-4xl px-4 pt-16 pb-32">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-serif text-charcoalBrown md:text-5xl">Return & Refund Policy</h1>
+      <div className="text-center mb-12 flex flex-col items-center">
+        <h1 className="text-4xl font-serif text-charcoalBrown md:text-5xl mb-6">Return & Refund Policy</h1>
+        <Link href="/returns" className="btn-primary-gold px-8 py-3 w-full sm:w-auto">
+          Start a Return / Exchange
+        </Link>
       </div>
-      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
+      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl p-6 md:p-10">
         <p className="mb-8 whitespace-pre-line text-lg font-serif">
           {returnPolicyText}
         </p>

@@ -20,6 +20,9 @@ type CartContextType = {
   couponId: string;
   applyCoupon: (code: string) => Promise<{ success: boolean; error?: string }>;
   freeShippingThreshold: number | null;
+  isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -28,6 +31,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -194,6 +198,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
         return [...prev, { product, quantity }];
       });
+      setIsDrawerOpen(true); // Auto-open drawer when adding to cart
     },
     removeFromCart: (id) => setItems((prev) => prev.filter((item) => item.product.id !== id)),
     increase: (id) => setItems((prev) => prev.map((item) => item.product.id === id ? { ...item, quantity: item.quantity + 1 } : item)),
@@ -235,8 +240,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: "Failed to apply coupon." };
       }
     },
-    freeShippingThreshold
-  }), [items, subtotal, shipping, discount, total, activeCoupon, freeShippingThreshold]);
+    freeShippingThreshold,
+    isDrawerOpen,
+    openDrawer: () => setIsDrawerOpen(true),
+    closeDrawer: () => setIsDrawerOpen(false)
+  }), [items, subtotal, shipping, discount, total, activeCoupon, freeShippingThreshold, isDrawerOpen]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

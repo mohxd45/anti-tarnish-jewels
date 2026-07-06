@@ -18,7 +18,8 @@ import {
   UserProfile,
   UserRole,
   UserStatus,
-  AuditLog
+  AuditLog,
+  Review
 } from "@/types";
 import {
   addDoc,
@@ -1937,4 +1938,82 @@ export async function saveCart(userId: string, cart: CartItem[]): Promise<void> 
   if (!db) return;
   const docRef = doc(db, "users", userId);
   await updateDoc(docRef, { cart });
+}
+
+// Reviews
+export async function getProductReviews(productId: string): Promise<Review[]> {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, "reviews"),
+      where("productId", "==", productId),
+      where("status", "==", "approved"),
+      orderBy("createdAt", "desc")
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Review));
+  } catch (error) {
+    console.error("Error fetching product reviews:", error);
+    return [];
+  }
+}
+
+export async function submitProductReview(reviewData: Omit<Review, "id" | "createdAt">): Promise<void> {
+  if (!db) return;
+  try {
+    const reviewRef = doc(collection(db, "reviews"));
+    await setDoc(reviewRef, {
+      ...reviewData,
+      createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    throw error;
+  }
+}
+
+export async function submitReturnRequest(data: {
+  orderNumber: string;
+  identifier: string;
+  requestType: "Return" | "Exchange";
+  reason: string;
+  message: string;
+}) {
+  if (!db) throw new Error("Firebase not initialized");
+  
+  // Find order
+  const ordersRef = collection(db, "orders");
+  const q = query(ordersRef, where("orderNumber", "==", data.orderNumber));
+  const snapshot = await getDocs(q);
+  
+  if (snapshot.empty) {
+    throw new Error("Order not found. Please check your order number.");
+  }
+  
+  const orderDoc = snapshot.docs[0];
+  const orderData = orderDoc.data();
+  
+  const ident = data.identifier.toLowerCase().trim();
+  const emailMatch = (orderData.customerEmail || "").toLowerCase() === ident;
+  // Clean phone numbers to digits only for comparison
+  const cleanDbPhone = (orderData.customerPhone || "").replace(/\D/g, '');
+  const cleanInputPhone = ident.replace(/\D/g, '');
+  const phoneMatch = cleanDbPhone && cleanInputPhone && cleanDbPhone.includes(cleanInputPhone);
+  
+  if (!emailMatch && !phoneMatch) {
+    throw new Error("Email or Phone does not match the order details.");
+  }
+  
+  const requestRef = doc(collection(db, "returnRequests"));
+  await setDoc(requestRef, {
+    orderNumber: data.orderNumber,
+    orderId: orderDoc.id,
+    customerEmail: orderData.customerEmail || "",
+    customerPhone: orderData.customerPhone || "",
+    requestType: data.requestType,
+    reason: data.reason,
+    message: data.message,
+    status: "pending",
+    createdAt: new Date().toISOString()
+  });
 }

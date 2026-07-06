@@ -42,6 +42,7 @@ export type Product = {
   variants?: any[];
   tags?: string[];
   badges?: string[];
+  faqs?: { question: string; answer: string; }[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -364,3 +365,27 @@ export type UserProfile = {
 };
 
 
+
+export type Review = {
+  id: string;
+  productId: string;
+  userId?: string;
+  customerName: string;
+  rating: number;
+  comment: string;
+  status: "approved" | "pending" | "rejected";
+  createdAt: string;
+};
+
+export type ReturnRequest = {
+  id: string;
+  orderNumber: string;
+  orderId?: string;
+  customerEmail: string;
+  customerPhone?: string;
+  requestType: "Return" | "Exchange";
+  reason: string;
+  message: string;
+  status: "pending" | "approved" | "rejected" | "completed";
+  createdAt: string;
+};

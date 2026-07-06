@@ -14,7 +14,7 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function MobileNav({ open, onClose, openDrawer }: { open: boolean; onClose: () => void; openDrawer: () => void }) {
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -55,14 +55,15 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
             <Link href="/login" onClick={onClose} className="block rounded-xl bg-stone-50/50 py-3 text-center text-stone-900">
               Login / Signup
             </Link>
-            <Link
-              href="/cart"
-              onClick={onClose}
-              className="block rounded-xl py-3 text-center font-semibold text-white"
-              style={{ background: "#FAF9F6" }}
+            <button
+              onClick={() => {
+                onClose();
+                openDrawer();
+              }}
+              className="block w-full rounded-xl bg-charcoalBrown py-3 text-center font-semibold text-white transition hover:bg-stone-800"
             >
               View Cart
-            </Link>
+            </button>
           </div>
         </div>
       </aside>

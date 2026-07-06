@@ -7,10 +7,13 @@ import { MobileNav } from "./MobileNav";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { SearchModal } from "./SearchModal";
+import { CartDrawer } from "./CartDrawer";
 
 export function Navbar({ settings }: { settings?: any }) {
   const [open, setOpen] = useState(false);
-  const { items: cart } = useCart();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const { items: cart, openDrawer } = useCart();
   const { items: wishlist } = useWishlist();
   const { user, isAdmin } = useAuth();
   
@@ -59,7 +62,13 @@ export function Navbar({ settings }: { settings?: any }) {
           </div>
 
           <div className="flex items-center gap-1">
-            <IconBtn label="Search"><Search className="h-5 w-5" /></IconBtn>
+            <button
+              className="rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60"
+              aria-label="Search"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+            </button>
             <Link href="/wishlist" className="relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
               {wishlist.length > 0 && (
@@ -68,15 +77,17 @@ export function Navbar({ settings }: { settings?: any }) {
                 </span>
               )}
             </Link>
-            <Link href="/cart" className="relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Cart">
+            <button onClick={openDrawer} className="relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Cart">
               <ShoppingBag className="h-5 w-5" />
-              <span
-                className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
-                style={{ background: "linear-gradient(135deg, #D4AF37, #B8860B)" }}
-              >
-                {cartCount}
-              </span>
-            </Link>
+              {cartCount > 0 && (
+                <span
+                  className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
+                  style={{ background: "linear-gradient(135deg, #D4AF37, #B8860B)" }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
             <Link href={user ? "/account" : "/login"} className="rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Profile">
               <User className="h-5 w-5" />
             </Link>
@@ -89,7 +100,9 @@ export function Navbar({ settings }: { settings?: any }) {
         </div>
       </nav>
 
-      <MobileNav open={open} onClose={() => setOpen(false)} />
+      <MobileNav open={open} onClose={() => setOpen(false)} openDrawer={openDrawer} />
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <CartDrawer />
     </>
   );
 }
