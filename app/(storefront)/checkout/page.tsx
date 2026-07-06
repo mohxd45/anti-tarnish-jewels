@@ -69,7 +69,7 @@ export default function CheckoutPage() {
     <>
       <div className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/cart" className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 border border-goldBeige text-charcoalBrown transition hover:bg-beige/50 hover:shadow-sm">
+          <Link href="/cart" className="flex h-12 w-12 items-center justify-center rounded-full bg-white/95 backdrop-blur-sm border border-stone-200 text-charcoalBrown transition hover:bg-stone-50/50 hover:shadow-sm">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
           </Section>
 
           <Section title="Payment method">
-            <label className="glass bg-white/80 flex cursor-pointer items-center gap-4 rounded-2xl p-4 border border-goldBeige hover:bg-beige/30 transition-colors">
+            <label className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
               <input type="radio" name="pm" defaultChecked className="accent-champagne" disabled={settings?.codEnabled === false} /> 
               <span className={`text-sm font-medium ${settings?.codEnabled === false ? 'text-stoneGray/50' : 'text-charcoalBrown'}`}>
                 Cash on Delivery
@@ -169,18 +169,18 @@ export default function CheckoutPage() {
             {settings?.codEnabled !== false && settings?.codText && (
               <p className="text-xs text-stoneGray mt-2 px-2">{settings.codText}</p>
             )}
-            <label className="glass bg-white/50 flex cursor-not-allowed items-center gap-4 rounded-2xl p-4 opacity-50 border border-goldBeige/50">
+            <label className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
               <input type="radio" name="pm" disabled /> 
               <span className="text-sm text-charcoalBrown">UPI (Coming Soon)</span>
             </label>
-            <label className="glass bg-white/50 flex cursor-not-allowed items-center gap-4 rounded-2xl p-4 opacity-50 border border-goldBeige/50">
+            <label className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
               <input type="radio" name="pm" disabled /> 
               <span className="text-sm text-charcoalBrown">Credit / Debit Card (Coming Soon)</span>
             </label>
           </Section>
           
           {settings?.checkoutNote && (
-            <div className="bg-beige/30 p-4 rounded-2xl border border-champagne/30 text-sm text-charcoalBrown/80">
+            <div className="bg-stone-50/30 p-4 rounded-2xl border border-champagne/30 text-sm text-charcoalBrown/80">
               {settings.checkoutNote}
             </div>
           )}
@@ -190,12 +190,12 @@ export default function CheckoutPage() {
           </button>
         </form>
 
-        <aside className="glass bg-white/80 shadow-sm border border-goldBeige h-fit rounded-[2rem] p-6 md:p-8 sticky top-24">
+        <aside className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
           <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">Order summary</h3>
           <div className="space-y-4 max-h-[40vh] overflow-y-auto no-scrollbar pr-2 mb-6">
             {cart.items.map((it) => (
               <div key={it.product.id} className="flex gap-4">
-                <div className="h-16 w-16 rounded-xl border border-goldBeige/30 overflow-hidden shrink-0">
+                <div className="h-16 w-16 rounded-xl border border-stone-200/30 overflow-hidden shrink-0">
                   <img 
                     src={getOptimizedImageUrl(it.product.images?.[0] || "", 150)} 
                     alt="" 
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
             ))}
           </div>
 
-          <div className="mt-4 border-t border-goldBeige/50 pt-4 space-y-3 text-sm text-stoneGray">
+          <div className="mt-4 border-t border-stone-200/50 pt-4 space-y-3 text-sm text-stoneGray">
             <div className="flex justify-between">
               <span>Subtotal</span><span>₹{cart.subtotal}</span>
             </div>
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
               <span>Shipping</span><span>{cart.shipping === 0 ? <span className="text-emerald-600 font-medium">Free</span> : `₹${cart.shipping}`}</span>
             </div>
             
-            <div className="my-4 border-t border-goldBeige/50" />
+            <div className="my-4 border-t border-stone-200/50" />
             
             <div className="flex justify-between font-serif text-xl text-charcoalBrown font-bold">
               <span>Total</span><span className="text-champagne">₹{cart.total + (cart.shipping || 0)}</span>
@@ -244,7 +244,7 @@ export default function CheckoutPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-[2rem] p-6 md:p-8">
+    <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
       <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">{title}</h3>
       <div className="space-y-5">{children}</div>
     </div>

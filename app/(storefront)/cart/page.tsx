@@ -54,7 +54,7 @@ export default function CartPage() {
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
-        <div className="glass bg-white/80 shadow-sm p-6 md:p-8 rounded-[2rem] border border-goldBeige mb-8">
+        <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
           <h1 className="font-serif text-3xl md:text-4xl text-charcoalBrown">Your Bag</h1>
           <p className="mt-2 text-stoneGray">{items.length} item{items.length === 1 ? "" : "s"} waiting for you</p>
         </div>
@@ -74,8 +74,8 @@ export default function CartPage() {
             </EmptyStateCard>
           )}
           {items.map(item => (
-            <div key={item.product.id} className="glass bg-white/80 border border-goldBeige shadow-sm flex gap-4 rounded-[1.5rem] p-4 relative transition-all hover:shadow-md">
-              <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden md:h-32 md:w-32 border border-goldBeige/30">
+            <div key={item.product.id} className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
+              <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden md:h-32 md:w-32 border border-stone-200/30">
                 <img 
                   src={getOptimizedImageUrl(item.product.images?.[0] || "", 300)} 
                   alt={item.product.name} 
@@ -100,7 +100,7 @@ export default function CartPage() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <div className="glass bg-beige/50 border border-goldBeige/30 flex items-center rounded-xl p-1">
+                  <div className="glass bg-stone-50/50 border border-stone-200/30 flex items-center rounded-xl p-1">
                     <button 
                       onClick={() => decrease(item.product.id)} 
                       className="flex h-8 w-8 items-center justify-center rounded-lg text-charcoalBrown hover:bg-white hover:shadow-sm transition-all" 
@@ -132,7 +132,7 @@ export default function CartPage() {
         </div>
 
         {items.length > 0 && (
-          <aside className="glass bg-white/80 border border-goldBeige shadow-sm h-fit rounded-[2rem] p-6 md:p-8 sticky top-24">
+          <aside className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
             <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">Order Summary</h3>
             <div className="space-y-3 text-sm text-stoneGray">
               <Row label="Subtotal" value={formatPrice(subtotal)} />
@@ -149,7 +149,7 @@ export default function CartPage() {
                 value={shipping === 0 ? <span className="text-emerald-600 font-medium">Free</span> : formatPrice(shipping)} 
               />
               
-              <div className="my-4 border-t border-goldBeige/50" />
+              <div className="my-4 border-t border-stone-200/50" />
               <Row 
                 label={<span className="font-serif text-xl font-bold text-charcoalBrown">Total</span>} 
                 value={<span className="font-serif text-xl font-bold text-champagne">{formatPrice(finalTotal)}</span>} 

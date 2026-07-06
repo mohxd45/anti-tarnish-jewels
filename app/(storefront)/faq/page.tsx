@@ -13,7 +13,7 @@ function FAQAccordionItem({ question, answer }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-goldBeige last:border-0 py-4">
+    <div className="border-b border-stone-200 last:border-0 py-4">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center justify-between text-left font-serif text-lg text-charcoalBrown hover:text-[color:var(--color-gold)] transition-colors py-2"
@@ -88,7 +88,7 @@ export default function FAQPage() {
         {introText}
       </p>
       
-      <div className="mt-8 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige p-6 md:p-10 shadow-sm border border-[color:var(--glass-border)]">
+      <div className="mt-8 rounded-3xl bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
         <div className="divide-y divide-pink-200">
           {defaultFaqs.map((faq, idx) => (
             <FAQAccordionItem key={idx} question={faq.question} answer={faq.answer} />

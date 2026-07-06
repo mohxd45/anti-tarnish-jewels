@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </div>
       
-      <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-3xl p-8 md:p-12 space-y-12">
+      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
         <section>
           <h2 className="text-2xl font-serif text-charcoalBrown mb-4">1. Information Collection</h2>
           <p className="text-stoneGray leading-relaxed">

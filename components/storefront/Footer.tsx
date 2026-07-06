@@ -23,7 +23,7 @@ export async function Footer() {
                 <span className="font-serif text-lg font-bold text-white">{logoText}</span>
               </div>
               <div>
-                <h3 className="font-serif text-lg text-charcoalBrown">{brandName}</h3>
+                <h3 className="font-serif text-lg text-stone-900">{brandName}</h3>
                 {settings?.subtitle && <p className="-mt-1 text-xs text-stoneGray">{settings.subtitle}</p>}
               </div>
             </div>
@@ -44,7 +44,7 @@ export async function Footer() {
             { href: "/return-policy", label: "Returns" },
           ]}/>
           <div>
-            <h4 className="mb-4 font-semibold text-charcoalBrown">Connect</h4>
+            <h4 className="mb-4 font-semibold text-stone-900">Connect</h4>
             <ul className="space-y-2 text-sm text-stoneGray">
               {settings?.email && <li className="flex items-center gap-2"><Mail className="h-4 w-4" />{settings.email}</li>}
               {settings?.whatsAppNumber && <li className="flex items-center gap-2"><Phone className="h-4 w-4" />{settings.whatsAppNumber}</li>}
@@ -59,13 +59,13 @@ export async function Footer() {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-goldBeige/50 pt-6 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-stone-200/50 pt-6 md:flex-row">
           <p className="text-sm text-stoneGray">© {new Date().getFullYear()} {brandName}. All rights reserved.</p>
           <div className="flex gap-4 text-sm text-stoneGray">
             {settings?.deliveryText && <span className="mr-2 border-r border-pink-400 pr-4">{settings.deliveryText}</span>}
-            <Link href="/privacy-policy" className="hover:text-charcoalBrown">Privacy</Link>
-            <Link href="/return-policy" className="hover:text-charcoalBrown">Returns</Link>
-            <Link href="/contact" className="hover:text-charcoalBrown">Contact</Link>
+            <Link href="/privacy-policy" className="hover:text-stone-900">Privacy</Link>
+            <Link href="/return-policy" className="hover:text-stone-900">Returns</Link>
+            <Link href="/contact" className="hover:text-stone-900">Contact</Link>
           </div>
         </div>
       </div>
@@ -76,11 +76,11 @@ export async function Footer() {
 function FooterCol({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
     <div>
-      <h4 className="mb-4 font-semibold text-charcoalBrown">{title}</h4>
+      <h4 className="mb-4 font-semibold text-stone-900">{title}</h4>
       <ul className="space-y-2 text-sm text-stoneGray">
         {links.map((l) => (
           <li key={l.label}>
-            <Link href={l.href} className="hover:text-charcoalBrown">{l.label}</Link>
+            <Link href={l.href} className="hover:text-stone-900">{l.label}</Link>
           </li>
         ))}
       </ul>

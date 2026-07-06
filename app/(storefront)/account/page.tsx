@@ -35,13 +35,13 @@ export default function AccountDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="glass bg-white/80 shadow-sm p-6 md:p-8 rounded-[2rem] border border-goldBeige">
+      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
         <h1 className="font-serif text-3xl text-charcoalBrown mb-2">Welcome back, {profile?.name?.split(' ')[0] || 'Guest'}</h1>
         <p className="text-stoneGray text-sm">Manage your orders, track shipments, and update your profile.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="glass bg-white/80 shadow-sm p-6 rounded-[2rem] border border-goldBeige">
+        <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-serif text-xl text-charcoalBrown flex items-center gap-2">
               <Package className="h-5 w-5 text-champagne" /> Recent Orders
@@ -53,8 +53,8 @@ export default function AccountDashboard() {
           
           {loading ? (
             <div className="animate-pulse space-y-4">
-              <div className="h-16 bg-beige/50 rounded-xl"></div>
-              <div className="h-16 bg-beige/50 rounded-xl"></div>
+              <div className="h-16 bg-stone-50/50 rounded-xl"></div>
+              <div className="h-16 bg-stone-50/50 rounded-xl"></div>
             </div>
           ) : recentOrders.length === 0 ? (
             <div className="text-center py-6">
@@ -64,7 +64,7 @@ export default function AccountDashboard() {
           ) : (
             <div className="space-y-3">
               {recentOrders.map(order => (
-                <div key={order.id} className="flex justify-between items-center p-3 bg-beige/20 border border-goldBeige/50 rounded-xl">
+                <div key={order.id} className="flex justify-between items-center p-3 bg-stone-50/20 border border-stone-200/50 rounded-xl">
                   <div>
                     <p className="text-xs text-stoneGray">#{order.orderNumber || order.id.slice(0, 8)}</p>
                     <p className="text-sm font-semibold text-charcoalBrown">{new Date(order.createdAt).toLocaleDateString()}</p>
@@ -79,7 +79,7 @@ export default function AccountDashboard() {
           )}
         </div>
 
-        <div className="glass bg-white/80 shadow-sm p-6 rounded-[2rem] border border-goldBeige">
+        <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
           <h2 className="font-serif text-xl text-charcoalBrown mb-4 flex items-center gap-2">
             <MapPin className="h-5 w-5 text-champagne" /> Saved Details
           </h2>

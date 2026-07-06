@@ -108,8 +108,8 @@ export default async function HomePage() {
             
             <div className="mt-8 flex justify-center">
               <div className="glass-premium flex items-center gap-3 rounded-full px-5 py-2 shadow-sm border border-white/60 mx-auto max-w-max">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-beige/50 text-stoneGray text-xs">✨</span>
-                <p className="text-sm font-medium text-pink-950">{promotionalText} <Link href="/sale" className="underline hover:text-stoneGray font-semibold ml-1">Shop Sale</Link></p>
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-stone-50/50 text-stoneGray text-xs">✨</span>
+                <p className="text-sm font-medium text-stone-900">{promotionalText} <Link href="/sale" className="underline hover:text-stoneGray font-semibold ml-1">Shop Sale</Link></p>
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ export default async function HomePage() {
                 <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
                 <div className="relative z-20 h-full w-full flex flex-col justify-end p-2.5 sm:p-3">
                   <h3 className="font-serif text-sm sm:text-base text-white drop-shadow-md leading-tight">{b.title}</h3>
-                  <p className="text-[10px] sm:text-xs text-pink-100 drop-shadow-md leading-tight mt-0.5 opacity-90">{b.subtitle}</p>
+                  <p className="text-[10px] sm:text-xs text-stone-100 drop-shadow-md leading-tight mt-0.5 opacity-90">{b.subtitle}</p>
                 </div>
               </Link>
             ))}
@@ -159,7 +159,7 @@ export default async function HomePage() {
                   <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
                   <div className="relative z-20 h-full w-full flex flex-col justify-end p-4">
                     <h3 className="font-serif text-lg text-white drop-shadow-md">{b.title}</h3>
-                    <p className="text-xs text-pink-100 drop-shadow-md">{b.subtitle}</p>
+                    <p className="text-xs text-stone-100 drop-shadow-md">{b.subtitle}</p>
                   </div>
                 </Link>
               );
@@ -334,7 +334,7 @@ function CategoryTile({
 function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
     <div className="glass-premium rounded-2xl p-6 border border-white/60 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-beige text-[color:var(--color-gold)]">{icon}</div>
+      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
       <h3 className="mb-2 font-serif text-xl text-[color:var(--color-espresso)]">{title}</h3>
       <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
     </div>

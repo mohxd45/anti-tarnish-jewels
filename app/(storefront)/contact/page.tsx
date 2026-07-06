@@ -75,9 +75,9 @@ export default function ContactPage() {
             </a>
           )}
 
-          <div className="p-6 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige">
+          <div className="p-6 rounded-3xl bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-beige/50 rounded-2xl border border-goldBeige">
+              <div className="p-3 bg-stone-50/50 rounded-2xl border border-stone-200">
                 <Mail className="w-6 h-6 text-charcoalBrown" />
               </div>
               <div>
@@ -95,9 +95,9 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige">
+          <div className="p-6 rounded-3xl bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-beige/50 rounded-2xl border border-goldBeige">
+              <div className="p-3 bg-stone-50/50 rounded-2xl border border-stone-200">
                 <Clock className="w-6 h-6 text-charcoalBrown" />
               </div>
               <div>
@@ -122,7 +122,7 @@ export default function ContactPage() {
         </div>
 
         <div className="lg:col-span-7">
-          <div className="p-6 sm:p-10 rounded-3xl glass bg-white/80 shadow-sm border border-goldBeige">
+          <div className="p-6 sm:p-10 rounded-3xl bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
             <h2 className="text-2xl font-serif text-charcoalBrown mb-2">Send Us a Message</h2>
             <p className="text-sm text-stoneGray mb-8">Fill out the form below and we will get back to you within 24 hours.</p>
 

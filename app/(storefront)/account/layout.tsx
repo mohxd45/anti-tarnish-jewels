@@ -45,7 +45,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Sidebar */}
         <div className="md:col-span-1 space-y-4">
-          <div className="glass bg-white/80 shadow-jewel border border-goldBeige p-6 rounded-[2rem] text-center">
+          <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-champagne/20 border border-champagne text-champagne">
               <span className="font-serif text-3xl font-bold">
                 {profile?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}

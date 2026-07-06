@@ -122,7 +122,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
   if (error || !order) {
     return (
       <section className="mx-auto max-w-xl px-4 py-20 text-center">
-        <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-10 shadow-jewel flex flex-col items-center">
+        <div className="rounded-[2rem] border border-stone-200 bg-[#FAF9F6]/95 backdrop-blur-sm p-10 shadow-sm flex flex-col items-center">
           <AlertCircle className="text-dustyRose w-16 h-16 mb-4" />
           <h1 className="text-2xl font-serif font-semibold text-charcoalBrown">{error || "Order Not Found"}</h1>
           <p className="mt-2 text-stoneGray text-sm">Please verify the order number or contact support.</p>
@@ -148,7 +148,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
     <section className="mx-auto max-w-4xl px-4 py-10 space-y-8 pb-24">
       {/* Header breadcrumb */}
       <div className="flex items-center gap-3">
-        <Link href="/orders" className="rounded-full p-2 border border-goldBeige bg-white/70 backdrop-blur-md text-charcoalBrown hover:bg-champagne/10 transition-all">
+        <Link href="/orders" className="rounded-full p-2 border border-stone-200 bg-[#FAF9F6]/95 backdrop-blur-sm text-charcoalBrown hover:bg-champagne/10 transition-all">
           <ArrowLeft size={16} />
         </Link>
         <div>
@@ -161,8 +161,8 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
         {/* Main tracking & items column */}
         <div className="md:col-span-2 space-y-6">
           {/* Stepper tracking progress */}
-          <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 md:p-8 shadow-jewel">
-            <div className="flex justify-between items-center border-b border-goldBeige/20 pb-4 mb-6">
+          <div className="rounded-[2rem] border border-stone-200 bg-[#FAF9F6]/95 backdrop-blur-sm p-6 md:p-8 shadow-sm">
+            <div className="flex justify-between items-center border-b border-stone-200/20 pb-4 mb-6">
               <h3 className="text-sm font-serif font-semibold text-champagne uppercase tracking-wider">Order Journey</h3>
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                 order.status === "Delivered" ? "bg-emerald-500/10 text-emerald-600" :
@@ -190,8 +190,8 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
-                              ? "bg-champagne border-champagne text-charcoalBrown shadow-jewel shadow-champagne/20"
-                              : "bg-white/70 backdrop-blur-md border-goldBeige text-stoneGray/30"
+                              ? "bg-champagne border-champagne text-charcoalBrown shadow-sm shadow-champagne/20"
+                              : "bg-[#FAF9F6]/95 backdrop-blur-sm border-stone-200 text-stoneGray/30"
                           }`}
                         >
                           {isCompleted ? <CheckCircle2 size={15} className="stroke-[2.5]" /> : <span className="text-[10px]">{idx + 1}</span>}
@@ -205,7 +205,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                 </div>
 
                 {/* Vertical Stepper for Mobile */}
-                <div className="relative sm:hidden flex flex-col gap-6 pl-6 border-l-2 border-goldBeige/40 ml-4">
+                <div className="relative sm:hidden flex flex-col gap-6 pl-6 border-l-2 border-stone-200/40 ml-4">
                   {steps.map((step, idx) => {
                     const isCompleted = idx <= currentIdx;
                     const isCurrent = idx === currentIdx;
@@ -214,8 +214,8 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                         <div
                           className={`absolute -left-[35px] w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
-                              ? "bg-champagne border-champagne text-charcoalBrown shadow-jewel"
-                              : "bg-white/70 backdrop-blur-md border-goldBeige text-stoneGray/30"
+                              ? "bg-champagne border-champagne text-charcoalBrown shadow-sm"
+                              : "bg-[#FAF9F6]/95 backdrop-blur-sm border-stone-200 text-stoneGray/30"
                           }`}
                         >
                           {isCompleted ? <CheckCircle2 size={12} className="stroke-[2.5]" /> : <div className="w-1.5 h-1.5 rounded-full bg-goldBeige/40" />}
@@ -236,8 +236,8 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           </div>
 
           {/* Items checklist */}
-          <div className="rounded-[2rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 shadow-jewel">
-            <h3 className="text-sm font-serif font-semibold text-champagne uppercase tracking-wider border-b border-goldBeige/20 pb-4 mb-4 flex items-center gap-1.5">
+          <div className="rounded-[2rem] border border-stone-200 bg-[#FAF9F6]/95 backdrop-blur-sm p-6 shadow-sm">
+            <h3 className="text-sm font-serif font-semibold text-champagne uppercase tracking-wider border-b border-stone-200/20 pb-4 mb-4 flex items-center gap-1.5">
               <ShoppingBag size={16} /> Items Purchased
             </h3>
             <div className="divide-y divide-goldBeige/20">
@@ -245,7 +245,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                 <div key={item.product.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     {item.product.images?.[0] && (
-                      <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-goldBeige/30 shrink-0">
+                      <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-stone-200/30 shrink-0">
                         <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                       </div>
                     )}
@@ -268,7 +268,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 rounded-3xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-jewel transition-all text-center justify-center"
+            className="flex items-center gap-3 p-4 rounded-3xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-sm transition-all text-center justify-center"
           >
             <MessageSquare size={18} />
             <span>Chat on WhatsApp</span>
@@ -276,7 +276,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
 
           {/* Delivery & Tracking info */}
           {order.trackingNumber && (
-            <div className="rounded-2xl border border-goldBeige bg-beige p-5 space-y-3 shadow-sm">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 space-y-3 shadow-sm">
               <h4 className="text-xs font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5">
                 <Truck size={14} /> Tracking details
               </h4>
@@ -288,8 +288,8 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           )}
 
           {/* Shipping Address */}
-          <div className="rounded-[2.5rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 shadow-jewel space-y-4">
-            <h3 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5 border-b border-goldBeige/20 pb-3">
+          <div className="rounded-[2.5rem] border border-stone-200 bg-[#FAF9F6]/95 backdrop-blur-sm p-6 shadow-sm space-y-4">
+            <h3 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200/20 pb-3">
               <MapPin size={14} /> Shipping Address
             </h3>
             <div className="text-xs md:text-sm leading-6 text-charcoalBrown space-y-1">
@@ -304,8 +304,8 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           </div>
 
           {/* Order Summary breakdown */}
-          <div className="rounded-[2.5rem] border border-goldBeige bg-white/70 backdrop-blur-md p-6 shadow-jewel space-y-4">
-            <h3 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5 border-b border-goldBeige/20 pb-3">
+          <div className="rounded-[2.5rem] border border-stone-200 bg-[#FAF9F6]/95 backdrop-blur-sm p-6 shadow-sm space-y-4">
+            <h3 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200/20 pb-3">
               <CreditCard size={14} /> Payment & Billing
             </h3>
             <div className="text-xs md:text-sm space-y-2 text-stoneGray">
@@ -319,7 +319,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                   {order.paymentStatus}
                 </span>
               </div>
-              <div className="flex justify-between border-t border-goldBeige/25 pt-2">
+              <div className="flex justify-between border-t border-stone-200/25 pt-2">
                 <span>Subtotal</span>
                 <span className="text-charcoalBrown font-medium">{formatPrice(order.subtotal)}</span>
               </div>
@@ -333,7 +333,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                 <span>Shipping Charges</span>
                 <span className="text-charcoalBrown font-medium">{order.shipping === 0 ? "Free" : formatPrice(order.shipping)}</span>
               </div>
-              <div className="flex justify-between border-t border-goldBeige/25 pt-2 text-base font-serif font-semibold text-champagne">
+              <div className="flex justify-between border-t border-stone-200/25 pt-2 text-base font-serif font-semibold text-champagne">
                 <span>Total Amount</span>
                 <span>{formatPrice(order.total)}</span>
               </div>

@@ -63,7 +63,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="glass bg-white/80 shadow-sm p-6 md:p-8 rounded-[2rem] border border-goldBeige">
+    <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
       <div className="mb-8">
         <h1 className="font-serif text-2xl md:text-3xl text-charcoalBrown mb-2">My Profile</h1>
         <p className="text-stoneGray text-sm">Manage your personal information and contact details.</p>
@@ -176,7 +176,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-goldBeige">
+        <div className="pt-6 border-t border-stone-200">
           <button 
             type="submit" 
             disabled={saving}

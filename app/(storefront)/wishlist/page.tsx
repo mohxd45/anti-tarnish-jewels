@@ -28,7 +28,7 @@ export default function WishlistPage() {
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
-        <div className="glass bg-white/80 shadow-sm p-6 md:p-8 rounded-[2rem] border border-goldBeige mb-8">
+        <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
           <h1 className="font-serif text-3xl md:text-4xl text-charcoalBrown text-center md:text-left">Your Wishlist</h1>
           <p className="mt-2 text-stoneGray text-center md:text-left">{items.length} item{items.length === 1 ? "" : "s"} saved for later</p>
         </div>

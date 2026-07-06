@@ -33,7 +33,7 @@ export function ProductCard({ product }: { product: Product }) {
   const isSale = product.regularPrice && product.regularPrice > product.salePrice;
   
   const badge =
-    isSale ? { label: "Sale", cls: "bg-beige0 text-white" } :
+    isSale ? { label: "Sale", cls: "bg-stone-500 text-white" } :
     product.isBestSeller ? { label: "Bestseller", cls: "clay-badge px-3 py-1 text-charcoalBrown" } :
     product.tags?.[0] ? { label: product.tags[0], cls: "bg-pink-900 text-white" } :
     null;

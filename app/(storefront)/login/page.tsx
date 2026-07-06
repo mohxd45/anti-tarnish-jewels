@@ -61,7 +61,7 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 pt-16 pb-32">
-      <div className="glass bg-white/80 border border-goldBeige shadow-sm rounded-3xl p-8">
+      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
         <h1 className="mb-2 text-center font-serif text-3xl text-charcoalBrown">
           {mode === "login" ? "Welcome back" : "Create account"}
         </h1>
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
         <div className="mt-8 relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-goldBeige/50"></div>
+            <div className="w-full border-t border-stone-200/50"></div>
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 bg-transparent text-stoneGray">Or</span>
@@ -136,7 +136,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="mt-6 w-full py-3 rounded-xl bg-white border border-goldBeige text-charcoalBrown font-semibold hover:bg-beige/50 transition-colors flex items-center justify-center gap-3 shadow-sm"
+          className="mt-6 w-full py-3 rounded-xl bg-white border border-stone-200 text-charcoalBrown font-semibold hover:bg-stone-50/50 transition-colors flex items-center justify-center gap-3 shadow-sm"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

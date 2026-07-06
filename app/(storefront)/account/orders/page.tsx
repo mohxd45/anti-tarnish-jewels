@@ -65,7 +65,7 @@ export default function AccountOrdersPage() {
   }
 
   return (
-    <div className="glass bg-white/80 shadow-sm p-6 md:p-8 rounded-[2rem] border border-goldBeige">
+    <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
       <div className="mb-8">
         <h1 className="font-serif text-2xl md:text-3xl text-charcoalBrown mb-2">My Orders</h1>
         <p className="text-stoneGray text-sm">Track the shipping progress and view order summaries of your purchases.</p>
@@ -89,11 +89,11 @@ export default function AccountOrdersPage() {
             const isReturned = order.status === "Returned";
 
             return (
-              <div key={order.id} className="rounded-[1.5rem] border border-goldBeige bg-white overflow-hidden shadow-sm transition-all">
+              <div key={order.id} className="rounded-[1.5rem] border border-stone-200 bg-white overflow-hidden shadow-sm transition-all">
                 {/* Header Summary */}
                 <div
                   onClick={() => toggleExpand(order.id)}
-                  className="p-5 cursor-pointer flex flex-wrap items-center justify-between gap-4 hover:bg-beige/30 transition-all"
+                  className="p-5 cursor-pointer flex flex-wrap items-center justify-between gap-4 hover:bg-stone-50/30 transition-all"
                 >
                   <div className="space-y-1">
                     <p className="text-xs uppercase tracking-wider text-stoneGray">Order Reference</p>
@@ -121,7 +121,7 @@ export default function AccountOrdersPage() {
 
                 {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="border-t border-goldBeige/40 p-5 bg-beige/10 space-y-6 transition-all">
+                  <div className="border-t border-stone-200/40 p-5 bg-stone-50/10 space-y-6 transition-all">
                     {/* Visual Tracking Stepper */}
                     {!isCancelled && !isReturned ? (
                       <div className="py-4">
@@ -142,7 +142,7 @@ export default function AccountOrdersPage() {
                                   className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
                                     isCompleted
                                       ? "bg-champagne border-champagne text-white shadow-sm"
-                                      : "bg-white border-goldBeige text-stoneGray/30"
+                                      : "bg-white border-stone-200 text-stoneGray/30"
                                   }`}
                                 >
                                   {isCompleted ? <CheckCircle2 size={16} className="stroke-[3]" /> : <div className="w-2 h-2 rounded-full bg-goldBeige/40" />}
@@ -156,7 +156,7 @@ export default function AccountOrdersPage() {
                         </div>
 
                         {/* Vertical Stepper for Mobile */}
-                        <div className="relative sm:hidden flex flex-col gap-5 pl-4 border-l-2 border-goldBeige/40 ml-2">
+                        <div className="relative sm:hidden flex flex-col gap-5 pl-4 border-l-2 border-stone-200/40 ml-2">
                           {steps.map((step, idx) => {
                             const isCompleted = idx <= currentIdx;
                             const isCurrent = idx === currentIdx;
@@ -166,7 +166,7 @@ export default function AccountOrdersPage() {
                                   className={`absolute -left-[27px] w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${
                                     isCompleted
                                       ? "bg-champagne border-champagne text-white"
-                                      : "bg-beige border-goldBeige"
+                                      : "bg-stone-50 border-stone-200"
                                   }`}
                                 >
                                   {isCompleted ? <CheckCircle2 size={10} className="stroke-[3]" /> : <div className="w-1.5 h-1.5 rounded-full bg-goldBeige/40" />}
@@ -192,12 +192,12 @@ export default function AccountOrdersPage() {
                         <h4 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5">
                           <ShoppingBag size={14} /> Order Items
                         </h4>
-                        <div className="divide-y divide-goldBeige/30 rounded-xl border border-goldBeige/50 bg-white p-3 space-y-2">
+                        <div className="divide-y divide-goldBeige/30 rounded-xl border border-stone-200/50 bg-white p-3 space-y-2">
                           {order.items.map((item) => (
                             <div key={item.product.id} className="pt-2 first:pt-0 flex items-center justify-between text-sm">
                               <div className="flex items-center gap-3">
                                 {item.product.images?.[0] && (
-                                  <div className="relative w-10 h-10 rounded overflow-hidden border border-goldBeige/30">
+                                  <div className="relative w-10 h-10 rounded overflow-hidden border border-stone-200/30">
                                     <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                                   </div>
                                 )}
@@ -219,7 +219,7 @@ export default function AccountOrdersPage() {
                           <h4 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5">
                             <MapPin size={14} /> Shipping
                           </h4>
-                          <div className="rounded-xl border border-goldBeige/50 bg-white p-3 text-xs leading-5 text-stoneGray">
+                          <div className="rounded-xl border border-stone-200/50 bg-white p-3 text-xs leading-5 text-stoneGray">
                             <p className="font-serif font-semibold text-charcoalBrown text-sm">{order.address.fullName}</p>
                             <p>{order.address.line1}, {order.address.line2}</p>
                             <p>{order.address.city}, {order.address.state} - {order.address.pincode}</p>
@@ -232,14 +232,14 @@ export default function AccountOrdersPage() {
                           <h4 className="text-xs font-serif font-semibold text-champagne uppercase tracking-wider flex items-center gap-1.5">
                             <CreditCard size={14} /> Payment
                           </h4>
-                          <div className="rounded-xl border border-goldBeige/50 bg-white p-3 text-xs space-y-1.5 text-stoneGray">
+                          <div className="rounded-xl border border-stone-200/50 bg-white p-3 text-xs space-y-1.5 text-stoneGray">
                             <div className="flex justify-between">
                               <span>Method</span>
                               <span className="font-medium text-charcoalBrown capitalize">
                                 {order.paymentMethod === "cod" ? "COD" : order.paymentMethod}
                               </span>
                             </div>
-                            <div className="flex justify-between border-t border-goldBeige/30 pt-1.5">
+                            <div className="flex justify-between border-t border-stone-200/30 pt-1.5">
                               <span>Subtotal</span>
                               <span className="text-charcoalBrown font-medium">{formatPrice(order.subtotal)}</span>
                             </div>
@@ -249,7 +249,7 @@ export default function AccountOrdersPage() {
                                 <span>-{formatPrice(order.discount)}</span>
                               </div>
                             )}
-                            <div className="flex justify-between border-t border-goldBeige/30 pt-1.5 text-sm font-serif font-bold text-champagne">
+                            <div className="flex justify-between border-t border-stone-200/30 pt-1.5 text-sm font-serif font-bold text-champagne">
                               <span>Total</span>
                               <span>{formatPrice(order.total)}</span>
                             </div>

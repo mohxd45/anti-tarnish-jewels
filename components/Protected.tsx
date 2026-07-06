@@ -60,7 +60,7 @@ export function Protected({
               <Link href="/login" className="flex items-center justify-center gap-2 rounded-full bg-champagne px-6 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-colors">
                 Login with Email
               </Link>
-              <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-goldBeige/60 bg-white/70 backdrop-blur-md px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
+              <Link href="/signup" className="flex items-center justify-center gap-2 rounded-full border border-stone-200/60 bg-white/70 backdrop-blur-md px-6 py-3 font-semibold text-charcoalBrown hover:border-champagne transition-colors">
                 Create Account
               </Link>
             </>
@@ -81,7 +81,7 @@ export function Protected({
         </div>
         <h1 className="text-2xl font-serif font-semibold text-dustyRose tracking-wide">Account {userStatus === "banned" ? "Banned" : "Suspended"}</h1>
         <p className="mt-3 text-stoneGray text-sm leading-relaxed">Your account has been {userStatus}. You cannot access this dashboard.</p>
-        <Link href="/" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-jewel">
+        <Link href="/" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-sm">
           Return Home
         </Link>
       </div>
@@ -100,7 +100,7 @@ export function Protected({
           </div>
           <h1 className="text-2xl font-serif font-semibold text-dustyRose tracking-wide">Access Denied</h1>
           <p className="mt-3 text-stoneGray text-sm leading-relaxed">Your current role ({userRole || 'customer'}) does not have permission to view this page.</p>
-          <Link href="/admin" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-jewel">
+          <Link href="/admin" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-sm">
             Return to Dashboard
           </Link>
         </div>
@@ -117,7 +117,7 @@ export function Protected({
         </div>
         <h1 className="text-2xl font-serif font-semibold text-dustyRose tracking-wide">Staff / Admin Only</h1>
         <p className="mt-3 text-stoneGray text-sm leading-relaxed">This dashboard is protected for authorized staff only.</p>
-        <Link href="/" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-jewel">
+        <Link href="/" className="mt-8 inline-block rounded-full bg-champagne px-7 py-3 font-semibold text-charcoalBrown hover:bg-champagne/90 transition-all shadow-sm">
           Return Home
         </Link>
       </div>

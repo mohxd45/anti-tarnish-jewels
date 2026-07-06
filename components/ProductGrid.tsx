@@ -6,7 +6,7 @@ import { useMemo, useState, useEffect } from "react";
 import { getCategories } from "@/lib/firestore";
 import { Filter, X, ChevronDown, ChevronUp, Star, RotateCcw, Search, PackageSearch } from "lucide-react";
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
-import { PublicJewelryBackground } from "./ui/PublicJewelryBackground";
+
 
 interface ProductGridProps {
   products: Product[];
@@ -360,7 +360,7 @@ export function ProductGrid({
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleMultiSelect(cat, selectedCategories, setSelectedCategories)}
-                    className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                    className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
                   />
                   <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{cat}</span>
                 </label>
@@ -390,7 +390,7 @@ export function ProductGrid({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMultiSelect(m, selectedMaterials, setSelectedMaterials)}
-                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                      className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
                     />
                     <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{m}</span>
                   </label>
@@ -421,7 +421,7 @@ export function ProductGrid({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMultiSelect(o, selectedOccasions, setSelectedOccasions)}
-                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                      className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
                     />
                     <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{o}</span>
                   </label>
@@ -452,7 +452,7 @@ export function ProductGrid({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMultiSelect(col, selectedCollections, setSelectedCollections)}
-                      className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                      className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
                     />
                     <span className={isChecked ? "text-[#C98484] font-semibold" : "hover:text-[#3B2B2B]/90"}>{col}</span>
                   </label>
@@ -487,7 +487,7 @@ export function ProductGrid({
                   name="priceRange"
                   checked={priceRange === pOpt.value}
                   onChange={() => setPriceRange(pOpt.value)}
-                  className="accent-champagne h-4 w-4 border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                  className="accent-champagne h-4 w-4 border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
                 />
                 <span className={priceRange === pOpt.value ? "text-[#C98484] font-semibold" : ""}>{pOpt.label}</span>
               </label>
@@ -500,7 +500,7 @@ export function ProductGrid({
                   placeholder="Min"
                   value={customMinPrice}
                   onChange={(e) => setCustomMinPrice(e.target.value)}
-                  className="w-full rounded-lg border border-goldBeige bg-white/70 backdrop-blur-md px-2.5 py-1.5 text-xs text-[#3B2B2B] outline-none focus:border-[#C98484]"
+                  className="w-full rounded-lg border border-stone-200 bg-white/70 backdrop-blur-md px-2.5 py-1.5 text-xs text-[#3B2B2B] outline-none focus:border-[#C98484]"
                 />
                 <span className="text-[#6F5555]">-</span>
                 <input
@@ -508,7 +508,7 @@ export function ProductGrid({
                   placeholder="Max"
                   value={customMaxPrice}
                   onChange={(e) => setCustomMaxPrice(e.target.value)}
-                  className="w-full rounded-lg border border-goldBeige bg-white/70 backdrop-blur-md px-2.5 py-1.5 text-xs text-[#3B2B2B] outline-none focus:border-[#C98484]"
+                  className="w-full rounded-lg border border-stone-200 bg-white/70 backdrop-blur-md px-2.5 py-1.5 text-xs text-[#3B2B2B] outline-none focus:border-[#C98484]"
                 />
               </div>
             )}
@@ -534,7 +534,7 @@ export function ProductGrid({
                   name="rating"
                   checked={selectedRating === starVal}
                   onChange={() => setSelectedRating(starVal)}
-                  className="accent-champagne h-4 w-4 border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                  className="accent-champagne h-4 w-4 border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
                 />
                 <span className="flex items-center gap-1 text-[#3B2B2B]">
                   {starVal}★ & above
@@ -547,7 +547,7 @@ export function ProductGrid({
                 name="rating"
                 checked={selectedRating === null}
                 onChange={() => setSelectedRating(null)}
-                className="accent-champagne h-4 w-4 border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className="text-[#3B2B2B]">Any Rating</span>
             </label>
@@ -578,7 +578,7 @@ export function ProductGrid({
                         className={`rounded-full border px-3 py-1 text-xs transition-colors ${
                           isSel
                             ? "bg-[#E0A9A5] text-white border-[#E0A9A5] font-semibold"
-                            : "border-goldBeige/60 bg-ivory hover:border-[#F1CFCF] hover:text-[#C98484]"
+                            : "border-stone-200/60 bg-ivory hover:border-[#F1CFCF] hover:text-[#C98484]"
                         }`}
                       >
                         {c}
@@ -608,7 +608,7 @@ export function ProductGrid({
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={() => setInStockOnly(!inStockOnly)}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className={inStockOnly ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>In Stock Only</span>
             </label>
@@ -617,7 +617,7 @@ export function ProductGrid({
                 type="checkbox"
                 checked={waterproofOnly}
                 onChange={() => setWaterproofOnly(!waterproofOnly)}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className={waterproofOnly ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Waterproof Only</span>
             </label>
@@ -626,7 +626,7 @@ export function ProductGrid({
                 type="checkbox"
                 checked={antiTarnishOnly}
                 onChange={() => setAntiTarnishOnly(!antiTarnishOnly)}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className={antiTarnishOnly ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Anti-Tarnish Only</span>
             </label>
@@ -635,7 +635,7 @@ export function ProductGrid({
                 type="checkbox"
                 checked={flags.isNewArrival}
                 onChange={() => setFlags((prev) => ({ ...prev, isNewArrival: !prev.isNewArrival }))}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className={flags.isNewArrival ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>New Arrivals</span>
             </label>
@@ -644,7 +644,7 @@ export function ProductGrid({
                 type="checkbox"
                 checked={flags.isBestSeller}
                 onChange={() => setFlags((prev) => ({ ...prev, isBestSeller: !prev.isBestSeller }))}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className={flags.isBestSeller ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Best Sellers</span>
             </label>
@@ -653,7 +653,7 @@ export function ProductGrid({
                 type="checkbox"
                 checked={flags.isFlashDeal}
                 onChange={() => setFlags((prev) => ({ ...prev, isFlashDeal: !prev.isFlashDeal }))}
-                className="accent-champagne h-4 w-4 rounded border-goldBeige/60 bg-white/70 backdrop-blur-md text-champagne"
+                className="accent-champagne h-4 w-4 rounded border-stone-200/60 bg-white/70 backdrop-blur-md text-champagne"
               />
               <span className={flags.isFlashDeal ? "text-[#C98484] font-semibold" : "text-[#3B2B2B]"}>Flash Deals Only</span>
             </label>
@@ -807,16 +807,16 @@ export function ProductGrid({
           <div className="fixed inset-0 animate-fade-in" onClick={() => setIsFilterDrawerOpen(false)} />
           
           {/* Bottom Sheet */}
-          <aside className="relative w-full bg-white/80 backdrop-blur-md rounded-t-[2rem] border-t border-ink/10 p-5 shadow-[0_-10px_40px_rgba(224,169,165,0.15)] max-h-[80vh] flex flex-col justify-between z-10 overflow-hidden animate-slide-up">
+          <aside className="relative w-full bg-white/95 backdrop-blur-sm backdrop-blur-md rounded-t-[2rem] border-t border-ink/10 p-5 shadow-[0_-10px_40px_rgba(224,169,165,0.15)] max-h-[80vh] flex flex-col justify-between z-10 overflow-hidden animate-slide-up">
             {/* Drag Handle Bar */}
             <div className="w-12 h-1 bg-champagne/30 mx-auto rounded-full mb-3 shrink-0" />
             
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-goldBeige/20 pb-3 mb-4 shrink-0">
+            <div className="flex items-center justify-between border-b border-stone-200/20 pb-3 mb-4 shrink-0">
               <span className="text-lg font-serif font-semibold text-champagne uppercase tracking-wider">Refine & Sort</span>
               <button 
                 onClick={() => setIsFilterDrawerOpen(false)} 
-                className="rounded-full border border-goldBeige p-1 text-champagne hover:bg-champagne/10"
+                className="rounded-full border border-stone-200 p-1 text-champagne hover:bg-champagne/10"
                 aria-label="Close filters"
               >
                 <X size={18} />
@@ -829,7 +829,7 @@ export function ProductGrid({
             </div>
 
             {/* Sticky Bottom Actions */}
-            <div className="border-t border-goldBeige/40 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] mt-4 grid grid-cols-2 gap-3 shrink-0">
+            <div className="border-t border-stone-200/40 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] mt-4 grid grid-cols-2 gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => {

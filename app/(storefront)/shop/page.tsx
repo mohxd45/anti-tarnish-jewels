@@ -94,10 +94,10 @@ function ShopContent() {
         <div className="flex justify-between items-center mb-6">
           <p className="text-stoneGray text-sm font-medium">{products.length} Products</p>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-3 py-1.5 glass bg-white/80 shadow-sm border border-goldBeige rounded-lg text-charcoalBrown text-xs font-medium hover:bg-beige/50 transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
               <Filter className="w-3 h-3" /> Filter
             </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 glass bg-white/80 shadow-sm border border-goldBeige rounded-lg text-charcoalBrown text-xs font-medium hover:bg-beige/50 transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
               <SlidersHorizontal className="w-3 h-3" /> Sort
             </button>
           </div>
@@ -106,7 +106,7 @@ function ShopContent() {
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="aspect-[4/5] bg-beige/30 animate-pulse rounded-2xl" />
+              <div key={i} className="aspect-[4/5] bg-stone-50/30 animate-pulse rounded-2xl" />
             ))}
           </div>
         ) : products.length > 0 ? (
@@ -116,7 +116,7 @@ function ShopContent() {
             ))}
           </div>
         ) : (
-          <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-2xl p-10 text-center text-stoneGray">
+          <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
             No products found. <Link href="/shop?category=all" className="text-stoneGray underline">View all</Link>
           </div>
         )}
@@ -129,7 +129,7 @@ export default function ShopPage() {
   return (
     <Suspense fallback={
       <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-goldBeige/50 border-t-champagne rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-stone-200/50 border-t-champagne rounded-full animate-spin"></div>
       </div>
     }>
       <ShopContent />

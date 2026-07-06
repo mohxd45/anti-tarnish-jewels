@@ -80,7 +80,7 @@ export default function TrackOrderPage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 pt-16 pb-32">
-      <div className="glass bg-white/80 rounded-[2rem] p-8 border border-goldBeige shadow-sm">
+      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
         <div className="text-center mb-8">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-champagne/20 border border-champagne">
             <Search className="h-10 w-10 text-champagne" />
@@ -122,14 +122,14 @@ export default function TrackOrderPage() {
         </form>
 
         {errorMsg && (
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-dustyRose/10 border border-dustyRose/20 text-dustyRose text-sm animate-in fade-in">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-stone-100 border border-stone-200 text-stone-600 text-sm animate-in fade-in">
             <AlertCircle className="h-5 w-5 shrink-0" />
             <p>{errorMsg}</p>
           </div>
         )}
 
         {order && (
-          <div className="border-t border-goldBeige/40 pt-8 mt-8 animate-in fade-in space-y-8">
+          <div className="border-t border-stone-200/40 pt-8 mt-8 animate-in fade-in space-y-8">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-xs text-stoneGray uppercase tracking-wider mb-1">Status</p>
@@ -149,7 +149,7 @@ export default function TrackOrderPage() {
             </div>
             
             {!isCancelled && !isReturned ? (
-              <div className="relative flex flex-col gap-6 pl-4 border-l-2 border-goldBeige/40 ml-2">
+              <div className="relative flex flex-col gap-6 pl-4 border-l-2 border-stone-200/40 ml-2">
                 {steps.map((step, idx) => {
                   const isCompleted = idx <= currentIdx;
                   const isCurrent = idx === currentIdx;
@@ -159,7 +159,7 @@ export default function TrackOrderPage() {
                         className={`absolute -left-[27px] w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
                           isCompleted
                             ? "bg-champagne border-champagne text-white"
-                            : "bg-beige border-goldBeige"
+                            : "bg-stone-50 border-stone-200"
                         }`}
                       >
                         {isCompleted ? <CheckCircle size={12} className="stroke-[3]" /> : <div className="w-1.5 h-1.5 rounded-full bg-goldBeige/40" />}
@@ -172,7 +172,7 @@ export default function TrackOrderPage() {
                 })}
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-dustyRose/10 border border-dustyRose/20 text-dustyRose text-center text-sm">
+              <div className="p-4 rounded-xl bg-stone-100 border border-stone-200 text-stone-600 text-center text-sm">
                 This order has been {order.status.toLowerCase()}. Tracking is unavailable.
               </div>
             )}

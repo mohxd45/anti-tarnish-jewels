@@ -26,7 +26,7 @@ export default function ReturnPolicyPage() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-serif text-charcoalBrown md:text-5xl">Return & Refund Policy</h1>
       </div>
-      <div className="glass bg-white/80 shadow-sm border border-goldBeige rounded-3xl p-8 md:p-12 leading-relaxed text-stoneGray font-sans text-sm md:text-base border border-[color:var(--glass-border)] shadow-sm">
+      <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
         <p className="mb-8 whitespace-pre-line text-lg font-serif">
           {returnPolicyText}
         </p>

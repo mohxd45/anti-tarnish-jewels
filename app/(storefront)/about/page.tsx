@@ -31,7 +31,7 @@ export default function AboutPage() {
   return (
     <section className="mx-auto max-w-4xl px-4 py-16">
       <h1 className="text-4xl font-serif font-semibold text-gold tracking-wide">About Anti Tarnish Jewels</h1>
-      <div className="mt-6 rounded-[2rem] border border-gold/15 bg-white/[0.04] p-8 leading-8 text-cream/70 font-sans text-sm md:text-base">
+      <div className="mt-6 rounded-[2rem] border border-stone-200 bg-white/[0.04] p-8 leading-8 text-stone-600 font-sans text-sm md:text-base">
         <p className="whitespace-pre-line">
           {aboutText}
         </p>

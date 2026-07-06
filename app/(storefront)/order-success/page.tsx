@@ -32,7 +32,7 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
         
         {orderId && (
           <div className="mt-6 w-full space-y-2">
-            <p className="inline-block rounded-full bg-beige px-6 py-3 text-sm text-charcoalBrown font-mono tracking-wider">
+            <p className="inline-block rounded-full bg-stone-50 px-6 py-3 text-sm text-charcoalBrown font-mono tracking-wider">
               Order Reference: {orderId}
             </p>
             <p className="text-[11px] text-stoneGray/80 block">Please keep your order number safe for tracking.</p>

@@ -42,7 +42,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Gallery */}
           <div>
-            <div className="glass bg-white/80 shadow-sm border border-goldBeige mb-4 overflow-hidden rounded-3xl">
+            <div className="bg-white/95 backdrop-blur-sm shadow-sm border border-stone-200 mb-4 overflow-hidden rounded-3xl">
               <img
                 src={images[activeImg]}
                 alt={p.name}
@@ -69,7 +69,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
             <div className="mb-4 flex flex-wrap gap-2">
               {p.tags?.[0] && <span className="rounded-full bg-pink-900 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">{p.tags[0]}</span>}
               {p.isBestSeller && <span className="clay-badge px-3 py-1 text-[10px] font-bold uppercase tracking-wide">Bestseller</span>}
-              {isSale && <span className="rounded-full bg-beige0 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sale</span>}
+              {isSale && <span className="rounded-full bg-stone-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sale</span>}
               <span className="anti-tarnish-badge">Anti-Tarnish</span>
             </div>
             <p className="mb-2 text-xs uppercase tracking-widest text-stoneGray">{(p.categorySlug || p.category || "").replace("-", " ")}</p>
@@ -80,7 +80,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
                 <>
                   <span className="text-3xl font-bold text-charcoalBrown">₹{p.salePrice}</span>
                   <span className="text-lg text-stoneGray line-through">₹{p.regularPrice}</span>
-                  <span className="rounded-full bg-beige/50 px-2 py-0.5 text-xs font-semibold text-stoneGray">
+                  <span className="rounded-full bg-stone-50/50 px-2 py-0.5 text-xs font-semibold text-stoneGray">
                     {Math.round(((p.regularPrice! - p.salePrice) / p.regularPrice!) * 100)}% off
                   </span>
                 </>
@@ -95,11 +95,11 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
 
             <div className="mb-6 flex items-center gap-4">
               <div className="glass flex items-center gap-1 rounded-xl p-1">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoalBrown hover:bg-beige/50" aria-label="Decrease">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoalBrown hover:bg-stone-50/50" aria-label="Decrease">
                   <Minus className="h-4 w-4" />
                 </button>
                 <span className="w-8 text-center font-semibold text-charcoalBrown">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(p.stock || 10, q + 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoalBrown hover:bg-beige/50" aria-label="Increase">
+                <button onClick={() => setQty((q) => Math.min(p.stock || 10, q + 1))} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoalBrown hover:bg-stone-50/50" aria-label="Increase">
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
