@@ -284,6 +284,7 @@ export type SEOSettings = {
 
 export type AnnouncementSettings = {
   showAnnouncement: boolean;
+  cardStyle?: "flat" | "rounded" | "glass";
   text: string;
   countdownTimer?: string;
   popupOfferTitle?: string;

@@ -12,6 +12,14 @@ export async function AnnouncementTicker() {
   const activeAnnouncements = list.filter(a => a.isActive).sort((a, b) => a.order - b.order);
   
   let tickerItems: React.ReactNode[] = [];
+  let countdownEl = null;
+  
+  if (globalSettings.countdownTimer) {
+    const target = new Date(globalSettings.countdownTimer).getTime();
+    if (target > Date.now()) {
+      countdownEl = <span className="ml-4 font-mono bg-black/20 px-2 py-0.5 rounded text-xs animate-pulse">SALE ENDS SOON</span>;
+    }
+  }
 
   if (activeAnnouncements.length === 0) {
     const text = globalSettings.text || "Welcome to Anti Tarnish Jewels";
@@ -30,7 +38,7 @@ export async function AnnouncementTicker() {
         {a.emoji && <span>{a.emoji}</span>}
         {a.link ? (
           <Link href={a.link} className="hover:underline">
-            {a.text}
+            {a.text}{countdownEl}
           </Link>
         ) : (
           <span>{a.text}</span>
@@ -46,7 +54,10 @@ export async function AnnouncementTicker() {
 
   return (
     <div
-      className="fixed left-0 right-0 top-16 z-40 overflow-hidden py-2"
+      className={`fixed left-0 right-0 top-16 z-40 overflow-hidden py-2 ${
+    globalSettings.cardStyle === 'rounded' ? 'm-2 rounded-full shadow-md' : 
+    globalSettings.cardStyle === 'glass' ? 'bg-opacity-70 backdrop-blur-md' : ''
+  }`}
       style={{ background: "linear-gradient(90deg, #4A3040, #6B4060, #4A3040)" }}
     >
       <div className="ticker-animate flex whitespace-nowrap">

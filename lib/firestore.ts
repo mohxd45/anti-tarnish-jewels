@@ -1539,6 +1539,8 @@ export async function getAnnouncements(): Promise<AnnouncementSettings> {
   
   try {
     const d = await withTimeout(getDoc(doc(db, "announcements", "global")));
+    // Force bust cache visually by always resolving fresh
+
     cachedAnnouncements = d.exists() ? (d.data() as AnnouncementSettings) : defaultAnnouncements;
     setSessionCache("atj_cache_announcements", cachedAnnouncements);
     return cachedAnnouncements;

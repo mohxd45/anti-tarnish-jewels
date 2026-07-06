@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
+import { clearNextCache } from "@/app/actions/revalidate";
 
 
 import { useEffect, useState } from "react";
@@ -69,6 +70,7 @@ export default function AnnouncementsPage() {
     setSaving(true);
     try {
       await saveAnnouncements(settings);
+      await clearNextCache();
       if (user) {
         await logActivity({
           actorUid: user.uid,
@@ -106,6 +108,7 @@ export default function AnnouncementsPage() {
       setIsAdding(false);
       setNewAnnouncement({ text: "", couponCode: "", link: "", emoji: "", isActive: true, order: 0 });
       loadData();
+      await clearNextCache();
       toast.success("Announcement added!");
     } catch {
       toast.error("Failed to add announcement");
@@ -116,6 +119,7 @@ export default function AnnouncementsPage() {
     try {
       await updateAnnouncement(id, updates);
       loadData();
+      await clearNextCache();
       toast.success("Updated!");
     } catch {
       toast.error("Failed to update");
@@ -127,6 +131,7 @@ export default function AnnouncementsPage() {
     try {
       await deleteAnnouncement(id);
       loadData();
+      await clearNextCache();
       toast.success("Deleted!");
     } catch {
       toast.error("Failed to delete");
