@@ -32,10 +32,20 @@ export function PromoPopup({ settings }: { settings: AnnouncementSettings | null
         </button>
         <h2 className="text-2xl font-serif text-charcoalBrown mb-2">{settings.popupOfferTitle || "Join Our Newsletter"}</h2>
         <p className="text-stoneGray mb-6 text-sm">{settings.popupOfferText || "Sign up for exclusive offers and updates."}</p>
-        <div className="flex gap-2">
-          <input type="email" placeholder="Email address" className="w-full rounded-xl border border-stone-200 px-4 py-2 text-sm focus:border-[color:var(--color-gold)] focus:outline-none" />
-          <button onClick={close} className="btn-primary-gold px-6 py-2 whitespace-nowrap">Subscribe</button>
-        </div>
+        {settings.popupOfferLinkUrl ? (
+          <a 
+            href={settings.popupOfferLinkUrl} 
+            onClick={close}
+            className="inline-block bg-[color:var(--color-gold)] text-white px-8 py-3 rounded-full hover:bg-[color:var(--color-gold)]/90 transition-colors font-medium shadow-lg hover:shadow-xl w-full sm:w-auto"
+          >
+            {settings.popupOfferLinkText || "Shop Now"}
+          </a>
+        ) : (
+          <div className="flex gap-2">
+            <input type="email" placeholder="Email address" className="w-full rounded-xl border border-stone-200 px-4 py-2 text-sm focus:border-[color:var(--color-gold)] focus:outline-none" />
+            <button onClick={close} className="btn-primary-gold px-6 py-2 whitespace-nowrap">Subscribe</button>
+          </div>
+        )}
       </div>
     </div>
   );

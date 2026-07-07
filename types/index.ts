@@ -289,6 +289,8 @@ export type AnnouncementSettings = {
   countdownTimer?: string;
   popupOfferTitle?: string;
   popupOfferText?: string;
+  popupOfferLinkText?: string;
+  popupOfferLinkUrl?: string;
   showNewsletterPopup: boolean;
   whatsAppSupport?: string;
   whatsAppMessage?: string;

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
-import { getProducts, getBanners, getCategories, getReviews, getSiteContent, getSiteSettings } from "@/lib/firestore";
+import { getProducts, getBanners, getCategories, getReviews, getSiteContent, getSiteSettings, getAnnouncements } from "@/lib/firestore";
 import { Sparkles, Droplets, Gem, Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
+import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSaleBanner";
 
 export const metadata = {
   title: "Anti Tarnish Jewels — Premium Anti-Tarnish Jewellery",
@@ -9,13 +10,14 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [products, banners, categories, reviews, content, settings] = await Promise.all([
+  const [products, banners, categories, reviews, content, settings, announcements] = await Promise.all([
     getProducts(),
     getBanners(),
     getCategories(),
     getReviews(),
     getSiteContent("home"),
-    getSiteSettings()
+    getSiteSettings(),
+    getAnnouncements()
   ]);
 
   const bestsellers = products.filter(p => p.isBestSeller || (p.rating && p.rating >= 4.5)).slice(0, 8);
@@ -167,6 +169,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* FLASH SALE BANNER */}
+      <HomepageFlashSaleBanner settings={announcements} />
 
       {/* SHOP BY CATEGORY (bento) */}
       <section className="mx-auto max-w-7xl px-4 py-16">

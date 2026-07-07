@@ -298,6 +298,25 @@ export default function AnnouncementsPage() {
                       />
                     </Field>
                   </div>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4 pt-2">
+                    <Field label="Button Text (Optional)">
+                      <Input 
+                        value={settings.popupOfferLinkText || ""}
+                        onChange={(e) => setSettings({ ...settings, popupOfferLinkText: e.target.value })}
+                        className="bg-card/40"
+                        placeholder="e.g. Shop Now"
+                      />
+                    </Field>
+                    <Field label="Button Link (Optional)">
+                      <Input 
+                        value={settings.popupOfferLinkUrl || ""}
+                        onChange={(e) => setSettings({ ...settings, popupOfferLinkUrl: e.target.value })}
+                        className="bg-card/40"
+                        placeholder="e.g. /shop"
+                      />
+                    </Field>
+                  </div>
 
                   <div className="pt-2">
                     <Field label="Flash Sale Countdown Timer (Optional)" hint="Countdown timer triggers homepage ticking panels. Leave empty to disable.">
