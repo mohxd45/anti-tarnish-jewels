@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 import { AnnouncementSettings } from "@/types";
 import { X } from "lucide-react";
 
-export function NewsletterPopup({ settings }: { settings: AnnouncementSettings | null }) {
+export function PromoPopup({ settings }: { settings: AnnouncementSettings | null }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (!settings?.showNewsletterPopup) return;
     
-    // Check if user already saw it
-    const hasSeen = localStorage.getItem("atj_seen_popup");
+    // Check if user already saw it in THIS session
+    const hasSeen = sessionStorage.getItem("atj_seen_popup");
     if (!hasSeen) {
       const timer = setTimeout(() => setIsOpen(true), 3000);
       return () => clearTimeout(timer);
@@ -21,7 +21,7 @@ export function NewsletterPopup({ settings }: { settings: AnnouncementSettings |
 
   const close = () => {
     setIsOpen(false);
-    localStorage.setItem("atj_seen_popup", "true");
+    sessionStorage.setItem("atj_seen_popup", "true");
   };
 
   return (

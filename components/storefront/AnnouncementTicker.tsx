@@ -1,5 +1,6 @@
 import { getAnnouncementsList, getAnnouncements } from "@/lib/firestore";
 import Link from "next/link";
+import { FlashSaleCountdown } from "./FlashSaleCountdown";
 
 export async function AnnouncementTicker() {
   const globalSettings = await getAnnouncements();
@@ -15,10 +16,7 @@ export async function AnnouncementTicker() {
   let countdownEl = null;
   
   if (globalSettings.countdownTimer) {
-    const target = new Date(globalSettings.countdownTimer).getTime();
-    if (target > Date.now()) {
-      countdownEl = <span className="ml-4 font-mono bg-black/20 px-2 py-0.5 rounded text-xs animate-pulse">SALE ENDS SOON</span>;
-    }
+    countdownEl = <FlashSaleCountdown targetDate={globalSettings.countdownTimer} />;
   }
 
   if (activeAnnouncements.length === 0) {
