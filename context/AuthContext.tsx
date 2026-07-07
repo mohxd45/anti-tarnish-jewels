@@ -90,7 +90,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Removed local caching
 
         try {
-          const existingProfile = await getUserProfile(current.uid);
+          let existingProfile = null;
+          try {
+            existingProfile = await getUserProfile(current.uid);
+          } catch (err) {
+            console.error("Failed to fetch existing profile during auth state change:", err);
+            // If fetch fails (network, permission, etc), do NOT proceed to overwrite.
+            setLoading(false);
+            return;
+          }
+
           const providerId = current.providerData[0]?.providerId;
           const providerName = providerId === "google.com" ? "google" : providerId === "password" ? "email" : undefined;
           
@@ -101,18 +110,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             updatedAt: new Date().toISOString(),
             lastLoginAt: new Date().toISOString()
           };
+          
           if (!existingProfile) {
             profileData.role = "customer";
             profileData.status = "active";
             profileData.createdAt = new Date().toISOString();
           } else {
-            // For existing profiles missing a role or status, set safe defaults
+            // Only set safe defaults if explicitly missing. Do NOT overwrite existing fields!
             if (!existingProfile.role) profileData.role = "customer";
             if (!existingProfile.status) profileData.status = "active";
+            if (!existingProfile.createdAt) profileData.createdAt = new Date().toISOString();
           }
           
-          // Check for staff invite if role is customer
-          if ((!existingProfile || existingProfile.role === "customer" || !existingProfile.role) && current.email) {
+          // Check for staff invite ONLY if creating a new user or missing a role completely
+          if ((!existingProfile || !existingProfile.role) && current.email) {
             try {
               const inviteRef = doc(db, "staffInvites", current.email.toLowerCase());
               const inviteSnap = await getDoc(inviteRef);
@@ -136,8 +147,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (existingProfile?.phone) profileData.phone = existingProfile.phone;
           if (existingProfile?.phoneE164) profileData.phoneE164 = existingProfile.phoneE164;
           
-          if (!existingProfile) {
-            profileData.createdAt = new Date().toISOString();
+          if (process.env.NODE_ENV === "development" || typeof window !== "undefined") {
+            console.log("[Auth Debug] UID:", current.uid);
+            console.log("[Auth Debug] Email:", current.email);
+            console.log("[Auth Debug] Existing Role Before Save:", existingProfile?.role || "none");
+            console.log("[Auth Debug] Role to Save:", profileData.role || existingProfile?.role || "none");
           }
           
           await saveUserProfile(current.uid, profileData);

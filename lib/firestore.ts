@@ -347,19 +347,15 @@ export async function saveUserProfile(uid: string, data: Record<string, unknown>
     await setDoc(doc(db, "users", uid), cleanProfile, { merge: true });
   } catch (err) {
     console.error("Error saving user profile to database:", err);
+    throw err;
   }
 }
 
 export async function getUserProfile(uid: string): Promise<any | null> {
-  
-  try {
-    const docRef = doc(db, "users", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { uid, ...docSnap.data() };
-    }
-  } catch (err) {
-    console.error("Error fetching user profile:", err);
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return { uid, ...docSnap.data() };
   }
   return null;
 }
