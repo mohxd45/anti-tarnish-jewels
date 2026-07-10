@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -6,7 +7,9 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     return NextResponse.json({
-      message: "Debug SDK Route loaded successfully without Firebase Admin.",
+      message: "Debug SDK Route loaded successfully",
+      authInitialized: !!adminAuth,
+      dbInitialized: !!adminDb,
       hasProjectId: !!process.env.FIREBASE_ADMIN_PROJECT_ID,
       hasClientEmail: !!process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
       hasPrivateKey: !!process.env.FIREBASE_ADMIN_PRIVATE_KEY,
