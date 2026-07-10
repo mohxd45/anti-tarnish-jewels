@@ -9,18 +9,23 @@ if (!getApps().length) {
   let privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
 
   if (privateKey) {
-    // Handle newline characters safely if they come in escaped
-    privateKey = privateKey.replace(/\\n/g, "\n");
+    // Handle newline characters safely if they come in escaped and strip surrounding quotes if present
+    privateKey = privateKey.replace(/\\n/g, "\n").replace(/^"|"$/g, "");
   }
 
   if (projectId && clientEmail && privateKey) {
-    initializeApp({
-      credential: cert({
-        projectId,
-        clientEmail,
-        privateKey,
-      }),
-    });
+    try {
+      initializeApp({
+        credential: cert({
+          projectId,
+          clientEmail,
+          privateKey,
+        }),
+      });
+      console.log("Firebase Admin SDK initialized successfully.");
+    } catch (error) {
+      console.error("Firebase Admin initialization error:", error);
+    }
   } else {
     console.warn("Firebase Admin environment variables missing. Admin SDK not initialized.");
   }
