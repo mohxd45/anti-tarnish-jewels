@@ -107,6 +107,6 @@ export async function POST(req: NextRequest) {
     if (error.code === 'auth/invalid-phone-number') {
       return NextResponse.json({ error: "Invalid phone number format. Must include country code." }, { status: 400 });
     }
-    return NextResponse.json({ error: "An unexpected error occurred while creating staff." }, { status: 500 });
+    return NextResponse.json({ error: `An unexpected error occurred while creating staff: ${error.message || String(error)}` }, { status: 500 });
   }
 }
