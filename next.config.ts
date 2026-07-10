@@ -39,7 +39,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["firebase-admin"],
+  // serverExternalPackages is removed because firebase-admin v12+ is ESM and require() fails on Vercel
   poweredByHeader: false,
   async headers() {
     return [
