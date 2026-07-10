@@ -117,7 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profileData.createdAt = new Date().toISOString();
           } else {
             // Only set safe defaults if explicitly missing. Do NOT overwrite existing fields!
-            if (!existingProfile.role) profileData.role = "customer";
+            // WARNING: We must NOT set role to customer if it's undefined because the user might have a typo like 'Role: admin' in the DB.
+            // if (!existingProfile.role) profileData.role = "customer"; // Commented out to prevent overwriting manually fixed roles
             if (!existingProfile.status) profileData.status = "active";
             if (!existingProfile.createdAt) profileData.createdAt = new Date().toISOString();
           }

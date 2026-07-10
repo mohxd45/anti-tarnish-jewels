@@ -47,11 +47,13 @@ export default function AdminLoginPage() {
         user.email === "admin@antitarnishjewel.com" || 
         user.email === "anti.tarnish.jewel@gmail.com";
       
-      if (role === "admin" || isAdminEmail) {
+      const allowedRoles = ["admin", "owner_admin", "partner_admin", "developer_admin", "staff"];
+      
+      if (allowedRoles.includes(role) || isAdminEmail) {
         router.push("/admin");
       } else {
         await signOut(auth);
-        throw new Error("Access denied. Admin privileges required.");
+        throw new Error(`Access denied. Admin privileges required. (Current role: ${role})`);
       }
     } catch (err: any) {
       setMessage(err.message || "Login failed");
