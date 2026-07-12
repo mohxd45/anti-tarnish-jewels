@@ -106,20 +106,24 @@ export default async function HomePage() {
 
 
 
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full">
+      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full overflow-hidden">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 pb-4">
+        <div className="flex overflow-x-auto gap-3 sm:gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
           {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <div key={p.id} className="min-w-[45vw] max-w-[45vw] snap-start shrink-0 md:min-w-0 md:max-w-none">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full bg-gradient-to-b from-[#FFF0F5]/30 to-transparent">
+      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full bg-gradient-to-b from-[#FFF0F5]/30 to-transparent overflow-hidden">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 pb-4">
+        <div className="flex overflow-x-auto gap-3 sm:gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
           {newArrivals.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <div key={p.id} className="min-w-[45vw] max-w-[45vw] snap-start shrink-0 md:min-w-0 md:max-w-none">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </section>
