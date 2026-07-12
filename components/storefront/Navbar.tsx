@@ -19,7 +19,7 @@ export function Navbar({ settings }: { settings?: any }) {
   
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   
-  const brandName = settings?.brandName || "Anti Tarnish Jewels";
+  const brandName = settings?.brandName || "LONA JEWELS";
   const logoText = settings?.logoText || brandName.charAt(0);
   const subtitle = settings?.subtitle || "Jewels";
 

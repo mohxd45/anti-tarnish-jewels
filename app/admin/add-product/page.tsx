@@ -247,7 +247,7 @@ export default function AddProductPage() {
                   <Input value={badgesText} onChange={(e) => setBadgesText(e.target.value)} placeholder="rose-gold, pearl, bridal (comma separated)" />
                 </Field>
                 <Field label="Brand">
-                  <Input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="e.g. Anti Tarnish Jewels" />
+                  <Input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="e.g. LONA JEWELS" />
                 </Field>
                 <Field label="Subcategory">
                   <Input value={subCategory} onChange={(e) => setSubCategory(e.target.value)} placeholder="e.g. Chokers" />

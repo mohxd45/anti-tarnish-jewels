@@ -7,7 +7,7 @@ export async function Footer() {
   const settings = await getSiteSettings();
   const content = await getSiteContent("home");
 
-  const brandName = settings?.brandName || "Anti Tarnish Jewels";
+  const brandName = settings?.brandName || "LONA JEWELS";
   const logoText = settings?.logoText || brandName.charAt(0);
   const footerText = content?.footerText || "Premium anti-tarnish jewellery crafted for everyday elegance. Stay radiant, always.";
 

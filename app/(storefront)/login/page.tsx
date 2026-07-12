@@ -66,7 +66,7 @@ export default function LoginPage() {
           {mode === "login" ? "Welcome back" : "Create account"}
         </h1>
         <p className="mb-6 text-center text-sm text-stoneGray">
-          {mode === "login" ? "Log in to continue" : "Join Anti Tarnish Jewels"}
+          {mode === "login" ? "Log in to continue" : "Join LONA JEWELS"}
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-3">

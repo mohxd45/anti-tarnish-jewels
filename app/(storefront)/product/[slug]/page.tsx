@@ -8,10 +8,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const resolvedParams = await params;
   const product = await getProductBySlug(resolvedParams.slug);
   if (!product) {
-    return { title: "Product Not Found | Anti Tarnish Jewels" };
+    return { title: "Product Not Found | LONA JEWELS" };
   }
   return {
-    title: `${product.name} | Anti Tarnish Jewels`,
+    title: `${product.name} | LONA JEWELS`,
     description: product.description.substring(0, 160),
   };
 }

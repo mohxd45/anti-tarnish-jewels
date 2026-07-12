@@ -257,7 +257,7 @@ export default function AnnouncementsPage() {
                             value={settings.text || ""}
                             onChange={(e) => setSettings({ ...settings, text: e.target.value })}
                             className="bg-card/40"
-                            placeholder="e.g. ✨ Welcome to Anti Tarnish Jewels!"
+                            placeholder="e.g. ✨ Welcome to LONA JEWELS!"
                           />
                         </Field>
                       </div>
@@ -381,7 +381,7 @@ export default function AnnouncementsPage() {
                         value={settings.whatsAppMessage || ""}
                         onChange={(e) => setSettings({ ...settings, whatsAppMessage: e.target.value })}
                         className="bg-card/40"
-                        placeholder="e.g. Hi Anti Tarnish Jewels, I need help..."
+                        placeholder="e.g. Hi LONA JEWELS, I need help..."
                       />
                     </Field>
                   </div>
@@ -397,7 +397,7 @@ export default function AnnouncementsPage() {
                     <div className="py-2 px-4 text-center text-[11px] font-medium tracking-wide text-white" style={{ background: "var(--gradient-rose)" }}>
                       {announcements.filter(a => a.isActive).length > 0 
                         ? announcements.filter(a => a.isActive)[0].text 
-                        : (settings.text || "✨ Welcome to Anti Tarnish Jewels")}
+                        : (settings.text || "✨ Welcome to LONA JEWELS")}
                     </div>
                   ) : null}
                   <div className="bg-card/50 p-6 flex flex-col items-center justify-center border-t border-border/40 relative">

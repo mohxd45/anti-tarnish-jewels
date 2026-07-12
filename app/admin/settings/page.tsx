@@ -41,7 +41,7 @@ export default function SettingsPage() {
       // Initialize with empty defaults if not present
       if (!data) {
         setSettings({
-          brandName: "Anti Tarnish Jewels",
+          brandName: "LONA JEWELS",
           logoText: "A",
           darkMode: true,
         });

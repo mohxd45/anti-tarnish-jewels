@@ -84,7 +84,7 @@ export default function AdminLoginPage() {
             <div className="h-16 w-16 rounded-2xl grid place-items-center text-white shadow-lg mb-6" style={{ background: "var(--gradient-rose)" }}>
               <Gem className="h-8 w-8" />
             </div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">Anti Tarnish Jewels</h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">LONA JEWELS</h1>
             <p className="text-[11px] uppercase tracking-[0.25em] font-semibold text-muted-foreground mt-2">Admin Console</p>
           </div>
 

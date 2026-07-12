@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Privacy Policy | Anti Tarnish Jewels",
-  description: "Learn how Anti Tarnish Jewels collects, uses, and protects your personal data.",
+  title: "Privacy Policy | LONA JEWELS",
+  description: "Learn how LONA JEWELS collects, uses, and protects your personal data.",
 };
 
 export default function PrivacyPolicyPage() {

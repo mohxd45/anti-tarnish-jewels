@@ -9,7 +9,7 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
   
   const whatsappNumber = await getWhatsAppNumber();
   
-  const confirmMsg = `Hi Anti Tarnish Jewels, I want to confirm my COD order ${orderId || ""}.`;
+  const confirmMsg = `Hi LONA JEWELS, I want to confirm my COD order ${orderId || ""}.`;
   const whatsappUrl = createWhatsAppUrl(whatsappNumber, confirmMsg);
 
   return (

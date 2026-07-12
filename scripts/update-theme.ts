@@ -29,8 +29,8 @@ try {
 
 async function main() {
   const settings = {
-    brandName: "Anti Tarnish Jewels",
-    logoText: "Anti Tarnish Jewels",
+    brandName: "LONA JEWELS",
+    logoText: "LONA JEWELS",
     primaryColor: "#B8955E",       // Champagne Gold accent
     secondaryColor: "#B7A28C",     // Soft Taupe secondary accent
     accentColor: "#C98B8B",        // Dusty Rose highlight

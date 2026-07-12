@@ -19,7 +19,7 @@ export default function AboutPage() {
       if (data?.aboutText) {
         setAboutText(data.aboutText);
       } else {
-        setAboutText("Welcome to Anti Tarnish Jewels, your premium destination for anti-tarnish jewellery. We offer carefully curated collections of rings, necklaces, bracelets, earrings, and accessories that stay beautiful forever.");
+        setAboutText("Welcome to LONA JEWELS, your premium destination for anti-tarnish jewellery. We offer carefully curated collections of rings, necklaces, bracelets, earrings, and accessories that stay beautiful forever.");
       }
     } catch (err) {
       console.error(err);
@@ -30,7 +30,7 @@ export default function AboutPage() {
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-4xl font-serif font-semibold text-gold tracking-wide">About Anti Tarnish Jewels</h1>
+      <h1 className="text-4xl font-serif font-semibold text-gold tracking-wide">About LONA JEWELS</h1>
       <div className="mt-6 rounded-[2rem] border border-stone-200 bg-white/[0.04] p-8 leading-8 text-stone-600 font-sans text-sm md:text-base">
         <p className="whitespace-pre-line">
           {aboutText}

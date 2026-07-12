@@ -8,14 +8,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!banner || (banner.active === false && banner.isActive === false)) {
     return {
-      title: "Offer Not Found | Noore",
+      title: "Offer Not Found | LONA JEWELS",
       description: "This offer could not be found or has expired."
     };
   }
 
   return {
     title: `${banner.pageTitle || banner.title} | Offers`,
-    description: banner.pageDescription || banner.subtitle || "Exclusive offer from Noore",
+    description: banner.pageDescription || banner.subtitle || "Exclusive offer from LONA JEWELS",
     openGraph: {
       images: [banner.imageUrl],
     },

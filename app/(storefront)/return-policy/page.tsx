@@ -6,7 +6,7 @@ import { getSiteContent } from "@/lib/firestore";
 import Link from "next/link";
 
 export default function ReturnPolicyPage() {
-  const [returnPolicyText, setReturnPolicyText] = useState("At Anti Tarnish Jewels, customer satisfaction is our top priority. We offer a 7-day easy return and replacement policy for eligible products.");
+  const [returnPolicyText, setReturnPolicyText] = useState("At LONA JEWELS, customer satisfaction is our top priority. We offer a 7-day easy return and replacement policy for eligible products.");
 
   useEffect(() => {
     loadData();

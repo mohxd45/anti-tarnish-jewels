@@ -20,7 +20,7 @@ export async function AnnouncementTicker({ className = "fixed left-0 right-0 top
   }
 
   if (activeAnnouncements.length === 0) {
-    const text = globalSettings.text || "Welcome to Anti Tarnish Jewels";
+    const text = globalSettings.text || "Welcome to LONA JEWELS";
     tickerItems = Array(8).fill(text).map((t, i) => (
       <span key={i} className="mx-8 text-sm text-white">
         {t}

@@ -175,7 +175,7 @@ export default function SEOPage() {
                       </div>
                     ) : (
                       <div className="aspect-[1.91/1] grid place-items-center text-white" style={{ background: "var(--gradient-rose)" }}>
-                        <span className="font-display text-2xl drop-shadow-md tracking-tight">{seo.homepageTitle || "Anti Tarnish Jewels"}</span>
+                        <span className="font-display text-2xl drop-shadow-md tracking-tight">{seo.homepageTitle || "LONA JEWELS"}</span>
                       </div>
                     )}
                     

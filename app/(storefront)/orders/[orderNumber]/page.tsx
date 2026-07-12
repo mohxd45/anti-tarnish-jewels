@@ -59,7 +59,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
   const [error, setError] = useState("");
   const [whatsAppConfigs, setWhatsAppConfigs] = useState({
     number: "919999999999",
-    message: "Hi Anti Tarnish Jewels, I need help with my order."
+    message: "Hi LONA JEWELS, I need help with my order."
   });
 
   useEffect(() => {
@@ -72,7 +72,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
           if (parsed.whatsAppSupport) {
             setWhatsAppConfigs({
               number: parsed.whatsAppSupport,
-              message: parsed.whatsAppMessage || "Hi Anti Tarnish Jewels, I need help with my order."
+              message: parsed.whatsAppMessage || "Hi LONA JEWELS, I need help with my order."
             });
           }
         } catch (e) {
@@ -141,7 +141,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
   const isReturned = order.status === "Returned";
 
   // Build WhatsApp Support URL
-  const waMsg = `Hi Anti Tarnish Jewels, I need help with my order ${order.orderNumber || order.id}.`;
+  const waMsg = `Hi LONA JEWELS, I need help with my order ${order.orderNumber || order.id}.`;
   const waUrl = `https://wa.me/${whatsAppConfigs.number}?text=${encodeURIComponent(waMsg)}`;
 
   return (

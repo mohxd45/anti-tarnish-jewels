@@ -601,7 +601,7 @@ function printInvoice(o: Order) {
   const status = o.status || o.orderStatus || "Pending";
 
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"/>
-    <title>${o.orderNumber || o.id} — Anti Tarnish Jewels</title>
+    <title>${o.orderNumber || o.id} — LONA JEWELS</title>
     <style>
       * { box-sizing: border-box }
       body { font-family: 'Inter', system-ui, sans-serif; color:#1f1a17; padding:32px; max-width:720px; margin:auto }
@@ -618,7 +618,7 @@ function printInvoice(o: Order) {
     </style></head><body>
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <h1>Anti Tarnish Jewels</h1>
+        <h1>LONA JEWELS</h1>
         <div class="muted">Luxury that never fades</div>
       </div>
       <div style="text-align:right">

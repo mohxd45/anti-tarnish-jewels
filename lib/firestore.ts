@@ -1183,20 +1183,20 @@ export async function validateCoupon(
 // SITE CONTENT MANAGER
 const defaultSiteContent: Record<string, any> = {
   home: {
-    heroTitle: "Anti Tarnish Jewels",
+    heroTitle: "LONA JEWELS",
     heroSubtitle: "Anti-Tarnish Jewellery for Everyday Shine",
     heroCtaText: "Shop Collection",
     footerText: "Premium anti-tarnish, waterproof, non-fading jewellery for daily wear and special occasions."
   },
   about: {
-    aboutText: "Welcome to Anti Tarnish Jewels, your premium destination for anti-tarnish jewellery. We offer carefully curated collections of rings, necklaces, bracelets, earrings, and accessories that stay beautiful forever."
+    aboutText: "Welcome to LONA JEWELS, your premium destination for anti-tarnish jewellery. We offer carefully curated collections of rings, necklaces, bracelets, earrings, and accessories that stay beautiful forever."
   },
   faq: {
     faqText: "Find answers about shipping, payments, returns, order tracking, product specifications, and account support."
   },
   policies: {
-    returnPolicyText: "At Anti Tarnish Jewels, customer satisfaction is our top priority. We offer a 7-day easy return and replacement policy for eligible products.",
-    privacyPolicyText: "At Anti Tarnish Jewels, accessible from our online store, one of our main priorities is the privacy of our visitors."
+    returnPolicyText: "At LONA JEWELS, customer satisfaction is our top priority. We offer a 7-day easy return and replacement policy for eligible products.",
+    privacyPolicyText: "At LONA JEWELS, accessible from our online store, one of our main priorities is the privacy of our visitors."
   }
 };
 
@@ -1313,8 +1313,8 @@ export async function deleteBanner(id: string): Promise<void> {
 
 // THEME & SITE SETTINGS
 const defaultSiteSettings: SiteSettings = {
-  brandName: "Anti Tarnish Jewels",
-  logoText: "Anti Tarnish Jewels",
+  brandName: "LONA JEWELS",
+  logoText: "LONA JEWELS",
   primaryColor: "#B8955E",
   secondaryColor: "#C79A8B",
   accentColor: "#C98B8B",
@@ -1478,11 +1478,11 @@ export async function deleteCategory(id: string): Promise<void> {
 
 // SEO SETTINGS
 const defaultSEOSettings: SEOSettings = {
-  homepageTitle: "Anti Tarnish Jewels | Waterproof & Tarnish-Free Jewellery Online",
+  homepageTitle: "LONA JEWELS | Waterproof & Tarnish-Free Jewellery Online",
   homepageDescription: "Shop premium anti-tarnish, waterproof, non-fading jewellery for daily wear, office wear, party wear, and bridal occasions.",
-  categoryTitleTemplate: "%s | Anti Tarnish Jewels",
-  productTitleTemplate: "%s | Buy at Anti Tarnish Jewels",
-  socialText: "Shop premium anti-tarnish, waterproof, non-fading jewellery for daily wear, office wear, party wear, and bridal occasions at Anti Tarnish Jewels."
+  categoryTitleTemplate: "%s | LONA JEWELS",
+  productTitleTemplate: "%s | Buy at LONA JEWELS",
+  socialText: "Shop premium anti-tarnish, waterproof, non-fading jewellery for daily wear, office wear, party wear, and bridal occasions at LONA JEWELS."
 };
 
 export async function getSEOSettings(): Promise<SEOSettings> {

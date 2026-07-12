@@ -6,8 +6,8 @@ import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSa
 import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 
 export const metadata = {
-  title: "Anti Tarnish Jewels — Premium Anti-Tarnish Jewellery",
-  description: "Timeless elegance in anti-tarnish jewellery. Shop rings, earrings, necklaces & bracelets crafted for everyday luxury.",
+  title: "LONA JEWELS | Premium Anti-Tarnish Jewellery",
+  description: "Shop premium anti-tarnish jewellery with long-lasting shine, water-resistant finish, and skin-friendly designs.",
 };
 
 export default async function HomePage() {

@@ -689,7 +689,7 @@ export function ProductGrid({
       {/* Title block */}
       <div className="relative z-10 mb-6 flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-champagne font-semibold">Anti Tarnish Jewels Collections</p>
+          <p className="text-xs uppercase tracking-[0.4em] text-champagne font-semibold">LONA JEWELS Collections</p>
           <h1 className="mt-1 text-3xl md:text-4xl font-serif font-semibold tracking-wide text-charcoalBrown">{title}</h1>
         </div>
 
