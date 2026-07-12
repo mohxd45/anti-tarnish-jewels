@@ -20,8 +20,8 @@ export function CategoryBar() {
   ];
 
   return (
-    <div className="sticky top-[64px] z-40 bg-[#FFF0F5]/95 backdrop-blur-md border-b border-[#B8955E]/20 block md:hidden shadow-sm">
-      <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
+    <div className="sticky top-[64px] z-40 bg-[#FFF9FB] border-b border-[#E8D7C8] shadow-[0_2px_10px_rgba(58,36,40,0.02)] block md:hidden w-full">
+      <div className="flex gap-2 overflow-x-auto px-4 py-3.5 scrollbar-hide snap-x snap-mandatory [&::-webkit-scrollbar]:hidden items-center">
         {categories.map((cat) => {
           const isActive = currentCategory === cat.param;
           const href = cat.param ? `/shop?category=${cat.param}` : `/shop`;
@@ -31,14 +31,14 @@ export function CategoryBar() {
             <Link 
               key={cat.name} 
               href={href}
-              className={`flex items-center gap-1.5 px-3.5 h-[42px] rounded-full border transition-all duration-300 snap-start shrink-0 ${
+              className={`flex items-center justify-center gap-1.5 px-3.5 h-[38px] rounded-full transition-all duration-300 snap-start shrink-0 border ${
                 isActive 
-                  ? "bg-gradient-to-r from-[#B8955E] to-[#D4AF37] border-[#D4AF37] text-white shadow-[0_4px_12px_rgba(184,149,94,0.3)] scale-[1.02]" 
-                  : "bg-[#FFF9FB] border-[#B8955E]/30 text-[#3A2428] hover:border-[#B8955E]/60 hover:bg-white shadow-[0_2px_8px_rgba(58,36,40,0.03)]"
+                  ? "bg-gradient-to-r from-[#B8955E] to-[#D4AF37] border-transparent text-white shadow-[0_2px_8px_rgba(184,149,94,0.25)]" 
+                  : "bg-white/40 border-[#B8955E]/15 text-[#3A2428] hover:bg-white hover:border-[#B8955E]/30"
               }`}
             >
-              <Icon className={`w-[14px] h-[14px] shrink-0 ${isActive ? "text-white" : "text-[#B8955E]"}`} strokeWidth={isActive ? 2.5 : 2} />
-              <span className={`text-[13px] whitespace-nowrap tracking-wide ${isActive ? 'font-semibold' : 'font-medium'}`}>
+              <Icon className={`w-[14px] h-[14px] shrink-0 ${isActive ? "text-white" : "text-[#B8955E]/80"}`} strokeWidth={isActive ? 2.5 : 1.5} />
+              <span className={`text-sm whitespace-nowrap tracking-wide ${isActive ? 'font-medium' : 'font-normal'}`}>
                 {cat.name}
               </span>
             </Link>
