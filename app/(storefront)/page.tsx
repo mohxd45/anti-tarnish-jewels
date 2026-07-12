@@ -213,20 +213,20 @@ export default async function HomePage() {
           <h2 className="mb-1 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Shop by Category</h2>
           <p className="text-sm md:text-base text-stoneGray">Find your perfect piece</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4 lg:grid-cols-5">
-          <CategoryTile category={catRing} className="col-span-1 h-40 sm:h-64 md:h-80" featured />
-          <CategoryTile category={catEar} className="col-span-1 h-40 sm:h-64 md:h-80" />
-          <CategoryTile category={catNeck} className="col-span-1 h-40 sm:h-64 md:h-80" />
-          <CategoryTile category={catBrac} className="col-span-1 h-40 sm:h-64 md:h-80" />
-          <CategoryTile category={catDaily} className="col-span-2 md:col-span-4 lg:col-span-1 h-40 sm:h-64 md:h-80" />
+        <div className="grid grid-cols-3 gap-3 md:gap-4 md:grid-cols-5">
+          <CategoryTile category={catRing} />
+          <CategoryTile category={catEar} />
+          <CategoryTile category={catNeck} />
+          <CategoryTile category={catBrac} />
+          <CategoryTile category={catDaily} />
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
           {bestsellers.map((p) => (
-            <div key={p.id} className="min-w-[55vw] sm:min-w-[40vw] md:min-w-0 snap-start shrink-0">
+            <div key={p.id} className="min-w-[44vw] max-w-[44vw] snap-start shrink-0 sm:min-w-[220px] sm:max-w-[220px]">
               <ProductCard product={p} />
             </div>
           ))}
@@ -235,9 +235,9 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
           {newArrivals.map((p) => (
-            <div key={p.id} className="min-w-[55vw] sm:min-w-[40vw] md:min-w-0 snap-start shrink-0">
+            <div key={p.id} className="min-w-[44vw] max-w-[44vw] snap-start shrink-0 sm:min-w-[220px] sm:max-w-[220px]">
               <ProductCard product={p} />
             </div>
           ))}
@@ -253,11 +253,11 @@ export default async function HomePage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <Benefit icon={<Sparkles className="h-6 w-6 md:h-8 md:w-8" />} title="Long-Lasting Shine" text="Keeps its beautiful shine for longer with proper care, so your jewellery looks fresh and premium every day." />
-            <Benefit icon={<Droplets className="h-6 w-6 md:h-8 md:w-8" />} title="Water-Resistant" text="Designed to handle light water exposure and daily use better than normal fashion jewellery." />
-            <Benefit icon={<Gem className="h-6 w-6 md:h-8 md:w-8" />} title="Hypoallergenic" text="Skin-friendly finishing made for comfortable everyday wear." />
-            <Benefit icon={<ShieldCheck className="h-6 w-6 md:h-8 md:w-8" />} title="Tarnish-Resistant" text="Made with a protective coating that helps reduce fading, dullness, and discoloration." />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+            <Benefit icon={<Sparkles className="h-5 w-5 md:h-8 md:w-8" />} title="Long-Lasting Shine" text="Keeps its beautiful shine for longer." />
+            <Benefit icon={<Droplets className="h-5 w-5 md:h-8 md:w-8" />} title="Water-Resistant" text="Handles light water exposure." />
+            <Benefit icon={<Gem className="h-5 w-5 md:h-8 md:w-8" />} title="Hypoallergenic" text="Skin-friendly for everyday wear." />
+            <Benefit icon={<ShieldCheck className="h-5 w-5 md:h-8 md:w-8" />} title="Tarnish-Resistant" text="Protective coating against fading." />
           </div>
         </div>
       </section>
@@ -362,34 +362,32 @@ function CategoryTile({
   return (
     <Link
       href={`/shop?category=${category.slug}`}
-      className={`category-card relative block cursor-pointer overflow-hidden rounded-2xl shadow-sm border border-stone-100 ${className ?? ""}`}
+      className={`group flex flex-col items-center gap-2 cursor-pointer ${className ?? ""}`}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoalBrown/80 via-charcoalBrown/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
-      <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 hover:scale-105" />
-      <div className="absolute bottom-3 left-3 md:bottom-4 md:left-5 z-10 text-white">
-        <h3 className={`relative z-20 font-serif drop-shadow-md leading-tight ${featured ? "text-xl sm:text-2xl md:text-3xl" : "text-base sm:text-xl"}`}>{category.name}</h3>
-        <p className="relative z-20 text-[11px] md:text-xs opacity-90 drop-shadow-md mt-1 hidden sm:block">Explore</p>
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-100 shadow-sm border border-stone-100">
+        <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 group-hover:scale-105" />
       </div>
+      <h3 className="font-serif text-[12px] md:text-sm text-center text-charcoalBrown leading-tight group-hover:text-pink-900 transition-colors">{category.name}</h3>
     </Link>
   );
 }
 
 function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
-    <div className="glass-premium rounded-2xl p-5 md:p-8 border border-white/80 text-center flex flex-col items-center shadow-sm transition hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
-      <div className="mb-4 inline-flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
-      <h3 className="mb-2 md:mb-3 font-serif text-lg md:text-xl text-[color:var(--color-espresso)] leading-tight">{title}</h3>
-      <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
+    <div className="glass-premium rounded-2xl p-4 md:p-8 border border-white/80 text-center flex flex-col items-center shadow-sm transition hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
+      <div className="mb-2 md:mb-4 inline-flex h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
+      <h3 className="mb-1 md:mb-3 font-serif text-[13px] md:text-xl text-[color:var(--color-espresso)] leading-tight">{title}</h3>
+      <p className="text-[11px] md:text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
     </div>
   );
 }
 
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="glass-premium p-4 md:p-6 rounded-2xl flex flex-col items-center border border-white/80 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
-      <div className="mb-2 md:mb-4 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
-      <h4 className="text-sm sm:text-base font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
-      <p className="mt-1 md:mt-2 text-xs md:text-sm text-[color:var(--color-muted-text)] leading-tight">{sub}</p>
+    <div className="glass-premium p-3 md:p-6 rounded-2xl flex flex-col items-center border border-white/80 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
+      <div className="mb-1 md:mb-4 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
+      <h4 className="text-[12px] sm:text-base font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
+      <p className="mt-0.5 md:mt-2 text-[10px] md:text-sm text-[color:var(--color-muted-text)] leading-tight">{sub}</p>
     </div>
   );
 }

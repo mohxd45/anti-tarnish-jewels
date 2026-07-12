@@ -39,10 +39,10 @@ export function ProductCard({ product }: { product: Product }) {
     null;
 
   return (
-    <div className="glass-premium card-hover hover-tilt group flex flex-col overflow-hidden rounded-2xl shine-sweep">
+    <div className="group flex flex-col w-full">
       <Link
         href={`/product/${product.slug || product.id}`}
-        className="relative block aspect-square overflow-hidden"
+        className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100 shadow-sm border border-stone-100 mb-3 block"
       >
         <img
           src={product.images?.[0] || (product as any).image || (product as any).imageUrl || "/product-stack.jpg"}
@@ -51,43 +51,43 @@ export function ProductCard({ product }: { product: Product }) {
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
         {badge && (
-          <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide ${badge.cls}`}>
+          <span className={`absolute left-2.5 top-2.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-sm ${badge.cls}`}>
             {badge.label}
           </span>
         )}
         <button
           aria-label="Add to wishlist"
-          className={`glass absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full transition hover:text-stoneGray ${isWishlisted ? 'text-red-500' : 'text-stoneGray'}`}
+          className={`glass absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full transition hover:scale-110 ${isWishlisted ? 'text-red-500' : 'text-stoneGray hover:text-charcoalBrown'}`}
           onClick={toggleWishlist}
         >
-          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
+          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
         </button>
       </Link>
-      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-stoneGray">
+      <div className="flex flex-col gap-1 px-1">
+        <p className="text-[9px] font-medium uppercase tracking-wider text-stoneGray">
           {(product.categorySlug || product.category || "").replace("-", " ")}
         </p>
         <Link
           href={`/product/${product.slug || product.id}`}
-          className="line-clamp-2 font-serif text-sm text-pink-950 hover:text-charcoalBrown sm:text-base font-medium"
+          className="line-clamp-2 font-serif text-[13px] sm:text-sm text-pink-950 hover:text-charcoalBrown font-medium leading-tight h-[36px] sm:h-[40px]"
         >
           {product.name}
         </Link>
-        <div className="mt-auto flex items-baseline gap-2 pt-1">
+        <div className="flex items-center gap-2 mt-0.5">
           {isSale ? (
             <>
-              <span className="text-base font-bold text-charcoalBrown">₹{product.salePrice}</span>
-              <span className="text-xs text-stoneGray line-through">₹{product.regularPrice}</span>
+              <span className="text-sm sm:text-base font-bold text-charcoalBrown">₹{product.salePrice}</span>
+              <span className="text-[10px] sm:text-xs text-stoneGray line-through">₹{product.regularPrice}</span>
             </>
           ) : (
-            <span className="text-base font-bold text-charcoalBrown">₹{product.salePrice}</span>
+            <span className="text-sm sm:text-base font-bold text-charcoalBrown">₹{product.salePrice}</span>
           )}
         </div>
         <button
-          className="btn-primary-gold mt-2 w-full text-xs sm:text-sm flex items-center justify-center gap-2"
+          className="btn-primary-gold mt-2 w-full text-xs py-2 sm:py-2.5 flex items-center justify-center gap-1.5 rounded-xl"
           onClick={handleAddToCart}
         >
-          <ShoppingBag className="h-4 w-4" />
+          <ShoppingBag className="h-3.5 w-3.5" />
           <span>Add to Cart</span>
         </button>
       </div>
