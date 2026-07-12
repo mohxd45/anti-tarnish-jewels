@@ -19,7 +19,7 @@ export async function WhatsAppButton() {
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"
-      className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[100] flex h-14 w-14 items-center justify-center rounded-full transition hover:scale-110"
+      className="whatsapp-button fixed bottom-[100px] md:bottom-6 right-4 md:right-6 z-[130] flex h-14 w-14 items-center justify-center rounded-full transition hover:scale-110"
       style={{ background: "#25D366", boxShadow: "0 4px 20px rgba(37, 211, 102, 0.4)" }}
     >
       <svg className="h-7 w-7 text-white" fill="currentColor" viewBox="0 0 24 24">

@@ -1,199 +1,188 @@
 "use client";
 
-import { useEffect } from "react";
-import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, ShoppingBag, Tag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useState, useEffect } from "react";
+import { CartItemCard } from "./CartItemCard";
+import { CartRewardTracker } from "./CartRewardTracker";
+import { RecommendedProductSlider } from "./RecommendedProductSlider";
+import { StickyCartSummaryBar } from "./StickyCartSummaryBar";
 
 export function CartDrawer() {
   const { 
     items, 
-    subtotal, 
     isDrawerOpen, 
     closeDrawer, 
-    increase, 
-    decrease, 
-    removeFromCart,
-    freeShippingThreshold 
+    subtotal, 
+    applyCoupon,
+    coupon,
+    increase,
+    decrease,
+    removeFromCart
   } = useCart();
+  
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState("");
+  const [couponSuccess, setCouponSuccess] = useState("");
+  const [isApplying, setIsApplying] = useState(false);
 
+  // Hide WhatsApp button when drawer is open
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeDrawer();
-    };
     if (isDrawerOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
+      document.body.classList.add('cart-drawer-open');
     } else {
-      document.body.style.overflow = "";
+      document.body.classList.remove('cart-drawer-open');
     }
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isDrawerOpen, closeDrawer]);
+    return () => document.body.classList.remove('cart-drawer-open');
+  }, [isDrawerOpen]);
 
-  if (!isDrawerOpen) return null;
-
-  const amountLeftForFreeShipping = freeShippingThreshold ? Math.max(0, freeShippingThreshold - subtotal) : 0;
-  const progressPercent = freeShippingThreshold ? Math.min(100, (subtotal / freeShippingThreshold) * 100) : 100;
+  const handleApplyCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCouponError("");
+    setCouponSuccess("");
+    if (!couponCode.trim()) return;
+    
+    setIsApplying(true);
+    const res = await applyCoupon(couponCode);
+    if (res.success) {
+      setCouponSuccess("Coupon applied successfully!");
+      setCouponCode("");
+    } else {
+      setCouponError(res.error || "Invalid coupon.");
+    }
+    setIsApplying(false);
+  };
 
   return (
-    <>
-      <div 
-        className="fixed inset-0 z-[150] bg-stone-900/40 backdrop-blur-sm transition-opacity"
-        onClick={closeDrawer}
-      />
-      
-      <div 
-        className={`fixed right-0 top-0 z-[160] flex h-screen w-[90%] max-w-[400px] flex-col bg-[#FAF9F6] shadow-2xl transition-transform duration-300 ${isDrawerOpen ? "translate-x-0" : "translate-x-full"}`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-200 p-4 sm:p-6">
-          <h2 className="font-serif text-2xl text-charcoalBrown">Your Cart</h2>
-          <button 
+    <AnimatePresence>
+      {isDrawerOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
             onClick={closeDrawer}
-            className="rounded-full p-2 text-stoneGray transition hover:bg-stone-200/50 hover:text-charcoalBrown"
-            aria-label="Close cart"
+            className="fixed inset-0 bg-black z-[140]"
+          />
+          
+          {/* Drawer */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed right-0 top-0 h-[100dvh] w-[90%] max-w-[420px] bg-[#FAF9F6] z-[150] shadow-2xl flex flex-col"
           >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Free Shipping Progress */}
-        {freeShippingThreshold && freeShippingThreshold > 0 && items.length > 0 && (
-          <div className="bg-stone-50/80 px-4 py-3 sm:px-6">
-            <p className="mb-2 text-xs font-medium text-stoneGray">
-              {amountLeftForFreeShipping > 0 
-                ? <>You're <span className="text-charcoalBrown font-bold">₹{amountLeftForFreeShipping}</span> away from free shipping!</>
-                : <span className="text-emerald-600 font-bold">You've unlocked free shipping!</span>
-              }
-            </p>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-200">
-              <div 
-                className="h-full bg-champagne transition-all duration-500" 
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-stone-100 text-stone-300">
-                <ShoppingBag className="h-8 w-8" />
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 bg-white border-b border-stone-100 shrink-0">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-[#c5a059]" />
+                <h2 className="text-lg font-semibold text-charcoalBrown font-serif">Your Cart</h2>
+                <span className="bg-stone-50 border border-stone-100 text-stone-500 text-[11px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                  {items.length}
+                </span>
               </div>
-              <h3 className="mb-2 font-serif text-xl text-charcoalBrown">Your cart is empty</h3>
-              <p className="mb-6 text-sm text-stoneGray">Looks like you haven't added anything yet.</p>
-              <Link 
-                href="/shop" 
+              <button
                 onClick={closeDrawer}
-                className="btn-primary-gold px-8 py-3 text-sm"
+                className="p-2 -mr-2 text-stone-400 hover:text-charcoalBrown hover:bg-stone-50 rounded-full transition-colors"
+                aria-label="Close cart"
               >
-                Start Shopping
-              </Link>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6">
-              {items.map((item) => {
-                const p = item.product;
-                const isSale = p.regularPrice && p.regularPrice > p.salePrice;
-                const img = p.images?.[0] || (p as any).imageUrl || "/placeholder.png";
-
-                return (
-                  <div key={p.id} className="flex gap-4">
-                    <Link 
-                      href={`/product/${p.slug || p.id}`} 
-                      onClick={closeDrawer}
-                      className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-50"
-                    >
-                      <img src={img} alt={p.name} className="h-full w-full object-cover" />
-                    </Link>
-                    
-                    <div className="flex flex-1 flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between gap-2">
-                          <Link 
-                            href={`/product/${p.slug || p.id}`}
-                            onClick={closeDrawer} 
-                            className="font-serif text-sm text-charcoalBrown hover:text-champagne line-clamp-2"
-                          >
-                            {p.name}
-                          </Link>
-                          <button 
-                            onClick={() => removeFromCart(p.id)}
-                            className="text-stoneGray hover:text-red-500 transition shrink-0"
-                            aria-label="Remove item"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                        <p className="mt-1 flex items-baseline gap-2 text-sm">
-                          {isSale ? (
-                            <>
-                              <span className="font-semibold text-charcoalBrown">₹{p.salePrice}</span>
-                              <span className="text-xs text-stoneGray line-through">₹{p.regularPrice}</span>
-                            </>
-                          ) : (
-                            <span className="font-semibold text-charcoalBrown">₹{p.salePrice}</span>
-                          )}
-                        </p>
-                      </div>
-
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="flex items-center gap-3 rounded-lg border border-stone-200 px-2 py-1">
-                          <button 
-                            onClick={() => decrease(p.id)} 
-                            className="text-stoneGray hover:text-charcoalBrown"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="text-xs font-medium text-charcoalBrown w-4 text-center">{item.quantity}</span>
-                          <button 
-                            onClick={() => increase(p.id)} 
-                            className="text-stoneGray hover:text-charcoalBrown"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        {items.length > 0 && (
-          <div className="border-t border-stone-200 bg-white p-4 sm:p-6 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-wider text-stoneGray">Subtotal</span>
-              <span className="font-serif text-xl font-bold text-charcoalBrown">₹{subtotal}</span>
+                <X className="h-5 w-5" />
+              </button>
             </div>
             
-            <div className="flex flex-col gap-3">
-              <Link 
-                href="/checkout" 
-                onClick={closeDrawer}
-                className="btn-primary-gold flex w-full justify-center py-4 text-base"
-              >
-                Checkout
-              </Link>
-              <Link 
-                href="/cart" 
-                onClick={closeDrawer}
-                className="btn-liquid flex w-full justify-center py-3.5 text-sm"
-              >
-                View Cart
-              </Link>
+            {/* Reward Tracker */}
+            <div className="shrink-0">
+              <CartRewardTracker subtotal={subtotal} />
             </div>
-          </div>
-        )}
-      </div>
-    </>
+
+            {/* Scrollable Area */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden relative bg-[#FAF9F6]">
+              {items.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 px-6 text-center h-full">
+                  <div className="h-20 w-20 rounded-full bg-white border border-stone-100 flex items-center justify-center mb-4 shadow-sm">
+                    <ShoppingBag className="h-8 w-8 text-stone-300" />
+                  </div>
+                  <p className="text-lg font-semibold text-charcoalBrown font-serif">Your cart is empty</p>
+                  <p className="text-sm text-stone-500 mt-2 mb-6">
+                    Looks like you haven't added anything to your cart yet.
+                  </p>
+                  <button
+                    onClick={closeDrawer}
+                    className="bg-charcoalBrown text-white px-8 py-3 rounded-xl font-semibold hover:bg-stone-800 transition-colors shadow-md"
+                  >
+                    Start Shopping
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col h-full">
+                  <div className="p-4 space-y-2">
+                    {items.map((item) => (
+                      <CartItemCard 
+                        key={item.product.id} 
+                        item={item} 
+                        increase={increase}
+                        decrease={decrease}
+                        removeFromCart={removeFromCart}
+                        closeDrawer={closeDrawer}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Coupon Section inside scrollable area to save sticky space */}
+                  <div className="px-4 pb-4">
+                    <div className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm">
+                      <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+                          <input
+                            type="text"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            placeholder="Discount code"
+                            className="w-full pl-9 pr-3 py-2 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a059] focus:border-[#c5a059] transition-shadow"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={isApplying || !couponCode.trim()}
+                          className="px-4 py-2 bg-stone-100 text-charcoalBrown text-sm font-semibold rounded-lg hover:bg-stone-200 transition-colors disabled:opacity-50"
+                        >
+                          {isApplying ? "..." : "Apply"}
+                        </button>
+                      </form>
+                      
+                      {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
+                      {couponSuccess && <p className="text-green-600 text-xs mt-2">{couponSuccess}</p>}
+                      {coupon && !couponSuccess && (
+                        <div className="mt-2 flex items-center justify-between text-[11px] bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-100/50">
+                          <span className="font-semibold flex items-center gap-1.5">
+                            <Tag className="h-3 w-3" />
+                            {coupon} applied
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-auto">
+                    <RecommendedProductSlider closeDrawer={closeDrawer} />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sticky Footer */}
+            {items.length > 0 && (
+              <div className="shrink-0 z-10">
+                <StickyCartSummaryBar closeDrawer={closeDrawer} />
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }

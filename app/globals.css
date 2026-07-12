@@ -101,6 +101,11 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--color-noir-text, #2E2823) !important;
 }
 
+/* Hide WhatsApp button when Cart Drawer is open */
+body.cart-drawer-open .whatsapp-button {
+  display: none !important;
+}
+
 .hover\:text-noir:hover {
   color: var(--color-noir-text, #2E2823) !important;
 }
