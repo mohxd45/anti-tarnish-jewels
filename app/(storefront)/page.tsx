@@ -106,24 +106,20 @@ export default async function HomePage() {
 
 
 
-      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
+      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 pb-4">
           {bestsellers.map((p) => (
-            <div key={p.id} className="min-w-[44vw] max-w-[44vw] snap-start shrink-0 sm:min-w-[220px] sm:max-w-[220px]">
-              <ProductCard product={p} />
-            </div>
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
+      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full bg-gradient-to-b from-[#FFF0F5]/30 to-transparent">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 pb-4">
           {newArrivals.map((p) => (
-            <div key={p.id} className="min-w-[44vw] max-w-[44vw] snap-start shrink-0 sm:min-w-[220px] sm:max-w-[220px]">
-              <ProductCard product={p} />
-            </div>
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>
@@ -195,12 +191,15 @@ export default async function HomePage() {
 
 function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: string; ctaTo: string }) {
   return (
-    <div className="mb-5 md:mb-8 flex flex-row items-end justify-between gap-4">
-      <div className="min-w-0">
-        <h2 className="mb-1 font-serif text-2xl md:text-5xl text-charcoalBrown">{title}</h2>
-        <p className="text-xs text-stoneGray md:text-base hidden sm:block">{subtitle}</p>
+    <div className="mb-6 md:mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 border-b border-[#B8955E]/15 pb-4">
+      <div className="min-w-0 flex-grow">
+        <h2 className="mb-1.5 font-serif text-3xl md:text-5xl text-[#3A2428] tracking-tight">{title}</h2>
+        <p className="text-[13px] md:text-base text-[#3A2428]/60 font-medium">{subtitle}</p>
       </div>
-      <Link href={ctaTo} className="text-sm font-semibold underline text-stoneGray hover:text-charcoalBrown whitespace-nowrap md:btn-liquid md:no-underline md:inline-flex">View All</Link>
+      <Link href={ctaTo} className="group inline-flex items-center text-xs md:text-sm font-semibold uppercase tracking-widest text-[#B8955E] hover:text-[#3A2428] transition-colors whitespace-nowrap self-start sm:self-end mb-1">
+        <span>View All</span>
+        <span className="ml-2 block transition-transform group-hover:translate-x-1">→</span>
+      </Link>
     </div>
   );
 }
