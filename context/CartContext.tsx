@@ -23,6 +23,7 @@ type CartContextType = {
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
+  isLoaded: boolean;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -243,8 +244,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     freeShippingThreshold,
     isDrawerOpen,
     openDrawer: () => setIsDrawerOpen(true),
-    closeDrawer: () => setIsDrawerOpen(false)
-  }), [items, subtotal, shipping, discount, total, activeCoupon, freeShippingThreshold, isDrawerOpen]);
+    closeDrawer: () => setIsDrawerOpen(false),
+    isLoaded: mounted,
+  }), [items, subtotal, shipping, discount, total, activeCoupon, freeShippingThreshold, isDrawerOpen, mounted]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -30,10 +30,10 @@ export default function CheckoutPage() {
   }, []);
 
   useEffect(() => {
-    if (!cart.items.length) {
+    if (cart.isLoaded && !cart.items.length) {
       router.push("/cart");
     }
-  }, [cart.items.length, router]);
+  }, [cart.items.length, cart.isLoaded, router]);
 
   async function handlePlaceOrder(e: React.FormEvent) {
     e.preventDefault();
@@ -63,7 +63,7 @@ export default function CheckoutPage() {
     }
   }
 
-  if (!cart.items.length) return null;
+  if (!cart.isLoaded || !cart.items.length) return null;
 
   return (
     <>
