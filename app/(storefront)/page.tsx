@@ -30,17 +30,16 @@ export default async function HomePage() {
     { id: '3', name: "Neha R.", initial: "N", color: "#F9A8D4", text: "Fast delivery and beautiful packaging. The rings are true to size and so elegant." }
   ];
 
-  const heroSmallTitle = content?.heroSmallTitle || "Premium Anti-Tarnish Collection";
-  const heroMainHeading = content?.heroMainHeading || content?.heroTitle || "Timeless Elegance";
-  
-  // Split title if possible, or just render it
-  const titleWords = heroMainHeading.split(" ");
-  const titleFirstPart = titleWords.length > 1 ? titleWords.slice(0, -1).join(" ") : heroMainHeading;
-  const titleLastPart = titleWords.length > 1 ? titleWords[titleWords.length - 1] : "";
-
-  const heroSubtitle = content?.heroSubtitle || "Discover jewellery that stays as radiant as you. Crafted with anti-tarnish technology for everyday luxury.";
-  const heroCtaText = content?.heroCtaText || "Shop Collection";
+  let heroSmallTitle = content?.heroSmallTitle || "UPGRADE YOUR DAILY GLAM 💖";
+  let heroMainHeading = (content?.heroMainHeading || content?.heroTitle) || "SUMMER SALE";
+  let heroSubtitle = content?.heroSubtitle || "Verified quality jewellery for every occasion.";
+  let heroCtaText = content?.heroCtaText || "Shop The Collection";
   const heroCtaLink = content?.heroCtaLink || "/shop";
+
+  // Force fix spelling error
+  heroSmallTitle = heroSmallTitle.replace(/SUMMER SELL/gi, "SUMMER SALE");
+  heroMainHeading = heroMainHeading.replace(/SUMMER SELL/gi, "SUMMER SALE");
+  heroSubtitle = heroSubtitle.replace(/SUMMER SELL/gi, "SUMMER SALE");
 
   return (
     <>
@@ -50,51 +49,54 @@ export default async function HomePage() {
         }
       `}</style>
       
-      <div className="-mt-12 md:mt-0">
-        <div className="block md:hidden">
+      <div className="-mt-[48px] lg:mt-0 flex flex-col w-full">
+        <div className="block md:hidden relative z-20 w-full overflow-hidden">
+          <AnnouncementTicker className="relative w-full h-[44px]" />
+        </div>
+
+        <div className="block md:hidden relative z-20 w-full">
           <HomepageFlashSaleBanner settings={announcements} />
         </div>
 
-        <CategoryBar />
-
-        <div className="block md:hidden">
-          <AnnouncementTicker className="relative z-40 w-full" />
+        <div className="relative z-30 w-full">
+          <CategoryBar />
         </div>
       </div>
 
-      <section className="relative flex min-h-[70vh] md:min-h-[85vh] items-center justify-center overflow-hidden px-4">
+      <section className="relative flex min-h-[560px] md:min-h-[85vh] items-center justify-center overflow-hidden w-full">
         <div className="absolute inset-0 z-0">
           <img
             src="/hero-showroom.jpg"
             alt=""
-            className="h-full w-full object-cover opacity-20"
+            className="h-full w-full object-cover opacity-80 md:opacity-100"
+          />
+          {/* Soft dark/rose overlay for premium feel and text readability */}
+          <div
+            className="absolute inset-0 bg-[#3A2428]/40 md:bg-transparent"
           />
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 hidden md:block"
             style={{ background: "linear-gradient(180deg, rgba(253,242,248,0.8) 0%, rgba(252,231,243,0.6) 50%, rgba(250,240,230,0.95) 100%)" }}
           />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl pt-10 md:pt-0">
-          <div className="mb-6 md:mb-10 text-center">
-            <p className="mb-2 md:mb-4 text-[10px] md:text-xs font-medium uppercase tracking-widest text-stoneGray sm:text-sm">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 md:px-0 pt-8 md:pt-0">
+          <div className="mb-6 md:mb-10 text-center flex flex-col items-center">
+            <p className="mb-3 md:mb-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white/90 md:text-stoneGray drop-shadow-sm md:drop-shadow-none">
               {heroSmallTitle}
             </p>
-            <h1 className="mb-3 md:mb-6 font-serif text-4xl leading-tight text-charcoalBrown md:text-7xl lg:text-8xl">
-              {titleFirstPart}<br />
-              <span className="gold-text italic">{titleLastPart}</span>
+            <h1 className="mb-4 md:mb-6 font-serif text-5xl leading-[1.1] md:text-7xl lg:text-8xl text-white md:text-charcoalBrown drop-shadow-md md:drop-shadow-none">
+              {heroMainHeading}
             </h1>
-            <p className="mx-auto mb-6 md:mb-8 max-w-2xl text-xs sm:text-sm text-stoneGray md:text-xl px-4 md:px-0">
+            <p className="mx-auto mb-8 max-w-lg text-base md:text-xl text-white/90 md:text-stoneGray drop-shadow-sm md:drop-shadow-none font-medium md:font-normal">
               {heroSubtitle}
             </p>
-            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4 px-4 md:px-0">
-              <Link href={heroCtaLink} className="btn-primary-gold px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
+            <div className="w-full sm:w-auto px-4 sm:px-0">
+              <Link href={heroCtaLink} className="flex items-center justify-center w-full sm:w-auto px-8 h-14 bg-[#B8955E] text-white font-medium rounded-full shadow-[0_8px_20px_rgba(184,149,94,0.3)] hover:bg-[#A38250] hover:shadow-[0_12px_24px_rgba(184,149,94,0.4)] transition-all text-base tracking-wide">
                 {heroCtaText}
               </Link>
             </div>
           </div>
-
-
         </div>
       </section>
 
