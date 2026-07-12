@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Truck } from "lucide-react";
+import { Truck, Gift, Package } from "lucide-react";
 
 interface Milestone {
   amount: number;
@@ -58,70 +58,60 @@ export function CartRewardTracker({ subtotal }: CartRewardTrackerProps) {
 
   let message = "";
   if (subtotal === 0) {
-    message = `Add ${currency} ${milestones[0].amount} more to get ${milestones[0].label} on this order`;
+    message = `Add ${currency}${milestones[0].amount} more to unlock ${milestones[0].label}`;
   } else if (!nextMilestone) {
     message = "✨ All cart rewards unlocked!";
   } else {
     const amountLeft = nextMilestone.amount - subtotal;
-    message = `Add ${currency} ${amountLeft.toLocaleString()} more to get ${nextMilestone.label} on this order`;
+    message = `Add ${currency}${amountLeft.toLocaleString()} more to unlock ${nextMilestone.label}`;
   }
 
-  // To prevent the first milestone from being placed too close to 0 or 100
-  // we will map them using space-around logic. 
-  // In the reference image, the bar doesn't start at 0 = ₹0.
-  // The first milestone is around 25% of the bar, second is 60%, third is 100%.
-  // We can calculate left percent relative to max amount, but give it a bit of padding.
-  
   return (
-    <div className="bg-white px-4 py-6 border-b border-stone-100">
-      <p className="mb-8 text-[13px] md:text-sm font-medium text-[#4A4A4A] text-center max-w-[280px] mx-auto leading-relaxed">
+    <div className="bg-brandCardBg px-4 py-5 border-b border-brandBorder/30 rounded-b-2xl shadow-sm mb-4 mx-4 mt-2">
+      <p className="mb-4 text-sm font-semibold text-brandEspresso text-center max-w-[280px] mx-auto leading-relaxed">
         {message}
       </p>
       
-      {/* Tracker Bar Container */}
-      <div className="relative w-[85%] mx-auto pb-10">
-        
-        {/* Background Grey Line */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-[#D3D9CF] rounded-full" />
-        
-        {/* Filled Pink Line */}
+      {/* Tracker Bar */}
+      <div className="relative w-full h-2.5 bg-stone-100 rounded-full mb-5 overflow-hidden shadow-inner border border-stone-200">
         <motion.div 
-          className="absolute top-1/2 -translate-y-1/2 left-0 h-2 bg-[#FA9A9C] rounded-full z-0"
+          className="absolute top-0 left-0 h-full bg-brandGold rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${progressPercent}%` }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         />
+      </div>
 
-        {/* Milestones */}
+      {/* Vertical Milestones */}
+      <div className="flex flex-col gap-2.5">
         {milestones.map((milestone, idx) => {
           const isReached = subtotal >= milestone.amount;
-          const leftPercent = (milestone.amount / maxAmount) * 100;
+          const Icon = idx === 0 ? Truck : idx === 1 ? Gift : Package;
           
           return (
             <div 
               key={idx} 
-              className="absolute top-1/2 flex flex-col items-center z-10"
-              style={{ 
-                left: `${leftPercent}%`,
-                transform: `translate(-50%, -50%)`
-              }}
+              className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+                isReached ? 'bg-brandGold/5 border-brandGold/30' : 'bg-white/50 border-stone-100'
+              }`}
             >
-              {/* Circle with Truck */}
+              {/* Circle Icon */}
               <div 
-                className={`relative flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-500 z-10 ${
-                  isReached ? 'bg-[#FA9A9C]' : 'bg-[#D3D9CF]'
+                className={`flex items-center justify-center w-8 h-8 rounded-full shadow-sm transition-colors ${
+                  isReached ? 'bg-brandGold text-white' : 'bg-stone-100 text-stone-400'
                 }`}
               >
-                <Truck className={`w-3.5 h-3.5 ${isReached ? 'text-white fill-white' : 'text-[#303940] fill-[#303940]'}`} />
+                <Icon className="w-4 h-4" />
               </div>
               
-              {/* Text Label Below */}
-              <div className="absolute top-8 w-24 text-center">
-                <div className="text-[11px] leading-[1.3] text-[#4A4A4A] font-medium whitespace-pre-wrap">
+              {/* Labels */}
+              <div className="flex-1 flex justify-between items-center">
+                <span className={`text-sm font-semibold ${isReached ? 'text-brandEspresso' : 'text-stone-500'}`}>
                   {milestone.label}
-                  <br />
-                  on {currency}{milestone.amount}!
-                </div>
+                </span>
+                <span className={`text-sm font-bold ${isReached ? 'text-brandGoldDeep' : 'text-stone-400'}`}>
+                  {currency}{milestone.amount}
+                </span>
               </div>
             </div>
           );

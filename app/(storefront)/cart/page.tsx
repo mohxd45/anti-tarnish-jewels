@@ -42,14 +42,14 @@ export default function CartPage() {
   }
 
   return (
-    <div className="pb-32 md:pb-24">
+    <div className="pb-40 md:pb-24 bg-brandMainBg min-h-[100dvh]">
       <div className="mx-auto max-w-7xl px-4 pt-8 md:pt-12">
-        <h1 className="font-serif text-3xl md:text-4xl text-charcoalBrown">Your Bag</h1>
-        <p className="mt-2 text-stone-500">{items.length} item{items.length === 1 ? "" : "s"} waiting for you</p>
+        <h1 className="font-serif text-3xl md:text-4xl text-brandEspresso">Your Bag</h1>
+        <p className="mt-2 text-brandMutedText">{items.length} item{items.length === 1 ? "" : "s"} waiting for you</p>
       </div>
 
       <div className="mx-auto mt-6 max-w-7xl px-4">
-        <div className="rounded-2xl overflow-hidden border border-stone-200 mb-8 bg-white shadow-sm">
+        <div className="rounded-2xl overflow-hidden border border-brandBorder/30 mb-8 bg-brandCardBg shadow-sm">
           <CartRewardTracker subtotal={subtotal} />
         </div>
       </div>
@@ -62,14 +62,14 @@ export default function CartPage() {
               text="Your bag is empty" 
               subtext="Let's find something beautiful for you."
             >
-              <Link href="/shop" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-charcoalBrown px-8 py-3.5 font-semibold text-white transition hover:bg-stone-800 shadow-md">
+              <Link href="/shop" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brandEspresso px-8 py-3.5 font-semibold text-white transition hover:bg-stone-800 shadow-md">
                 Continue Shopping
               </Link>
             </EmptyStateCard>
           )}
           
           {items.length > 0 && (
-            <div className="bg-white rounded-2xl border border-stone-200 p-4 shadow-sm">
+            <div className="bg-brandCardBg rounded-2xl border border-brandBorder/30 p-4 shadow-sm">
               <div className="space-y-1">
                 {items.map(item => (
                   <CartItemCard 
@@ -85,15 +85,15 @@ export default function CartPage() {
           )}
 
           {/* You May Also Like */}
-          <div className="mt-8 rounded-2xl overflow-hidden bg-white border border-stone-200 shadow-sm">
+          <div className="mt-8 rounded-2xl overflow-hidden bg-brandCardBg border border-brandBorder/30 shadow-sm">
             <RecommendedProductSlider />
           </div>
         </div>
 
         {items.length > 0 && (
           <div className="hidden lg:block">
-            <aside className="sticky top-24 bg-white shadow-sm border border-stone-200 rounded-2xl p-6">
-              <h3 className="mb-6 font-serif text-2xl text-charcoalBrown">Order Summary</h3>
+            <aside className="sticky top-24 bg-brandCardBg shadow-soft border border-brandBorder/30 rounded-2xl p-6">
+              <h3 className="mb-6 font-serif text-2xl text-brandEspresso">Order Summary</h3>
               <div className="space-y-3 text-sm text-stone-500">
                 <Row label="Subtotal" value={formatPrice ? formatPrice(subtotal) : `₹${subtotal.toLocaleString()}`} />
                 
@@ -111,8 +111,8 @@ export default function CartPage() {
                 
                 <div className="my-4 border-t border-stone-100" />
                 <Row 
-                  label={<span className="font-serif text-xl font-bold text-charcoalBrown">Total</span>} 
-                  value={<span className="font-serif text-xl font-bold text-[#c5a059]">{formatPrice ? formatPrice(total) : `₹${total.toLocaleString()}`}</span>} 
+                  label={<span className="font-serif text-xl font-bold text-brandEspresso">Total</span>} 
+                  value={<span className="font-serif text-xl font-bold text-brandGoldDeep">{formatPrice ? formatPrice(total) : `₹${total.toLocaleString()}`}</span>} 
                 />
               </div>
               
@@ -127,13 +127,13 @@ export default function CartPage() {
                           placeholder="Discount code" 
                           value={code}
                           onChange={(e) => setCode(e.target.value)}
-                          className="w-full pl-9 pr-3 py-3 text-sm border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a059] focus:border-[#c5a059] bg-stone-50 transition-shadow"
+                          className="w-full pl-9 pr-3 py-3 text-sm border border-brandBorder/50 rounded-xl focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold bg-white transition-shadow"
                         />
                       </div>
                       <button 
                         onClick={handleApplyCoupon}
                         disabled={couponLoading || !code.trim()}
-                        className="bg-stone-200 hover:bg-stone-300 text-charcoalBrown px-5 py-3 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors"
+                        className="bg-brandGold hover:bg-brandGoldDeep text-white px-5 py-3 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors shadow-sm"
                       >
                         {couponLoading ? "..." : "Apply"}
                       </button>
@@ -146,8 +146,7 @@ export default function CartPage() {
                   )}
                   {couponMsg && !coupon && <p className="text-xs text-red-500 mt-2 font-medium px-1">{couponMsg}</p>}
                 </div>
-
-                <button onClick={() => router.push("/checkout")} className="w-full py-4 bg-gradient-to-r from-[#c5a059] to-[#d4af37] text-white rounded-xl font-semibold shadow-lg shadow-[#c5a059]/20 hover:shadow-xl hover:shadow-[#c5a059]/30 transition-all flex items-center justify-center gap-2 group">
+                <button onClick={() => router.push("/checkout")} className="w-full py-4 bg-gradient-gold text-white rounded-2xl font-semibold shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
                   Proceed to Checkout
                 </button>
               </div>

@@ -61,10 +61,10 @@ export function CartDrawer() {
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeDrawer}
-            className="fixed inset-0 bg-black z-[140]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[140]"
           />
           
           {/* Drawer */}
@@ -73,14 +73,14 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 h-[100dvh] w-[90%] max-w-[420px] bg-[#FAF9F6] z-[150] shadow-2xl flex flex-col"
+            className="fixed inset-y-0 right-0 w-full max-w-[420px] bg-brandMainBg z-[150] shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-white border-b border-stone-100 shrink-0">
+            <div className="flex items-center justify-between p-4 bg-brandCardBg border-b border-stone-100 shrink-0">
               <div className="flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5 text-[#c5a059]" />
-                <h2 className="text-lg font-semibold text-charcoalBrown font-serif">Your Cart</h2>
-                <span className="bg-stone-50 border border-stone-100 text-stone-500 text-[11px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <ShoppingBag className="h-5 w-5 text-brandGold" />
+                <h2 className="text-lg font-semibold text-brandEspresso font-serif">Your Cart</h2>
+                <span className="bg-brandMainBg border border-stone-200 text-brandEspresso text-[11px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   {items.length}
                 </span>
               </div>
@@ -99,19 +99,19 @@ export function CartDrawer() {
             </div>
 
             {/* Scrollable Area */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden relative bg-[#FAF9F6]">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden relative bg-brandMainBg">
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-6 text-center h-full">
-                  <div className="h-20 w-20 rounded-full bg-white border border-stone-100 flex items-center justify-center mb-4 shadow-sm">
+                  <div className="h-20 w-20 rounded-full bg-brandCardBg border border-stone-200 flex items-center justify-center mb-4 shadow-sm">
                     <ShoppingBag className="h-8 w-8 text-stone-300" />
                   </div>
-                  <p className="text-lg font-semibold text-charcoalBrown font-serif">Your cart is empty</p>
+                  <p className="text-lg font-semibold text-brandEspresso font-serif">Your cart is empty</p>
                   <p className="text-sm text-stone-500 mt-2 mb-6">
                     Looks like you haven't added anything to your cart yet.
                   </p>
                   <button
                     onClick={closeDrawer}
-                    className="bg-charcoalBrown text-white px-8 py-3 rounded-xl font-semibold hover:bg-stone-800 transition-colors shadow-md"
+                    className="bg-brandEspresso text-white px-8 py-3 rounded-xl font-semibold hover:bg-stone-800 transition-colors shadow-md"
                   >
                     Start Shopping
                   </button>
@@ -133,7 +133,7 @@ export function CartDrawer() {
 
                   {/* Coupon Section inside scrollable area to save sticky space */}
                   <div className="px-4 pb-4">
-                    <div className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm">
+                    <div className="bg-brandCardBg rounded-2xl p-3 shadow-sm border border-brandBorder/30">
                       <form onSubmit={handleApplyCoupon} className="flex gap-2">
                         <div className="relative flex-1">
                           <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
@@ -142,13 +142,13 @@ export function CartDrawer() {
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value)}
                             placeholder="Discount code"
-                            className="w-full pl-9 pr-3 py-2 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a059] focus:border-[#c5a059] transition-shadow"
+                            className="w-full pl-9 pr-3 py-2 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold transition-shadow"
                           />
                         </div>
                         <button
                           type="submit"
                           disabled={isApplying || !couponCode.trim()}
-                          className="px-4 py-2 bg-stone-100 text-charcoalBrown text-sm font-semibold rounded-lg hover:bg-stone-200 transition-colors disabled:opacity-50"
+                          className="px-4 py-2 bg-brandGold text-white text-sm font-semibold rounded-lg hover:bg-brandGoldDeep transition-colors disabled:opacity-50"
                         >
                           {isApplying ? "..." : "Apply"}
                         </button>

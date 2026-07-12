@@ -67,14 +67,14 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
   if (products.length === 0) return null;
 
   return (
-    <div className="py-4 border-t border-stone-100 bg-white">
-      <h3 className="px-4 text-sm font-bold text-charcoalBrown mb-3 font-serif">You May Also Like</h3>
+    <div className="py-4 border-t border-brandBorder/30 bg-brandMainBg">
+      <h3 className="px-4 text-sm font-bold text-brandEspresso mb-3 font-serif">You May Also Like</h3>
       <div className="flex gap-4 px-4 overflow-x-auto snap-x snap-mandatory pb-2 hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {products.map(product => (
-          <div key={product.id} className="min-w-[140px] max-w-[160px] w-[45vw] snap-start flex flex-col relative group">
+          <div key={product.id} className="min-w-[160px] max-w-[180px] w-[50vw] snap-start flex flex-col relative group">
             <Link 
               href={`/product/${product.slug}`} 
-              className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-stone-50 border border-stone-100 mb-2 block"
+              className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-brandCardBg border border-brandBorder/30 mb-2 block"
               onClick={closeDrawer}
             >
               <Image
@@ -82,10 +82,10 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
                 alt={product.name}
                 fill
                 className="object-cover transition-transform group-hover:scale-105 duration-500"
-                sizes="(max-width: 640px) 45vw, 160px"
+                sizes="(max-width: 640px) 50vw, 180px"
               />
               {product.salePrice < product.regularPrice && (
-                <div className="absolute top-1 left-1 bg-dustyRose text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">
+                <div className="absolute top-1 left-1 bg-brandSale text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">
                   Sale
                 </div>
               )}
@@ -94,16 +94,16 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
             <div className="flex-1 flex flex-col justify-between">
               <div>
                 <Link href={`/product/${product.slug}`} onClick={closeDrawer}>
-                  <h4 className="text-[11px] font-medium text-charcoalBrown line-clamp-2 leading-tight hover:text-[#c5a059] transition-colors">
+                  <h4 className="text-[11px] font-medium text-brandEspresso line-clamp-2 leading-tight hover:text-brandGold transition-colors">
                     {product.name}
                   </h4>
                 </Link>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-xs font-bold text-charcoalBrown">
+                  <span className="text-xs font-bold text-brandEspresso">
                     {formatPrice ? formatPrice(product.salePrice) : `₹${product.salePrice?.toLocaleString()}`}
                   </span>
                   {product.salePrice < product.regularPrice && (
-                    <span className="text-[9px] text-stone-400 line-through">
+                    <span className="text-[9px] text-brandMutedText line-through">
                       {formatPrice ? formatPrice(product.regularPrice) : `₹${product.regularPrice?.toLocaleString()}`}
                     </span>
                   )}
@@ -112,7 +112,7 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
               
               <button
                 onClick={() => addToCart(product, 1)}
-                className="mt-2 w-full flex items-center justify-center gap-1 bg-stone-100 hover:bg-[#c5a059] hover:text-white text-charcoalBrown text-[11px] font-medium py-1.5 rounded-lg transition-colors"
+                className="mt-2 w-full flex items-center justify-center gap-1 bg-white border border-brandBorder/50 hover:bg-brandGold hover:border-brandGold hover:text-white text-brandEspresso text-[11px] font-semibold py-1.5 rounded-lg shadow-sm transition-all"
               >
                 <Plus className="h-3 w-3" /> Add
               </button>
