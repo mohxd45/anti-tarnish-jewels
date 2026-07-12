@@ -1,100 +1,155 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { getSiteContent } from "@/lib/firestore";
 
 interface FAQItemProps {
   question: string;
   answer: string;
+  category: string;
 }
 
-function FAQAccordionItem({ question, answer }: FAQItemProps) {
+const faqs: FAQItemProps[] = [
+  {
+    category: "Shopping",
+    question: "Why should I buy from LONA JEWELS?",
+    answer: "LONA JEWELS offers premium, long-lasting jewellery designed for everyday luxury. Our pieces are crafted with skin-friendly materials, ensuring durability without compromising on elegance."
+  },
+  {
+    category: "Shopping",
+    question: "What type of jewellery do you sell?",
+    answer: "We specialize in premium rings, earrings, necklaces, and bracelets. Our collections feature luxurious designs in rose gold, champagne gold, and pearl."
+  },
+  {
+    category: "Shopping",
+    question: "Are your products suitable for daily wear?",
+    answer: "Absolutely. Our pieces are designed to be water-resistant and durable, making them perfect for everyday wear without losing their shine."
+  },
+  {
+    category: "Payments",
+    question: "Do you offer Cash on Delivery?",
+    answer: "Yes, Cash on Delivery (COD) is available for most locations. You can select this option during checkout."
+  },
+  {
+    category: "Payments",
+    question: "Why do COD orders need confirmation?",
+    answer: "To ensure a smooth delivery experience and prevent fraudulent requests, we may contact you to confirm your COD order before dispatching it."
+  },
+  {
+    category: "Delivery",
+    question: "How long does delivery take?",
+    answer: "Orders are typically dispatched within 24-48 hours. Depending on your location, delivery usually takes 3-7 business days."
+  },
+  {
+    category: "Orders",
+    question: "How can I track my order?",
+    answer: "Once your order is shipped, you will receive a tracking link via email or SMS. You can also visit our Track Order page to check its live status."
+  },
+  {
+    category: "Returns",
+    question: "Can I return or exchange my order?",
+    answer: "Yes, we offer a 7-day easy return and exchange policy for eligible items. Please check our Return Policy page for exclusions."
+  },
+  {
+    category: "Returns",
+    question: "What should I do if I receive a damaged product?",
+    answer: "If you receive a damaged item, please contact our support team within 24 hours of delivery. A full unboxing video is required to process claims."
+  },
+  {
+    category: "Payments",
+    question: "Are online payments safe?",
+    answer: "Yes, all online payments are securely processed through trusted payment gateways using industry-standard encryption to protect your details."
+  },
+  {
+    category: "Orders",
+    question: "Can I cancel my order?",
+    answer: "You can cancel your order before it has been dispatched. For prepaid orders, the refund will be initiated to your original payment method."
+  },
+  {
+    category: "Support",
+    question: "How can I contact support?",
+    answer: "You can reach out to us via the Contact page, WhatsApp, or email us directly at support. Our team typically responds within 24 hours."
+  }
+];
+
+const categories = ["All", "Shopping", "Delivery", "Payments", "Returns", "Orders", "Support"];
+
+function FAQAccordionItem({ question, answer }: { question: string, answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-stone-200 last:border-0 py-4">
+    <div className="bg-[#FFF9FB] rounded-2xl shadow-[0_4px_12px_rgba(58,36,40,0.03)] border border-[#B8955E]/10 overflow-hidden transition-all duration-300">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between text-left font-serif text-lg text-charcoalBrown hover:text-[color:var(--color-gold)] transition-colors py-2"
+        className="flex w-full items-center justify-between text-left p-5 sm:p-6"
       >
-        <span>{question}</span>
-        {isOpen ? <ChevronUp className="text-[color:var(--color-gold)] shrink-0 ml-4" size={18} /> : <ChevronDown className="text-[color:var(--color-gold)] shrink-0 ml-4" size={18} />}
+        <span className="font-serif text-[#3A2428] sm:text-lg pr-4">{question}</span>
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#FFF0F5] flex items-center justify-center">
+          {isOpen ? (
+            <ChevronUp className="text-[#B8955E]" size={18} />
+          ) : (
+            <ChevronDown className="text-[#B8955E]" size={18} />
+          )}
+        </div>
       </button>
-      <div className={`mt-3 text-sm md:text-base leading-7 text-stoneGray font-sans pb-2 ${isOpen ? "block" : "hidden"}`}>
+      <div 
+        className={`px-5 sm:px-6 pb-6 text-sm sm:text-base leading-7 text-[#3A2428]/80 font-sans transition-all duration-300 ease-in-out ${isOpen ? "block" : "hidden"}`}
+      >
         {answer}
       </div>
     </div>
   );
 }
 
-const defaultFaqs = [
-  {
-    question: "What is anti-tarnish jewellery?",
-    answer: "Anti-tarnish jewellery is specially coated or made from materials like stainless steel and PVD gold plating that resist oxidation, keeping their shine intact for much longer."
-  },
-  {
-    question: "Is the jewellery waterproof?",
-    answer: "Yes, our jewellery is highly water-resistant. You can wear it while washing hands or in the shower without worrying about it losing its color."
-  },
-  {
-    question: "How do I care for my jewellery?",
-    answer: "Store your pieces in the provided pouches or boxes. Wipe them with a soft cloth after use to maintain their shine and avoid direct contact with harsh chemicals or perfumes."
-  },
-  {
-    question: "Is Cash on Delivery available?",
-    answer: "Yes, Cash on Delivery is available for most locations across India. You can choose this option at checkout."
-  },
-  {
-    question: "Why do COD orders need verification?",
-    answer: "To ensure the authenticity of Cash on Delivery orders and prevent fraudulent requests, we may contact you via WhatsApp or phone call to confirm your details before shipping."
-  },
-  {
-    question: "How do I track my order?",
-    answer: "Once your order is shipped, you will receive a tracking ID via email or SMS. You can also log into your account or visit our Track Order page to check its live status."
-  },
-  {
-    question: "What is the return/exchange policy?",
-    answer: "We offer a 7-day easy return or exchange window for eligible products. Please visit our Return Policy page for exclusions and detailed conditions."
-  },
-  {
-    question: "How do I contact support?",
-    answer: "You can reach out to us anytime via email at anti.tarnish.jewel@gmail.com, or through our Contact page. Our support team typically responds within 24 hours."
-  }
-];
-
 export default function FAQPage() {
-  const [introText, setIntroText] = useState("Find answers about shipping, payments, returns, order tracking, product specifications, and account support.");
+  const [activeCategory, setActiveCategory] = useState("All");
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    try {
-      const data = await getSiteContent("faq");
-      if (data?.faqText) {
-        setIntroText(data.faqText);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+  const filteredFaqs = faqs.filter(
+    (faq) => activeCategory === "All" || faq.category === activeCategory
+  );
 
   return (
-    <section className="mx-auto max-w-4xl px-4 pt-16 pb-32">
-      <h1 className="text-4xl font-serif text-charcoalBrown md:text-5xl text-center md:text-left">Frequently Asked Questions</h1>
-      <p className="mt-4 text-stoneGray text-sm md:text-base leading-7 text-center md:text-left">
-        {introText}
-      </p>
-      
-      <div className="mt-8 rounded-3xl bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
-        <div className="divide-y divide-pink-200">
-          {defaultFaqs.map((faq, idx) => (
-            <FAQAccordionItem key={idx} question={faq.question} answer={faq.answer} />
+    <div className="min-h-screen bg-[#FFF0F5] pb-32">
+      <div className="mx-auto max-w-4xl px-4 pt-10 sm:pt-16 pb-12">
+        {/* Header Card */}
+        <div className="bg-[#FFF9FB] rounded-[2rem] shadow-[0_8px_24px_rgba(58,36,40,0.04)] border border-[#B8955E]/20 p-8 sm:p-12 text-center mb-10">
+          <h1 className="text-3xl sm:text-5xl font-serif text-[#3A2428]">
+            Frequently Asked Questions
+          </h1>
+          <p className="mt-4 text-sm sm:text-base text-[#3A2428]/70 max-w-2xl mx-auto">
+            Find answers about shopping, delivery, payments, returns, and support at LONA JEWELS.
+          </p>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex overflow-x-auto hide-scrollbar gap-3 mb-10 pb-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                activeCategory === cat
+                  ? "bg-[#B8955E] text-white shadow-md"
+                  : "bg-[#FFF9FB] text-[#3A2428] hover:bg-[#FFF0F5] border border-[#B8955E]/20"
+              }`}
+            >
+              {cat}
+            </button>
           ))}
         </div>
+
+        {/* FAQ List */}
+        <div className="space-y-4">
+          {filteredFaqs.map((faq, idx) => (
+            <FAQAccordionItem key={idx} question={faq.question} answer={faq.answer} />
+          ))}
+          {filteredFaqs.length === 0 && (
+            <div className="text-center p-12 bg-[#FFF9FB] rounded-2xl border border-[#B8955E]/10">
+              <p className="text-[#3A2428]/70">No questions found in this category.</p>
+            </div>
+          )}
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
