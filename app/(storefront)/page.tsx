@@ -3,6 +3,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { getProducts, getBanners, getCategories, getReviews, getSiteContent, getSiteSettings, getAnnouncements } from "@/lib/firestore";
 import { Sparkles, Droplets, Gem, Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
 import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSaleBanner";
+import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 
 export const metadata = {
   title: "Anti Tarnish Jewels — Premium Anti-Tarnish Jewellery",
@@ -65,12 +66,40 @@ export default async function HomePage() {
   const heroSubtitle = content?.heroSubtitle || "Discover jewellery that stays as radiant as you. Crafted with anti-tarnish technology for everyday luxury.";
   const heroCtaText = content?.heroCtaText || "Shop Collection";
   const heroCtaLink = content?.heroCtaLink || "/shop";
-  const promotionalText = content?.promotionalText || "Discover our new premium collection.";
 
   return (
     <>
+      <style>{`
+        @media (max-width: 768px) {
+          .global-announcement-ticker { display: none !important; }
+        }
+      `}</style>
+      
+      <div className="-mt-12 md:mt-0">
+        {/* MOBILE FLASH SALE BANNER AT VERY TOP */}
+        <div className="block md:hidden">
+          <HomepageFlashSaleBanner settings={announcements} />
+        </div>
+
+        {/* CATEGORY QUICK CHIPS (Mobile Only) */}
+        <div className="block md:hidden w-full overflow-x-auto [&::-webkit-scrollbar]:hidden py-3 px-4 bg-white border-b border-stone-100">
+          <div className="flex gap-2 min-w-max">
+            <Link href="/shop" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">All Jewelry</Link>
+            <Link href="/shop?category=earrings" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Earrings</Link>
+            <Link href="/shop?category=necklaces" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Necklaces</Link>
+            <Link href="/shop?category=rings" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Rings</Link>
+            <Link href="/shop?category=bracelets" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Bracelets</Link>
+          </div>
+        </div>
+
+        {/* ANNOUNCEMENT TICKER (Mobile Only, Relative) */}
+        <div className="block md:hidden">
+          <AnnouncementTicker className="relative z-40 w-full" />
+        </div>
+      </div>
+
       {/* HERO */}
-      <section className="relative flex min-h-[80vh] md:min-h-[85vh] items-center justify-center overflow-hidden px-4">
+      <section className="relative flex min-h-[70vh] md:min-h-[85vh] items-center justify-center overflow-hidden px-4">
         {/* soft floating decorations */}
         <div className="pointer-events-none absolute inset-0 select-none opacity-20">
         </div>
@@ -88,7 +117,7 @@ export default async function HomePage() {
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-7xl pt-10 md:pt-0">
-          <div className="mb-8 md:mb-10 text-center">
+          <div className="mb-6 md:mb-10 text-center">
             <p className="mb-2 md:mb-4 text-[10px] md:text-xs font-medium uppercase tracking-widest text-stoneGray sm:text-sm">
               {heroSmallTitle}
             </p>
@@ -96,44 +125,14 @@ export default async function HomePage() {
               {titleFirstPart}<br />
               <span className="gold-text italic">{titleLastPart}</span>
             </h1>
-            <p className="mx-auto mb-6 md:mb-8 max-w-2xl text-sm text-stoneGray md:text-xl px-4 md:px-0">
+            <p className="mx-auto mb-6 md:mb-8 max-w-2xl text-xs sm:text-sm text-stoneGray md:text-xl px-4 md:px-0">
               {heroSubtitle}
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4 px-4 md:px-0">
               <Link href={heroCtaLink} className="btn-primary-gold px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
                 {heroCtaText}
               </Link>
-              <Link href="/shop?category=daily-wear" className="btn-liquid px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg">
-                Daily Wear
-              </Link>
             </div>
-            
-            <div className="mt-6 md:mt-8 flex justify-center">
-              <div className="glass-premium flex items-center gap-2 md:gap-3 rounded-full px-4 py-2 md:px-5 md:py-2 shadow-sm border border-white/60 mx-auto max-w-max">
-                <span className="flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-stone-50/50 text-stoneGray text-[10px] md:text-xs">✨</span>
-                <p className="text-xs md:text-sm font-medium text-stone-900">{promotionalText} <Link href="/sale" className="underline hover:text-stoneGray font-semibold ml-1">Shop Sale</Link></p>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Hero Cards (Compact) */}
-          <div className="mt-6 md:mt-10 grid grid-cols-3 gap-2 sm:gap-3 md:hidden px-1">
-            {safeHeroBanners.slice(0, 3).map((b, i) => (
-              <Link
-                key={b.id || i}
-                href={`/shop?category=${b.title?.toLowerCase()}`}
-                className={`relative h-28 sm:h-36 overflow-hidden rounded-xl shadow-sm border border-white/40 transition hover:-translate-y-1 ${
-                  i === 1 ? "-translate-y-2" : ""
-                }`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-pink-950/90 via-pink-900/20 to-transparent z-10" />
-                <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
-                <div className="relative z-20 h-full w-full flex flex-col justify-end p-2 sm:p-2.5">
-                  <h3 className="font-serif text-[13px] sm:text-sm text-white drop-shadow-md leading-tight">{b.title}</h3>
-                  <p className="text-[9px] sm:text-[10px] text-stone-100 drop-shadow-md leading-tight mt-0.5 opacity-90 line-clamp-1">{b.subtitle}</p>
-                </div>
-              </Link>
-            ))}
           </div>
 
           {/* floating hero cards — visible from md up so mobile stays clean */}
@@ -170,12 +169,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FLASH SALE BANNER (below hero on both mobile and desktop) */}
-      <HomepageFlashSaleBanner settings={announcements} />
+      {/* DESKTOP FLASH SALE BANNER */}
+      <div className="hidden md:block">
+        <HomepageFlashSaleBanner settings={announcements} />
+      </div>
 
       {/* SHOP BY CATEGORY (bento) */}
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
-        <div className="mb-6 md:mb-10 text-center">
+        <div className="mb-5 md:mb-10 text-center">
           <h2 className="mb-1 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Shop by Category</h2>
           <p className="text-xs md:text-base text-stoneGray">Find your perfect piece</p>
         </div>
@@ -189,53 +190,44 @@ export default async function HomePage() {
       </section>
 
       {/* BESTSELLERS */}
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
         <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
           {bestsellers.map((p) => (
-            <div key={p.id} className="min-w-[45vw] sm:min-w-[40vw] md:min-w-0 snap-start">
-              <ProductCard product={p} />
+            <div key={p.id} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start">
+              <ProductCard product={p} compact />
             </div>
           ))}
         </div>
       </section>
 
       {/* NEW ARRIVALS */}
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
         <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
           {newArrivals.map((p) => (
-            <div key={p.id} className="min-w-[45vw] sm:min-w-[40vw] md:min-w-0 snap-start">
-              <ProductCard product={p} />
+            <div key={p.id} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start">
+              <ProductCard product={p} compact />
             </div>
           ))}
         </div>
       </section>
 
-      {/* WHY ANTI-TARNISH (Compact Strip on Mobile) */}
+      {/* TRUST BADGES / WHY ANTI-TARNISH */}
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
-        <div className="glass-premium border border-white/60 rounded-2xl md:rounded-3xl p-4 md:p-12">
-          <div className="mb-4 md:mb-10 text-center">
-            <h2 className="mb-1 md:mb-3 font-serif text-xl md:text-5xl text-charcoalBrown">Why Anti-Tarnish?</h2>
-            <p className="mx-auto max-w-2xl text-[10px] md:text-base text-stoneGray hidden md:block">
-              Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
-            </p>
-          </div>
-          {/* Mobile: 1 horizontal swipeable strip | Desktop: 1 row of 3 */}
-          <div className="flex overflow-x-auto md:grid md:grid-cols-3 gap-2 md:gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
-            <div className="min-w-[40vw] snap-start col-span-1">
-              <Benefit icon={<Sparkles className="h-4 w-4 md:h-8 md:w-8" />} title="Long-Lasting Shine" text="Maintains brilliance." />
-            </div>
-            <div className="min-w-[40vw] snap-start col-span-1">
-              <Benefit icon={<Droplets className="h-4 w-4 md:h-8 md:w-8" />} title="Water Resistant" text="Wear it in shower/pool." />
-            </div>
-            <div className="min-w-[40vw] snap-start col-span-1">
-              <Benefit icon={<Gem className="h-4 w-4 md:h-8 md:w-8" />} title="Hypoallergenic" text="Nickel-free formula." />
-            </div>
-            <div className="min-w-[40vw] snap-start col-span-1 md:hidden">
-              <Benefit icon={<ShieldCheck className="h-4 w-4" />} title="Verified Quality" text="Premium materials." />
-            </div>
-          </div>
+        <div className="mb-4 md:mb-10 text-center">
+          <h2 className="mb-1 md:mb-3 font-serif text-xl md:text-5xl text-charcoalBrown">Why Anti-Tarnish?</h2>
+          <p className="mx-auto max-w-2xl text-[10px] md:text-base text-stoneGray hidden md:block">
+            Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
+          </p>
+        </div>
+        
+        {/* Mobile: 2x2 grid | Desktop: 1x4 grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+          <Trust icon={<Truck className="h-4 w-4 md:h-6 md:w-6" />} title="Free Delivery" sub="Above ₹999" />
+          <Trust icon={<RotateCcw className="h-4 w-4 md:h-6 md:w-6" />} title="7-Day Returns" sub="Easy exchange" />
+          <Trust icon={<ShieldCheck className="h-4 w-4 md:h-6 md:w-6" />} title="Anti-Tarnish" sub="Verified quality" />
+          <Trust icon={<Lock className="h-4 w-4 md:h-6 md:w-6" />} title="Secure Payment" sub="COD available" />
         </div>
       </section>
 
@@ -268,16 +260,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* TRUST BADGES */}
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-        <div className="grid grid-cols-2 gap-2 md:gap-4 md:grid-cols-4">
-          <Trust icon={<Truck className="h-4 w-4 md:h-6 md:w-6" />} title="Free Delivery" sub="Above ₹999" />
-          <Trust icon={<RotateCcw className="h-4 w-4 md:h-6 md:w-6" />} title="7-Day Returns" sub="Easy exchange" />
-          <Trust icon={<ShieldCheck className="h-4 w-4 md:h-6 md:w-6" />} title="Anti-Tarnish" sub="Verified quality" />
-          <Trust icon={<Lock className="h-4 w-4 md:h-6 md:w-6" />} title="Secure Payment" sub="COD available" />
-        </div>
-      </section>
-
       {/* NEWSLETTER */}
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
         <div className="glass-premium border border-white/60 mx-auto max-w-3xl rounded-2xl md:rounded-3xl p-6 md:p-12 text-center">
@@ -304,7 +286,7 @@ function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: st
   return (
     <div className="mb-4 md:mb-8 flex flex-row items-end justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="mb-1 font-serif text-xl md:text-5xl text-charcoalBrown">{title}</h2>
+        <h2 className="mb-0.5 font-serif text-xl md:text-5xl text-charcoalBrown">{title}</h2>
         <p className="text-[10px] text-stoneGray md:text-base hidden sm:block">{subtitle}</p>
       </div>
       <Link href={ctaTo} className="text-xs md:text-sm font-semibold underline text-stoneGray hover:text-charcoalBrown whitespace-nowrap md:btn-liquid md:no-underline md:inline-flex">View All</Link>
@@ -350,22 +332,12 @@ function CategoryTile({
   );
 }
 
-function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
-  return (
-    <div className="glass-premium rounded-xl md:rounded-2xl p-3 md:p-6 border border-white/60 text-center flex flex-col items-center justify-center shadow-sm transition hover:-translate-y-1 hover:shadow-md h-full">
-      <div className="mb-2 md:mb-4 inline-flex h-8 w-8 md:h-14 md:w-14 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
-      <h3 className="mb-1 md:mb-2 font-serif text-[11px] md:text-xl text-[color:var(--color-espresso)] leading-tight">{title}</h3>
-      <p className="text-[9px] md:text-sm text-[color:var(--color-muted-text)] leading-tight hidden md:block">{text}</p>
-    </div>
-  );
-}
-
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="glass-premium p-3 md:p-5 rounded-xl md:rounded-2xl flex flex-col items-center border border-white/60 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full">
+    <div className="glass-premium p-2.5 md:p-5 rounded-lg md:rounded-2xl flex flex-col items-center border border-white/60 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
       <div className="mb-1.5 md:mb-3 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
-      <h4 className="text-[9px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
-      <p className="mt-0.5 md:mt-1 text-[8px] md:text-xs text-[color:var(--color-muted-text)] leading-tight hidden sm:block">{sub}</p>
+      <h4 className="text-[10px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
+      <p className="mt-0.5 md:mt-1 text-[9px] md:text-xs text-[color:var(--color-muted-text)] leading-tight hidden sm:block">{sub}</p>
     </div>
   );
 }

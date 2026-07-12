@@ -36,7 +36,7 @@ export function Navbar({ settings }: { settings?: any }) {
               <Menu className="h-6 w-6" />
             </button>
             <Link href="/" className="flex min-w-0 items-center gap-2">
-              <div className="bg-stone-900 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--gradient-gold, linear-gradient(135deg, #D4AF37, #B8860B))" }}>
                 <span className="font-serif text-lg font-bold text-white">{logoText}</span>
               </div>
               <div className="hidden min-w-0 sm:block">
