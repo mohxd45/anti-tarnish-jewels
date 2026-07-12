@@ -4,6 +4,7 @@ import { getProducts, getReviews, getSiteContent, getSiteSettings, getAnnounceme
 import { Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
 import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSaleBanner";
 import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
+import { CategoryBar } from "@/components/storefront/CategoryBar";
 
 export const metadata = {
   title: "LONA JEWELS | Premium Anti-Tarnish Jewellery",
@@ -54,15 +55,7 @@ export default async function HomePage() {
           <HomepageFlashSaleBanner settings={announcements} />
         </div>
 
-        <div className="block md:hidden w-full overflow-x-auto [&::-webkit-scrollbar]:hidden py-3 px-4 bg-white border-b border-stone-100">
-          <div className="flex gap-2 min-w-max">
-            <Link href="/shop" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">All Jewelry</Link>
-            <Link href="/shop?category=earrings" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Earrings</Link>
-            <Link href="/shop?category=necklaces" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Necklaces</Link>
-            <Link href="/shop?category=rings" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Rings</Link>
-            <Link href="/shop?category=bracelets" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">Bracelets</Link>
-          </div>
-        </div>
+        <CategoryBar />
 
         <div className="block md:hidden">
           <AnnouncementTicker className="relative z-40 w-full" />
