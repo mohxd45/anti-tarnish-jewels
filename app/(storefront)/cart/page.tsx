@@ -43,18 +43,18 @@ export default function CartPage() {
 
   return (
     <div className="pb-40 md:pb-24 bg-brandMainBg min-h-[100dvh]">
-      <div className="mx-auto max-w-7xl px-4 pt-8 md:pt-12">
+      <div className="mx-auto max-w-6xl xl:max-w-[1140px] px-4 pt-8 md:pt-12">
         <h1 className="font-serif text-3xl md:text-4xl text-brandEspresso">Your Bag</h1>
         <p className="mt-2 text-brandMutedText">{items.length} item{items.length === 1 ? "" : "s"} waiting for you</p>
       </div>
 
-      <div className="mx-auto mt-6 max-w-7xl px-4">
+      <div className="mx-auto mt-6 max-w-6xl xl:max-w-[1140px] px-4">
         <div className="rounded-2xl overflow-hidden border border-brandBorder/30 mb-8 bg-brandCardBg shadow-sm">
           <CartRewardTracker subtotal={subtotal} />
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 lg:grid-cols-[1fr_380px]">
+      <div className="mx-auto grid max-w-6xl xl:max-w-[1140px] grid-cols-1 gap-8 px-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-10 items-start">
         <div className="space-y-4">
           {items.length === 0 && (
             <EmptyStateCard 
