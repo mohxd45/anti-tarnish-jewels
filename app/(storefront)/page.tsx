@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
-import { getProducts, getBanners, getCategories, getReviews, getSiteContent, getSiteSettings, getAnnouncements } from "@/lib/firestore";
-import { Sparkles, Droplets, Gem, Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
+import { getProducts, getReviews, getSiteContent, getSiteSettings, getAnnouncements } from "@/lib/firestore";
+import { Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
 import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSaleBanner";
 import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 
@@ -11,10 +11,8 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [products, banners, categories, reviews, content, settings, announcements] = await Promise.all([
+  const [products, reviews, content, settings, announcements] = await Promise.all([
     getProducts(),
-    getBanners(),
-    getCategories(),
     getReviews(),
     getSiteContent("home"),
     getSiteSettings(),
@@ -23,34 +21,6 @@ export default async function HomePage() {
 
   const bestsellers = products.filter(p => p.isBestSeller || (p.rating && p.rating >= 4.5)).slice(0, 8);
   const newArrivals = products.sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()).slice(0, 8);
-  const heroBanners = banners.filter((b) => b.placement === "hero-banner" && b.active);
-  const promoBanners = banners.filter((b) => b.placement === "homepage-banner" && b.active);
-
-  // Fallback banners if none exist in firestore
-  const safeHeroBanners = heroBanners.length >= 3 ? heroBanners : [
-    { id: '1', title: 'Rings', subtitle: 'Timeless elegance', imageUrl: '/product-ring.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
-    { id: '2', title: 'Earrings', subtitle: 'Radiant shine', imageUrl: '/product-earrings.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
-    { id: '3', title: 'Necklaces', subtitle: 'Everyday luxury', imageUrl: '/product-necklace.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
-  ];
-
-  const safePromoBanners = promoBanners.length > 0 ? promoBanners : [
-    { id: 'p1', title: 'Premium Anti-Tarnish', subtitle: 'Discover the new collection', imageUrl: '/hero-showroom.jpg', placement: "homepage-banner" as const, createdAt: "", updatedAt: "", link: "/shop" }
-  ];
-
-  // Fallback categories if empty
-  const safeCategories = categories.length >= 5 ? categories : [
-    { name: "Rings", slug: "rings", image: "/product-ring.jpg" },
-    { name: "Earrings", slug: "earrings", image: "/product-earrings.jpg" },
-    { name: "Necklaces", slug: "necklaces", image: "/product-necklace.jpg" },
-    { name: "Bracelets", slug: "bracelets", image: "/product-bracelet.jpg" },
-    { name: "Daily Wear", slug: "daily-wear", image: "/hero-showroom.jpg" },
-  ];
-
-  const catRing = safeCategories.find(c => c.slug.toLowerCase().includes('ring')) || safeCategories[0];
-  const catEar = safeCategories.find(c => c.slug.toLowerCase().includes('earring')) || safeCategories[1];
-  const catNeck = safeCategories.find(c => c.slug.toLowerCase().includes('necklace')) || safeCategories[2];
-  const catBrac = safeCategories.find(c => c.slug.toLowerCase().includes('bracelet')) || safeCategories[3];
-  const catDaily = safeCategories.find(c => c.slug.toLowerCase().includes('daily')) || safeCategories[4];
 
   // Fallback reviews
   const safeReviews = reviews.length > 0 ? reviews : [
@@ -131,56 +101,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="mt-6 md:mt-10 md:hidden w-full overflow-hidden">
-            <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden pb-4">
-              {safeHeroBanners.map((b, i) => (
-                <div key={b.id || i} className="min-w-[85vw] sm:min-w-[70vw] snap-center shrink-0">
-                  <Link
-                    href={`/shop?category=${b.title?.toLowerCase()}`}
-                    className="relative block w-full overflow-hidden rounded-2xl shadow-sm border border-stone-200/50 aspect-[16/10]"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-t from-pink-950/90 via-pink-900/20 to-transparent z-10" />
-                    <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
-                    <div className="relative z-20 h-full w-full flex flex-col justify-end p-4 sm:p-6">
-                      <h3 className="font-serif text-xl sm:text-2xl text-white drop-shadow-md leading-tight">{b.title}</h3>
-                      <p className="text-xs sm:text-sm text-stone-100 drop-shadow-md leading-tight mt-1 opacity-90">{b.subtitle}</p>
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          <div className="relative mt-4 hidden h-72 md:block lg:h-96">
-            {safeHeroBanners.slice(0, 3).map((b, i) => {
-              const positions = [
-                { top: "0%", left: "6%", width: "220px", anim: "float-anim" },
-                { top: "18%", left: "36%", width: "240px", anim: "float-slow" },
-                { top: "8%", right: "6%", width: "220px", anim: "float-reverse" },
-              ] as const;
-              const pos = positions[i];
-              const style: React.CSSProperties = {
-                top: pos.top,
-                width: pos.width,
-                ...(("left" in pos) ? { left: pos.left } : { right: pos.right }),
-              };
-              return (
-                <Link
-                  key={b.id || i}
-                  href={`/shop?category=${b.title?.toLowerCase()}`}
-                  className={`absolute cursor-pointer overflow-hidden rounded-2xl shadow-sm border border-white/40 transition hover:z-10 hover:-translate-y-2 hover:scale-105 hover:shadow-md ${pos.anim}`}
-                  style={style}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C2121]/80 via-[#2C2121]/20 to-transparent z-10" />
-                  <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
-                  <div className="relative z-20 h-full w-full flex flex-col justify-end p-4">
-                    <h3 className="font-serif text-lg text-white drop-shadow-md">{b.title}</h3>
-                    <p className="text-xs text-stone-100 drop-shadow-md">{b.subtitle}</p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
         </div>
       </section>
 
@@ -188,39 +109,7 @@ export default async function HomePage() {
         <HomepageFlashSaleBanner settings={announcements} />
       </div>
 
-      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
-        <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden pb-2">
-          {safePromoBanners.map((b, i) => (
-            <div key={b.id || i} className="min-w-[90vw] sm:min-w-[70vw] md:min-w-[50vw] lg:min-w-[40vw] snap-center shrink-0">
-              <Link
-                href={(b as any).link || `/shop`}
-                className="relative block w-full overflow-hidden rounded-2xl aspect-[16/10] md:aspect-[21/9] shadow-sm border border-stone-100 transition hover:-translate-y-1 hover:shadow-md"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoalBrown/90 via-charcoalBrown/20 to-transparent z-10" />
-                <img src={b.imageUrl || (b as any).image || "/hero-showroom.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
-                <div className="relative z-20 h-full w-full flex flex-col justify-end p-5 md:p-8">
-                  <h3 className="font-serif text-2xl md:text-3xl text-white drop-shadow-md mb-1">{b.title}</h3>
-                  <p className="text-sm md:text-base text-stone-100 drop-shadow-md opacity-90">{b.subtitle}</p>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
-        <div className="mb-5 md:mb-10 text-center">
-          <h2 className="mb-1 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Shop by Category</h2>
-          <p className="text-sm md:text-base text-stoneGray">Find your perfect piece</p>
-        </div>
-        <div className="grid grid-cols-3 gap-3 md:gap-4 md:grid-cols-5">
-          <CategoryTile category={catRing} />
-          <CategoryTile category={catEar} />
-          <CategoryTile category={catNeck} />
-          <CategoryTile category={catBrac} />
-          <CategoryTile category={catDaily} />
-        </div>
-      </section>
 
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
@@ -244,23 +133,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
-        <div className="glass-premium border border-stone-200/60 rounded-2xl md:rounded-3xl p-6 md:p-12 shadow-sm bg-white/50">
-          <div className="mb-6 md:mb-10 text-center">
-            <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Why Anti-Tarnish?</h2>
-            <p className="mx-auto max-w-2xl text-sm md:text-base text-stoneGray">
-              Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-            <Benefit icon={<Sparkles className="h-5 w-5 md:h-8 md:w-8" />} title="Long-Lasting Shine" text="Keeps its beautiful shine for longer." />
-            <Benefit icon={<Droplets className="h-5 w-5 md:h-8 md:w-8" />} title="Water-Resistant" text="Handles light water exposure." />
-            <Benefit icon={<Gem className="h-5 w-5 md:h-8 md:w-8" />} title="Hypoallergenic" text="Skin-friendly for everyday wear." />
-            <Benefit icon={<ShieldCheck className="h-5 w-5 md:h-8 md:w-8" />} title="Tarnish-Resistant" text="Protective coating against fading." />
-          </div>
-        </div>
-      </section>
+
 
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         <div className="mb-6 md:mb-10 text-center">
@@ -337,50 +210,6 @@ function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: st
   );
 }
 
-function CategoryTile({
-  category, className, featured = false,
-}: { category: any; className?: string; featured?: boolean }) {
-  if (!category) return null;
-  
-  const fallbackImages: Record<string, string> = {
-    ring: "/product-ring.jpg",
-    earring: "/product-earrings.jpg",
-    necklace: "/product-necklace.jpg",
-    bracelet: "/product-bracelet.jpg",
-    bangle: "/product-bracelet.jpg",
-    daily: "/hero-showroom.jpg",
-    bridal: "/product-stack.jpg",
-  };
-
-  let imageSrc = category.image || category.imageUrl;
-  if (!imageSrc) {
-    const nameLower = (category.name || "").toLowerCase();
-    const matchedKey = Object.keys(fallbackImages).find(k => nameLower.includes(k));
-    imageSrc = matchedKey ? fallbackImages[matchedKey] : "/hero-showroom.jpg";
-  }
-
-  return (
-    <Link
-      href={`/shop?category=${category.slug}`}
-      className={`group flex flex-col items-center gap-2 cursor-pointer ${className ?? ""}`}
-    >
-      <div className="relative aspect-square w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-100 shadow-sm border border-stone-100">
-        <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 group-hover:scale-105" />
-      </div>
-      <h3 className="font-serif text-[12px] md:text-sm text-center text-charcoalBrown leading-tight group-hover:text-pink-900 transition-colors">{category.name}</h3>
-    </Link>
-  );
-}
-
-function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
-  return (
-    <div className="glass-premium rounded-2xl p-4 md:p-8 border border-white/80 text-center flex flex-col items-center shadow-sm transition hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
-      <div className="mb-2 md:mb-4 inline-flex h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
-      <h3 className="mb-1 md:mb-3 font-serif text-[13px] md:text-xl text-[color:var(--color-espresso)] leading-tight">{title}</h3>
-      <p className="text-[11px] md:text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
-    </div>
-  );
-}
 
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
