@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { AnnouncementSettings } from "@/types";
 import Link from "next/link";
 
-export function HomepageFlashSaleBanner({ settings }: { settings: AnnouncementSettings | null }) {
+export function HomepageFlashSaleBanner({ settings, isMobileTop = false }: { settings: AnnouncementSettings | null; isMobileTop?: boolean }) {
   const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
   const [isExpired, setIsExpired] = useState(false);
 
@@ -39,12 +39,36 @@ export function HomepageFlashSaleBanner({ settings }: { settings: AnnouncementSe
 
   if (settings?.countdownTimer && isExpired) {
     return (
-      <div className="bg-black/5 border-y border-black/10 py-6 text-center">
-        <h2 className="text-xl font-serif text-charcoalBrown opacity-50">Offer Ended</h2>
+      <div className={`bg-black/5 border-y border-black/10 text-center ${isMobileTop ? 'py-3' : 'py-6'}`}>
+        <h2 className={`${isMobileTop ? 'text-sm' : 'text-xl'} font-serif text-charcoalBrown opacity-50`}>Offer Ended</h2>
       </div>
     );
   }
 
+  // Mobile compact layout
+  if (isMobileTop) {
+    return (
+      <div className="bg-[#FAF9F6] border-b border-[#BCA37F]/20 py-3 px-4 shadow-sm w-full">
+        <div className="flex flex-col items-center justify-center gap-2">
+          {settings?.popupOfferTitle && (
+            <h2 className="text-sm font-bold tracking-wide text-[#333333] uppercase text-center line-clamp-1">{settings.popupOfferTitle}</h2>
+          )}
+          {timeLeft && (
+            <div className="flex items-center gap-1.5 font-mono">
+              {timeLeft.d > 0 && <div className="flex items-center bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-black/5 rounded px-1.5 py-0.5"><span className="text-sm font-bold text-[#BCA37F]">{timeLeft.d}d</span></div>}
+              <div className="flex items-center bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-black/5 rounded px-1.5 py-0.5"><span className="text-sm font-bold text-[#BCA37F]">{timeLeft.h.toString().padStart(2, "0")}h</span></div>
+              <div className="text-sm font-bold text-[#BCA37F]/50">:</div>
+              <div className="flex items-center bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-black/5 rounded px-1.5 py-0.5"><span className="text-sm font-bold text-[#BCA37F]">{timeLeft.m.toString().padStart(2, "0")}m</span></div>
+              <div className="text-sm font-bold text-[#BCA37F]/50">:</div>
+              <div className="flex items-center bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-black/5 rounded px-1.5 py-0.5"><span className="text-sm font-bold text-[#BCA37F]">{timeLeft.s.toString().padStart(2, "0")}s</span></div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop / standard layout
   return (
     <div className="bg-[#FAF9F6] border-y border-[#BCA37F]/20 py-8 px-4 sm:px-6 shadow-sm">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">

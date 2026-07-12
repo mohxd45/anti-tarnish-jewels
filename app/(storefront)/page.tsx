@@ -69,8 +69,13 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* MOBILE FLASH SALE BANNER AT VERY TOP */}
+      <div className="block md:hidden">
+        <HomepageFlashSaleBanner settings={announcements} isMobileTop />
+      </div>
+
       {/* HERO */}
-      <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden px-4">
+      <section className="relative flex min-h-[85vh] md:min-h-[85vh] items-center justify-center overflow-hidden px-4">
         {/* soft floating decorations */}
         <div className="pointer-events-none absolute inset-0 select-none opacity-20">
         </div>
@@ -87,50 +92,50 @@ export default async function HomePage() {
           />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl">
-          <div className="mb-10 text-center">
-            <p className="mb-4 text-xs font-medium uppercase tracking-widest text-stoneGray sm:text-sm">
+        <div className="relative z-10 mx-auto w-full max-w-7xl pt-10 md:pt-0">
+          <div className="mb-8 md:mb-10 text-center">
+            <p className="mb-3 md:mb-4 text-[10px] md:text-xs font-medium uppercase tracking-widest text-stoneGray sm:text-sm">
               {heroSmallTitle}
             </p>
-            <h1 className="mb-6 font-serif text-5xl leading-tight text-charcoalBrown md:text-7xl lg:text-8xl">
+            <h1 className="mb-4 md:mb-6 font-serif text-4xl leading-tight text-charcoalBrown md:text-7xl lg:text-8xl">
               {titleFirstPart}<br />
               <span className="gold-text italic">{titleLastPart}</span>
             </h1>
-            <p className="mx-auto mb-8 max-w-2xl text-base text-stoneGray md:text-xl">
+            <p className="mx-auto mb-6 md:mb-8 max-w-2xl text-sm text-stoneGray md:text-xl px-4 md:px-0">
               {heroSubtitle}
             </p>
-            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
-              <Link href={heroCtaLink} className="btn-primary-gold px-8 py-4 text-base md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
+            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4 px-4 md:px-0">
+              <Link href={heroCtaLink} className="btn-primary-gold px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg shadow-xl shadow-pink-900/10 hover:shadow-pink-900/20">
                 {heroCtaText}
               </Link>
-              <Link href="/shop?category=daily-wear" className="btn-liquid px-8 py-4 text-base md:text-lg">
+              <Link href="/shop?category=daily-wear" className="btn-liquid px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg">
                 Daily Wear
               </Link>
             </div>
             
-            <div className="mt-8 flex justify-center">
-              <div className="glass-premium flex items-center gap-3 rounded-full px-5 py-2 shadow-sm border border-white/60 mx-auto max-w-max">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-stone-50/50 text-stoneGray text-xs">✨</span>
-                <p className="text-sm font-medium text-stone-900">{promotionalText} <Link href="/sale" className="underline hover:text-stoneGray font-semibold ml-1">Shop Sale</Link></p>
+            <div className="mt-6 md:mt-8 flex justify-center">
+              <div className="glass-premium flex items-center gap-2 md:gap-3 rounded-full px-4 py-2 md:px-5 md:py-2 shadow-sm border border-white/60 mx-auto max-w-max">
+                <span className="flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-stone-50/50 text-stoneGray text-[10px] md:text-xs">✨</span>
+                <p className="text-xs md:text-sm font-medium text-stone-900">{promotionalText} <Link href="/sale" className="underline hover:text-stoneGray font-semibold ml-1">Shop Sale</Link></p>
               </div>
             </div>
           </div>
 
           {/* Mobile Hero Cards (Compact) */}
-          <div className="mt-10 grid grid-cols-3 gap-2 sm:gap-3 md:hidden">
+          <div className="mt-8 md:mt-10 grid grid-cols-3 gap-2 sm:gap-3 md:hidden px-2">
             {safeHeroBanners.slice(0, 3).map((b, i) => (
               <Link
                 key={b.id || i}
                 href={`/shop?category=${b.title?.toLowerCase()}`}
-                className={`relative h-36 sm:h-44 overflow-hidden rounded-2xl shadow-sm border border-white/40 transition hover:-translate-y-1 ${
+                className={`relative h-28 sm:h-36 overflow-hidden rounded-xl shadow-sm border border-white/40 transition hover:-translate-y-1 ${
                   i === 1 ? "-translate-y-2" : ""
                 }`}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-pink-950/90 via-pink-900/20 to-transparent z-10" />
                 <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
-                <div className="relative z-20 h-full w-full flex flex-col justify-end p-2.5 sm:p-3">
-                  <h3 className="font-serif text-sm sm:text-base text-white drop-shadow-md leading-tight">{b.title}</h3>
-                  <p className="text-[10px] sm:text-xs text-stone-100 drop-shadow-md leading-tight mt-0.5 opacity-90">{b.subtitle}</p>
+                <div className="relative z-20 h-full w-full flex flex-col justify-end p-2 sm:p-2.5">
+                  <h3 className="font-serif text-[13px] sm:text-sm text-white drop-shadow-md leading-tight">{b.title}</h3>
+                  <p className="text-[9px] sm:text-[10px] text-stone-100 drop-shadow-md leading-tight mt-0.5 opacity-90 line-clamp-1">{b.subtitle}</p>
                 </div>
               </Link>
             ))}
@@ -170,115 +175,129 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FLASH SALE BANNER */}
-      <HomepageFlashSaleBanner settings={announcements} />
+      {/* DESKTOP FLASH SALE BANNER */}
+      <div className="hidden md:block">
+        <HomepageFlashSaleBanner settings={announcements} />
+      </div>
 
       {/* SHOP BY CATEGORY (bento) */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="mb-10 text-center">
-          <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-5xl">Shop by Category</h2>
-          <p className="text-stoneGray">Find your perfect piece</p>
+      <section className="mx-auto max-w-7xl px-4 py-12 md:py-16">
+        <div className="mb-8 md:mb-10 text-center">
+          <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Shop by Category</h2>
+          <p className="text-sm md:text-base text-stoneGray">Find your perfect piece</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 md:gap-4">
-          <CategoryTile category={catRing} className="col-span-1 h-48 sm:h-64 md:h-80" featured />
-          <CategoryTile category={catEar} className="col-span-1 h-48 sm:h-64 md:h-80" />
-          <CategoryTile category={catNeck} className="col-span-1 h-48 sm:h-64 md:h-80" />
-          <CategoryTile category={catBrac} className="col-span-1 h-48 sm:h-64 md:h-80" />
-          <CategoryTile category={catDaily} className="col-span-2 md:col-span-4 lg:col-span-1 h-48 sm:h-64 md:h-80" />
+        <div className="grid grid-cols-2 gap-2 md:gap-4 md:grid-cols-4 lg:grid-cols-5">
+          <CategoryTile category={catRing} className="col-span-1 h-40 sm:h-64 md:h-80" featured />
+          <CategoryTile category={catEar} className="col-span-1 h-40 sm:h-64 md:h-80" />
+          <CategoryTile category={catNeck} className="col-span-1 h-40 sm:h-64 md:h-80" />
+          <CategoryTile category={catBrac} className="col-span-1 h-40 sm:h-64 md:h-80" />
+          <CategoryTile category={catDaily} className="col-span-2 md:col-span-4 lg:col-span-1 h-40 sm:h-64 md:h-80" />
         </div>
       </section>
 
       {/* BESTSELLERS */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:py-12">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+        <div className="flex overflow-x-auto gap-3 pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
           {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <div key={p.id} className="min-w-[65vw] max-w-[65vw] sm:min-w-[45vw] md:min-w-0 md:max-w-none snap-start">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </section>
 
       {/* WHY ANTI-TARNISH */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="glass-premium border border-white/60 rounded-3xl p-6 md:p-12">
-          <div className="mb-10 text-center">
-            <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-5xl">Why Anti-Tarnish?</h2>
-            <p className="mx-auto max-w-2xl text-stoneGray">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:py-16">
+        <div className="glass-premium border border-white/60 rounded-2xl md:rounded-3xl p-5 md:p-12">
+          <div className="mb-6 md:mb-10 text-center">
+            <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Why Anti-Tarnish?</h2>
+            <p className="mx-auto max-w-2xl text-xs md:text-base text-stoneGray">
               Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-            <Benefit icon={<Sparkles className="h-8 w-8" />} title="Long-Lasting Shine" text="Maintains its brilliance for years without polishing." />
-            <Benefit icon={<Droplets className="h-8 w-8" />} title="Water Resistant" text="Wear it in the shower, pool or rain without worry." />
-            <Benefit icon={<Gem className="h-8 w-8" />} title="Hypoallergenic" text="Safe for sensitive skin — nickel-free formula." />
+          {/* Mobile: 2 rows (2 top, 1 bottom spanning 2 cols) | Desktop: 1 row of 3 */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+            <div className="col-span-1">
+              <Benefit icon={<Sparkles className="h-5 w-5 md:h-8 md:w-8" />} title="Long-Lasting Shine" text="Maintains its brilliance for years without polishing." />
+            </div>
+            <div className="col-span-1">
+              <Benefit icon={<Droplets className="h-5 w-5 md:h-8 md:w-8" />} title="Water Resistant" text="Wear it in the shower, pool or rain." />
+            </div>
+            <div className="col-span-2 md:col-span-1">
+              <Benefit icon={<Gem className="h-5 w-5 md:h-8 md:w-8" />} title="Hypoallergenic" text="Safe for sensitive skin — nickel-free formula." />
+            </div>
           </div>
         </div>
       </section>
 
       {/* NEW ARRIVALS */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:py-12">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+        <div className="flex overflow-x-auto gap-3 pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
           {newArrivals.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <div key={p.id} className="min-w-[65vw] max-w-[65vw] sm:min-w-[45vw] md:min-w-0 md:max-w-none snap-start">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </section>
 
       {/* REVIEWS */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="mb-10 text-center">
-          <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-5xl">Loved by Thousands</h2>
+      <section className="mx-auto max-w-7xl px-4 py-12 md:py-16">
+        <div className="mb-8 md:mb-10 text-center">
+          <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Loved by Thousands</h2>
           <div className="mb-1 flex items-center justify-center gap-2">
-            <span className="text-2xl" style={{ color: "#D4AF37" }}>★★★★★</span>
-            <span className="font-semibold text-stoneGray">4.9/5</span>
+            <span className="text-xl md:text-2xl" style={{ color: "#D4AF37" }}>★★★★★</span>
+            <span className="text-sm md:text-base font-semibold text-stoneGray">4.9/5</span>
           </div>
-          <p className="text-stoneGray">Based on 2,847 reviews</p>
+          <p className="text-xs md:text-base text-stoneGray">Based on 2,847 reviews</p>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+        {/* Mobile: horizontal scroll | Desktop: grid */}
+        <div className="flex overflow-x-auto gap-3 pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
           {safeReviews.slice(0, 3).map((r) => (
-            <div key={r.id} className="glass-premium rounded-2xl p-6 border border-white/60">
-              <div className="mb-4 flex items-center gap-3">
+            <div key={r.id} className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-start glass-premium rounded-xl md:rounded-2xl p-5 md:p-6 border border-white/60">
+              <div className="mb-3 md:mb-4 flex items-center gap-3">
                 <div
-                  className="flex h-12 w-12 items-center justify-center rounded-full font-bold text-white"
+                  className="flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-full font-bold text-white text-sm md:text-base"
                   style={{ background: r.color || "#FBCFE8" }}
                 >{r.initial || r.name?.charAt(0) || "U"}</div>
                 <div>
-                  <h4 className="font-semibold text-charcoalBrown">{r.name}</h4>
-                  <div className="text-sm" style={{ color: "#D4AF37" }}>★★★★★</div>
+                  <h4 className="text-sm md:text-base font-semibold text-charcoalBrown">{r.name}</h4>
+                  <div className="text-xs md:text-sm" style={{ color: "#D4AF37" }}>★★★★★</div>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-stoneGray">"{r.text}"</p>
+              <p className="text-xs md:text-sm leading-relaxed text-stoneGray">"{r.text}"</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* TRUST BADGES */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          <Trust icon={<Truck className="h-6 w-6" />} title="Free Delivery" sub="Above ₹999" />
-          <Trust icon={<RotateCcw className="h-6 w-6" />} title="7-Day Returns" sub="Easy exchange" />
-          <Trust icon={<ShieldCheck className="h-6 w-6" />} title="Anti-Tarnish" sub="Verified quality" />
-          <Trust icon={<Lock className="h-6 w-6" />} title="Secure Payment" sub="COD available" />
+      <section className="mx-auto max-w-7xl px-4 py-10 md:py-12">
+        <div className="grid grid-cols-2 gap-2 md:gap-4 md:grid-cols-4">
+          <Trust icon={<Truck className="h-5 w-5 md:h-6 md:w-6" />} title="Free Delivery" sub="Above ₹999" />
+          <Trust icon={<RotateCcw className="h-5 w-5 md:h-6 md:w-6" />} title="7-Day Returns" sub="Easy exchange" />
+          <Trust icon={<ShieldCheck className="h-5 w-5 md:h-6 md:w-6" />} title="Anti-Tarnish" sub="Verified quality" />
+          <Trust icon={<Lock className="h-5 w-5 md:h-6 md:w-6" />} title="Secure Payment" sub="COD available" />
         </div>
       </section>
 
       {/* NEWSLETTER */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="glass-premium border border-white/60 mx-auto max-w-3xl rounded-3xl p-8 text-center md:p-12">
-          <h2 className="mb-3 font-serif text-3xl text-charcoalBrown md:text-4xl">Join our list</h2>
-          <p className="mb-6 text-stoneGray">Get 10% off your first order and early access to new drops.</p>
+      <section className="mx-auto max-w-7xl px-4 py-12 md:py-16">
+        <div className="glass-premium border border-white/60 mx-auto max-w-3xl rounded-2xl md:rounded-3xl p-6 md:p-12 text-center">
+          <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-4xl text-charcoalBrown">Join our list</h2>
+          <p className="mb-5 md:mb-6 text-xs md:text-base text-stoneGray">Get 10% off your first order and early access to new drops.</p>
           <form
             className="mx-auto flex max-w-lg flex-col gap-3 sm:flex-row"
           >
             <input
               type="email"
               placeholder="your@email.com"
-              className="neo-input w-full px-4 py-3 text-sm"
+              className="neo-input w-full px-4 py-2.5 md:py-3 text-sm"
               required
             />
-            <button type="submit" className="btn-primary-gold px-6">Subscribe</button>
+            <button type="submit" className="btn-primary-gold px-6 py-2.5 md:py-3 text-sm">Subscribe</button>
           </form>
         </div>
       </section>
@@ -288,10 +307,10 @@ export default async function HomePage() {
 
 function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: string; ctaTo: string }) {
   return (
-    <div className="mb-8 flex items-end justify-between gap-4">
+    <div className="mb-5 md:mb-8 flex items-end justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="mb-1 font-serif text-3xl text-charcoalBrown md:text-5xl">{title}</h2>
-        <p className="text-sm text-stoneGray md:text-base">{subtitle}</p>
+        <h2 className="mb-1 font-serif text-2xl md:text-5xl text-charcoalBrown">{title}</h2>
+        <p className="text-xs text-stoneGray md:text-base">{subtitle}</p>
       </div>
       <Link href={ctaTo} className="btn-liquid hidden md:inline-flex">View All</Link>
     </div>
@@ -324,13 +343,13 @@ function CategoryTile({
   return (
     <Link
       href={`/shop?category=${category.slug}`}
-      className={`category-card relative block cursor-pointer overflow-hidden rounded-2xl ${className ?? ""}`}
+      className={`category-card relative block cursor-pointer overflow-hidden rounded-xl md:rounded-2xl ${className ?? ""}`}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-[#2C2121]/80 via-[#2C2121]/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
       <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 hover:scale-105" />
-      <div className="absolute bottom-3 left-4 z-10 text-white">
-        <h3 className={`relative z-20 font-serif drop-shadow-md ${featured ? "text-xl sm:text-2xl md:text-3xl" : "text-lg sm:text-xl"}`}>{category.name}</h3>
-        <p className="relative z-20 text-xs opacity-90 drop-shadow-md">Explore collection</p>
+      <div className="absolute bottom-2 left-2 md:bottom-3 md:left-4 z-10 text-white">
+        <h3 className={`relative z-20 font-serif drop-shadow-md leading-tight ${featured ? "text-lg sm:text-2xl md:text-3xl" : "text-sm sm:text-xl"}`}>{category.name}</h3>
+        <p className="relative z-20 text-[10px] md:text-xs opacity-90 drop-shadow-md mt-0.5">Explore</p>
       </div>
     </Link>
   );
@@ -338,20 +357,20 @@ function CategoryTile({
 
 function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
-    <div className="glass-premium rounded-2xl p-6 border border-white/60 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
-      <h3 className="mb-2 font-serif text-xl text-[color:var(--color-espresso)]">{title}</h3>
-      <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
+    <div className="glass-premium rounded-xl md:rounded-2xl p-3 md:p-6 border border-white/60 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md h-full">
+      <div className="mb-2 md:mb-4 inline-flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
+      <h3 className="mb-1 md:mb-2 font-serif text-[13px] md:text-xl text-[color:var(--color-espresso)] leading-tight">{title}</h3>
+      <p className="text-[10px] md:text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
     </div>
   );
 }
 
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="glass-premium p-5 rounded-2xl flex flex-col items-center border border-white/60 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md">
-      <div className="mb-3 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
-      <h4 className="text-[13px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider">{title}</h4>
-      <p className="mt-1 text-xs text-[color:var(--color-muted-text)]">{sub}</p>
+    <div className="glass-premium p-3 md:p-5 rounded-xl md:rounded-2xl flex flex-col items-center border border-white/60 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md">
+      <div className="mb-2 md:mb-3 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
+      <h4 className="text-[10px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
+      <p className="mt-1 text-[9px] md:text-xs text-[color:var(--color-muted-text)]">{sub}</p>
     </div>
   );
 }
