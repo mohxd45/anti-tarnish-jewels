@@ -195,7 +195,7 @@ export default async function HomePage() {
         <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
           {bestsellers.map((p) => (
             <div key={p.id} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start">
-              <ProductCard product={p} compact />
+              <ProductCard product={p} />
             </div>
           ))}
         </div>
@@ -207,7 +207,7 @@ export default async function HomePage() {
         <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
           {newArrivals.map((p) => (
             <div key={p.id} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start">
-              <ProductCard product={p} compact />
+              <ProductCard product={p} />
             </div>
           ))}
         </div>
