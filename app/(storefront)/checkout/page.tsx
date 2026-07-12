@@ -71,7 +71,7 @@ export default function CheckoutPage() {
         .whatsapp-button { display: none !important; }
       `}</style>
       
-      <div className="mx-auto max-w-7xl px-4 pt-28 md:pt-32">
+      <div className="mx-auto max-w-6xl xl:max-w-[1100px] px-4 pt-28 md:pt-32">
         <div className="flex items-center gap-4 mb-6 md:mb-8">
           <Link href="/cart" className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-[#E8D7C8] text-[#3A2428] transition hover:bg-[#FFF9FB] hover:border-[#B8955E] shadow-sm">
             <ArrowLeft className="h-5 w-5" />
@@ -83,7 +83,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <form id="checkout-form" onSubmit={handlePlaceOrder} className="mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 lg:grid-cols-[1fr_380px] lg:gap-8 pb-32 md:pb-16 items-start">
+      <form id="checkout-form" onSubmit={handlePlaceOrder} className="mx-auto grid grid-cols-1 gap-5 px-4 lg:grid-cols-[minmax(0,540px)_minmax(0,400px)] xl:grid-cols-[600px_420px] lg:justify-center lg:gap-12 pb-32 lg:pb-24 items-start">
         
         {/* Left Column (Forms) */}
         <div className="flex flex-col gap-4 md:gap-5">
