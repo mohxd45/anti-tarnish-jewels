@@ -37,7 +37,7 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
           const all = await getProducts();
           // Filter out items already in cart
           const cartItemIds = items.map(i => i.product.id);
-          recs = all.filter(p => !cartItemIds.includes(p.id) && p.inStock).slice(0, 6);
+          recs = all.filter(p => !cartItemIds.includes(p.id) && p.stock > 0).slice(0, 6);
         }
 
         setProducts(recs);
