@@ -76,7 +76,7 @@ export function CartDrawer() {
             className="fixed inset-y-0 right-0 w-full max-w-[420px] bg-brandMainBg z-[150] shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-brandCardBg border-b border-stone-100 shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 bg-brandCardBg border-b border-brandBorder/30 shrink-0">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-brandGold" />
                 <h2 className="text-lg font-semibold text-brandEspresso font-serif">Your Cart</h2>
@@ -118,7 +118,7 @@ export function CartDrawer() {
                 </div>
               ) : (
                 <div className="flex flex-col h-full">
-                  <div className="p-4 space-y-2">
+                  <div className="px-4 pt-2 pb-4 space-y-3">
                     {items.map((item) => (
                       <CartItemCard 
                         key={item.product.id} 

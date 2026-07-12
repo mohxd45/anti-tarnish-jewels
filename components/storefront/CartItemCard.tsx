@@ -16,10 +16,10 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
   const { product, quantity } = item;
   
   return (
-    <div className="flex gap-4 p-4 mb-3 bg-brandCardBg rounded-2xl shadow-sm border border-brandBorder/30">
+    <div className="flex gap-3 p-3 bg-brandCardBg rounded-2xl shadow-sm border border-brandBorder/30">
       <Link 
         href={`/product/${product.slug}`} 
-        className="relative h-[80px] w-[80px] flex-shrink-0 overflow-hidden rounded-xl bg-brandMainBg border border-stone-100 block"
+        className="relative h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-xl bg-brandMainBg border border-stone-100 block"
         onClick={closeDrawer}
       >
         <Image
@@ -27,7 +27,7 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
           alt={product.name || "Product image"}
           fill
           className="object-cover"
-          sizes="80px"
+          sizes="72px"
         />
       </Link>
       

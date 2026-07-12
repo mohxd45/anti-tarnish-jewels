@@ -20,7 +20,7 @@ export function StickyCartSummaryBar({ closeDrawer, isPage = false }: StickyCart
   };
 
   return (
-    <div className={`bg-brandCardBg border-t border-brandBorder/30 p-4 shadow-soft w-full ${isPage ? 'fixed bottom-[60px] left-0 right-0 z-40 md:static md:shadow-none' : 'sticky bottom-0 z-40'}`}>
+    <div className={`bg-brandCardBg border-t border-brandBorder/30 px-4 py-3 shadow-soft w-full ${isPage ? 'fixed bottom-[60px] left-0 right-0 z-40 md:static md:shadow-none' : 'sticky bottom-0 z-40'}`}>
       <div className={`flex items-center justify-between gap-4 ${isPage ? 'max-w-7xl mx-auto' : ''}`}>
         <div className="flex flex-col">
           <span className="text-[11px] uppercase tracking-wider font-semibold text-brandMutedText">Total</span>
@@ -31,7 +31,7 @@ export function StickyCartSummaryBar({ closeDrawer, isPage = false }: StickyCart
         
         <button
           onClick={handleCheckout}
-          className="flex-1 py-3.5 bg-gradient-gold text-white rounded-2xl font-semibold shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
+          className="flex-1 py-3 bg-gradient-gold text-white rounded-xl font-semibold shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
         >
           Checkout Securely
           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -39,7 +39,7 @@ export function StickyCartSummaryBar({ closeDrawer, isPage = false }: StickyCart
       </div>
       
       {!isPage && (
-        <p className="text-center text-[9px] text-brandMutedText uppercase tracking-widest mt-3">
+        <p className="text-center text-[10px] text-brandMutedText uppercase tracking-widest mt-2">
           Taxes included. SSL encrypted.
         </p>
       )}
