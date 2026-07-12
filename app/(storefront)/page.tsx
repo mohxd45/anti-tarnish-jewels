@@ -132,7 +132,7 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-6 md:mt-10 md:hidden w-full overflow-hidden">
-            <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+            <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden pb-4">
               {safeHeroBanners.map((b, i) => (
                 <div key={b.id || i} className="min-w-[85vw] sm:min-w-[70vw] snap-center shrink-0">
                   <Link
@@ -188,8 +188,8 @@ export default async function HomePage() {
         <HomepageFlashSaleBanner settings={announcements} />
       </div>
 
-      <section className="mx-auto max-w-7xl py-6 md:py-12 w-full overflow-hidden">
-        <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden px-4 pb-2">
+      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
+        <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden pb-2">
           {safePromoBanners.map((b, i) => (
             <div key={b.id || i} className="min-w-[90vw] sm:min-w-[70vw] md:min-w-[50vw] lg:min-w-[40vw] snap-center shrink-0">
               <Link
@@ -224,7 +224,7 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
           {bestsellers.map((p) => (
             <div key={p.id} className="min-w-[44vw] max-w-[44vw] snap-start shrink-0 sm:min-w-[220px] sm:max-w-[220px]">
               <ProductCard product={p} />
@@ -235,7 +235,7 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
           {newArrivals.map((p) => (
             <div key={p.id} className="min-w-[44vw] max-w-[44vw] snap-start shrink-0 sm:min-w-[220px] sm:max-w-[220px]">
               <ProductCard product={p} />
@@ -285,7 +285,7 @@ export default async function HomePage() {
             <span className="text-sm md:text-base font-semibold text-stoneGray">4.9/5</span>
           </div>
         </div>
-        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden pb-4">
           {safeReviews.slice(0, 3).map((r) => (
             <div key={r.id} className="min-w-[85vw] sm:min-w-[60vw] md:min-w-0 snap-start glass-premium rounded-2xl p-5 md:p-8 border border-white/60 shrink-0 shadow-sm">
               <div className="mb-4 md:mb-6 flex items-center gap-4">
