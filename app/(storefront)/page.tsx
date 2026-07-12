@@ -66,13 +66,13 @@ export default async function HomePage() {
       <section className="relative flex min-h-[560px] md:min-h-[85vh] items-center justify-center overflow-hidden w-full">
         <div className="absolute inset-0 z-0">
           <img
-            src="/hero-showroom.jpg"
-            alt=""
-            className="h-full w-full object-cover opacity-80 md:opacity-100"
+            src="/lona-hero-bg.png"
+            alt="LONA JEWELS Collection"
+            className="h-full w-full object-cover opacity-90 md:opacity-100"
           />
           {/* Soft dark/rose overlay for premium feel and text readability */}
           <div
-            className="absolute inset-0 bg-[#3A2428]/40 md:bg-transparent"
+            className="absolute inset-0 bg-[#3A2428]/30 md:bg-transparent"
           />
           <div
             className="absolute inset-0 hidden md:block"
