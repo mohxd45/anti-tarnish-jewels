@@ -33,6 +33,10 @@ export default async function HomePage() {
     { id: '3', title: 'Necklaces', subtitle: 'Everyday luxury', imageUrl: '/product-necklace.jpg', placement: "hero-banner" as const, createdAt: "", updatedAt: "" },
   ];
 
+  const safePromoBanners = promoBanners.length > 0 ? promoBanners : [
+    { id: 'p1', title: 'Premium Anti-Tarnish', subtitle: 'Discover the new collection', imageUrl: '/hero-showroom.jpg', placement: "homepage-banner" as const, createdAt: "", updatedAt: "", link: "/shop" }
+  ];
+
   // Fallback categories if empty
   const safeCategories = categories.length >= 5 ? categories : [
     { name: "Rings", slug: "rings", image: "/product-ring.jpg" },
@@ -76,12 +80,10 @@ export default async function HomePage() {
       `}</style>
       
       <div className="-mt-12 md:mt-0">
-        {/* MOBILE FLASH SALE BANNER AT VERY TOP */}
         <div className="block md:hidden">
           <HomepageFlashSaleBanner settings={announcements} />
         </div>
 
-        {/* CATEGORY QUICK CHIPS (Mobile Only) */}
         <div className="block md:hidden w-full overflow-x-auto [&::-webkit-scrollbar]:hidden py-3 px-4 bg-white border-b border-stone-100">
           <div className="flex gap-2 min-w-max">
             <Link href="/shop" className="px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-medium text-stone-700 whitespace-nowrap hover:bg-stone-50">All Jewelry</Link>
@@ -92,18 +94,12 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* ANNOUNCEMENT TICKER (Mobile Only, Relative) */}
         <div className="block md:hidden">
           <AnnouncementTicker className="relative z-40 w-full" />
         </div>
       </div>
 
-      {/* HERO */}
       <section className="relative flex min-h-[70vh] md:min-h-[85vh] items-center justify-center overflow-hidden px-4">
-        {/* soft floating decorations */}
-        <div className="pointer-events-none absolute inset-0 select-none opacity-20">
-        </div>
-
         <div className="absolute inset-0 z-0">
           <img
             src="/hero-showroom.jpg"
@@ -135,7 +131,26 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* floating hero cards — visible from md up so mobile stays clean */}
+          <div className="mt-6 md:mt-10 md:hidden w-full overflow-hidden">
+            <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
+              {safeHeroBanners.map((b, i) => (
+                <div key={b.id || i} className="min-w-[85vw] sm:min-w-[70vw] snap-center shrink-0">
+                  <Link
+                    href={`/shop?category=${b.title?.toLowerCase()}`}
+                    className="relative block w-full overflow-hidden rounded-2xl shadow-sm border border-stone-200/50 aspect-[16/10]"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-pink-950/90 via-pink-900/20 to-transparent z-10" />
+                    <img src={b.imageUrl || (b as any).image || "/product-stack.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
+                    <div className="relative z-20 h-full w-full flex flex-col justify-end p-4 sm:p-6">
+                      <h3 className="font-serif text-xl sm:text-2xl text-white drop-shadow-md leading-tight">{b.title}</h3>
+                      <p className="text-xs sm:text-sm text-stone-100 drop-shadow-md leading-tight mt-1 opacity-90">{b.subtitle}</p>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="relative mt-4 hidden h-72 md:block lg:h-96">
             {safeHeroBanners.slice(0, 3).map((b, i) => {
               const positions = [
@@ -169,112 +184,140 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* DESKTOP FLASH SALE BANNER */}
       <div className="hidden md:block">
         <HomepageFlashSaleBanner settings={announcements} />
       </div>
 
-      {/* SHOP BY CATEGORY (bento) */}
+      <section className="mx-auto max-w-7xl py-6 md:py-12 w-full overflow-hidden">
+        <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden px-4 pb-2">
+          {safePromoBanners.map((b, i) => (
+            <div key={b.id || i} className="min-w-[90vw] sm:min-w-[70vw] md:min-w-[50vw] lg:min-w-[40vw] snap-center shrink-0">
+              <Link
+                href={(b as any).link || `/shop`}
+                className="relative block w-full overflow-hidden rounded-2xl aspect-[16/10] md:aspect-[21/9] shadow-sm border border-stone-100 transition hover:-translate-y-1 hover:shadow-md"
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoalBrown/90 via-charcoalBrown/20 to-transparent z-10" />
+                <img src={b.imageUrl || (b as any).image || "/hero-showroom.jpg"} alt={b.title} className="h-full w-full absolute inset-0 object-cover" />
+                <div className="relative z-20 h-full w-full flex flex-col justify-end p-5 md:p-8">
+                  <h3 className="font-serif text-2xl md:text-3xl text-white drop-shadow-md mb-1">{b.title}</h3>
+                  <p className="text-sm md:text-base text-stone-100 drop-shadow-md opacity-90">{b.subtitle}</p>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
         <div className="mb-5 md:mb-10 text-center">
           <h2 className="mb-1 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Shop by Category</h2>
-          <p className="text-xs md:text-base text-stoneGray">Find your perfect piece</p>
+          <p className="text-sm md:text-base text-stoneGray">Find your perfect piece</p>
         </div>
-        <div className="grid grid-cols-2 gap-2 md:gap-4 md:grid-cols-4 lg:grid-cols-5">
-          <CategoryTile category={catRing} className="col-span-1 h-36 sm:h-64 md:h-80" featured />
-          <CategoryTile category={catEar} className="col-span-1 h-36 sm:h-64 md:h-80" />
-          <CategoryTile category={catNeck} className="col-span-1 h-36 sm:h-64 md:h-80" />
-          <CategoryTile category={catBrac} className="col-span-1 h-36 sm:h-64 md:h-80" />
-          <CategoryTile category={catDaily} className="col-span-2 md:col-span-4 lg:col-span-1 h-36 sm:h-64 md:h-80" />
+        <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4 lg:grid-cols-5">
+          <CategoryTile category={catRing} className="col-span-1 h-40 sm:h-64 md:h-80" featured />
+          <CategoryTile category={catEar} className="col-span-1 h-40 sm:h-64 md:h-80" />
+          <CategoryTile category={catNeck} className="col-span-1 h-40 sm:h-64 md:h-80" />
+          <CategoryTile category={catBrac} className="col-span-1 h-40 sm:h-64 md:h-80" />
+          <CategoryTile category={catDaily} className="col-span-2 md:col-span-4 lg:col-span-1 h-40 sm:h-64 md:h-80" />
         </div>
       </section>
 
-      {/* BESTSELLERS */}
-      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12">
+      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
           {bestsellers.map((p) => (
-            <div key={p.id} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start">
+            <div key={p.id} className="min-w-[55vw] sm:min-w-[40vw] md:min-w-0 snap-start shrink-0">
               <ProductCard product={p} />
             </div>
           ))}
         </div>
       </section>
 
-      {/* NEW ARRIVALS */}
-      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12">
+      <section className="mx-auto max-w-7xl px-4 py-6 md:py-12 w-full overflow-hidden">
         <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
           {newArrivals.map((p) => (
-            <div key={p.id} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start">
+            <div key={p.id} className="min-w-[55vw] sm:min-w-[40vw] md:min-w-0 snap-start shrink-0">
               <ProductCard product={p} />
             </div>
           ))}
         </div>
       </section>
 
-      {/* TRUST BADGES / WHY ANTI-TARNISH */}
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
-        <div className="mb-4 md:mb-10 text-center">
-          <h2 className="mb-1 md:mb-3 font-serif text-xl md:text-5xl text-charcoalBrown">Why Anti-Tarnish?</h2>
-          <p className="mx-auto max-w-2xl text-[10px] md:text-base text-stoneGray hidden md:block">
-            Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
+        <div className="glass-premium border border-stone-200/60 rounded-2xl md:rounded-3xl p-6 md:p-12 shadow-sm bg-white/50">
+          <div className="mb-6 md:mb-10 text-center">
+            <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Why Anti-Tarnish?</h2>
+            <p className="mx-auto max-w-2xl text-sm md:text-base text-stoneGray">
+              Our jewellery is crafted with advanced anti-tarnish technology so your favourite pieces stay radiant for years.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <Benefit icon={<Sparkles className="h-6 w-6 md:h-8 md:w-8" />} title="Long-Lasting Shine" text="Keeps its beautiful shine for longer with proper care, so your jewellery looks fresh and premium every day." />
+            <Benefit icon={<Droplets className="h-6 w-6 md:h-8 md:w-8" />} title="Water-Resistant" text="Designed to handle light water exposure and daily use better than normal fashion jewellery." />
+            <Benefit icon={<Gem className="h-6 w-6 md:h-8 md:w-8" />} title="Hypoallergenic" text="Skin-friendly finishing made for comfortable everyday wear." />
+            <Benefit icon={<ShieldCheck className="h-6 w-6 md:h-8 md:w-8" />} title="Tarnish-Resistant" text="Made with a protective coating that helps reduce fading, dullness, and discoloration." />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+        <div className="mb-6 md:mb-10 text-center">
+          <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-4xl text-charcoalBrown">Why Shop With Us?</h2>
+          <p className="mx-auto max-w-2xl text-sm md:text-base text-stoneGray">
+            Enjoy a seamless and secure shopping experience with every order.
           </p>
         </div>
-        
-        {/* Mobile: 2x2 grid | Desktop: 1x4 grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-          <Trust icon={<Truck className="h-4 w-4 md:h-6 md:w-6" />} title="Free Delivery" sub="Above ₹999" />
-          <Trust icon={<RotateCcw className="h-4 w-4 md:h-6 md:w-6" />} title="7-Day Returns" sub="Easy exchange" />
-          <Trust icon={<ShieldCheck className="h-4 w-4 md:h-6 md:w-6" />} title="Anti-Tarnish" sub="Verified quality" />
-          <Trust icon={<Lock className="h-4 w-4 md:h-6 md:w-6" />} title="Secure Payment" sub="COD available" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+          <Trust icon={<Truck className="h-6 w-6 md:h-8 md:w-8" />} title="Free Delivery" sub="On orders above ₹999" />
+          <Trust icon={<RotateCcw className="h-6 w-6 md:h-8 md:w-8" />} title="7-Day Return" sub="Easy return & exchange" />
+          <Trust icon={<Lock className="h-6 w-6 md:h-8 md:w-8" />} title="Secure Payment" sub="Safe checkout experience" />
+          <Trust icon={<ShieldCheck className="h-6 w-6 md:h-8 md:w-8" />} title="Verified Quality" sub="Quality checked products" />
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
+      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full overflow-hidden">
         <div className="mb-6 md:mb-10 text-center">
           <h2 className="mb-1 md:mb-3 font-serif text-2xl md:text-5xl text-charcoalBrown">Loved by Thousands</h2>
           <div className="mb-1 flex items-center justify-center gap-2">
             <span className="text-lg md:text-2xl" style={{ color: "#D4AF37" }}>★★★★★</span>
-            <span className="text-xs md:text-base font-semibold text-stoneGray">4.9/5</span>
+            <span className="text-sm md:text-base font-semibold text-stoneGray">4.9/5</span>
           </div>
         </div>
-        {/* Mobile: horizontal scroll | Desktop: grid */}
-        <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-3 md:gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 md:mx-0 md:px-0 pb-4 md:pb-0">
+        <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden -mx-4 px-4 pb-4">
           {safeReviews.slice(0, 3).map((r) => (
-            <div key={r.id} className="min-w-[75vw] sm:min-w-[60vw] md:min-w-0 snap-start glass-premium rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/60">
-              <div className="mb-3 md:mb-4 flex items-center gap-3">
+            <div key={r.id} className="min-w-[85vw] sm:min-w-[60vw] md:min-w-0 snap-start glass-premium rounded-2xl p-5 md:p-8 border border-white/60 shrink-0 shadow-sm">
+              <div className="mb-4 md:mb-6 flex items-center gap-4">
                 <div
-                  className="flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-full font-bold text-white text-sm md:text-base"
+                  className="flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-full font-bold text-white text-base md:text-lg"
                   style={{ background: r.color || "#FBCFE8" }}
                 >{r.initial || r.name?.charAt(0) || "U"}</div>
                 <div>
-                  <h4 className="text-sm md:text-base font-semibold text-charcoalBrown">{r.name}</h4>
-                  <div className="text-xs md:text-sm" style={{ color: "#D4AF37" }}>★★★★★</div>
+                  <h4 className="text-base md:text-lg font-semibold text-charcoalBrown">{r.name}</h4>
+                  <div className="text-sm md:text-base" style={{ color: "#D4AF37" }}>★★★★★</div>
                 </div>
               </div>
-              <p className="text-xs md:text-sm leading-relaxed text-stoneGray">"{r.text}"</p>
+              <p className="text-sm md:text-base leading-relaxed text-stoneGray">"{r.text}"</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* NEWSLETTER */}
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16">
-        <div className="glass-premium border border-white/60 mx-auto max-w-3xl rounded-2xl md:rounded-3xl p-6 md:p-12 text-center">
+        <div className="glass-premium border border-stone-200/60 mx-auto max-w-3xl rounded-3xl p-8 md:p-12 text-center shadow-sm">
           <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-4xl text-charcoalBrown">Join our list</h2>
-          <p className="mb-5 md:mb-6 text-xs md:text-base text-stoneGray">Get 10% off your first order and early access to new drops.</p>
+          <p className="mb-6 md:mb-8 text-sm md:text-base text-stoneGray">Get 10% off your first order and early access to new drops.</p>
           <form
             className="mx-auto flex max-w-lg flex-col gap-3 sm:flex-row"
           >
             <input
               type="email"
               placeholder="your@email.com"
-              className="neo-input w-full px-4 py-2.5 md:py-3 text-sm"
+              className="neo-input w-full px-4 py-3 md:py-3.5 text-sm"
               required
             />
-            <button type="submit" className="btn-primary-gold px-6 py-2.5 md:py-3 text-sm">Subscribe</button>
+            <button type="submit" className="btn-primary-gold px-8 py-3 md:py-3.5 text-sm whitespace-nowrap">Subscribe</button>
           </form>
         </div>
       </section>
@@ -284,12 +327,12 @@ export default async function HomePage() {
 
 function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: string; ctaTo: string }) {
   return (
-    <div className="mb-4 md:mb-8 flex flex-row items-end justify-between gap-4">
+    <div className="mb-5 md:mb-8 flex flex-row items-end justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="mb-0.5 font-serif text-xl md:text-5xl text-charcoalBrown">{title}</h2>
-        <p className="text-[10px] text-stoneGray md:text-base hidden sm:block">{subtitle}</p>
+        <h2 className="mb-1 font-serif text-2xl md:text-5xl text-charcoalBrown">{title}</h2>
+        <p className="text-xs text-stoneGray md:text-base hidden sm:block">{subtitle}</p>
       </div>
-      <Link href={ctaTo} className="text-xs md:text-sm font-semibold underline text-stoneGray hover:text-charcoalBrown whitespace-nowrap md:btn-liquid md:no-underline md:inline-flex">View All</Link>
+      <Link href={ctaTo} className="text-sm font-semibold underline text-stoneGray hover:text-charcoalBrown whitespace-nowrap md:btn-liquid md:no-underline md:inline-flex">View All</Link>
     </div>
   );
 }
@@ -299,7 +342,6 @@ function CategoryTile({
 }: { category: any; className?: string; featured?: boolean }) {
   if (!category) return null;
   
-  // Provide beautiful fallback images based on category name if none exists in Firestore
   const fallbackImages: Record<string, string> = {
     ring: "/product-ring.jpg",
     earring: "/product-earrings.jpg",
@@ -320,24 +362,34 @@ function CategoryTile({
   return (
     <Link
       href={`/shop?category=${category.slug}`}
-      className={`category-card relative block cursor-pointer overflow-hidden rounded-xl md:rounded-2xl ${className ?? ""}`}
+      className={`category-card relative block cursor-pointer overflow-hidden rounded-2xl shadow-sm border border-stone-100 ${className ?? ""}`}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2121]/80 via-[#2C2121]/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoalBrown/80 via-charcoalBrown/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-90" />
       <img src={imageSrc} alt={category.name} className="h-full w-full absolute inset-0 object-cover transition-transform duration-700 hover:scale-105" />
-      <div className="absolute bottom-2 left-2 md:bottom-3 md:left-4 z-10 text-white">
-        <h3 className={`relative z-20 font-serif drop-shadow-md leading-tight ${featured ? "text-lg sm:text-2xl md:text-3xl" : "text-sm sm:text-xl"}`}>{category.name}</h3>
-        <p className="relative z-20 text-[10px] md:text-xs opacity-90 drop-shadow-md mt-0.5 hidden sm:block">Explore</p>
+      <div className="absolute bottom-3 left-3 md:bottom-4 md:left-5 z-10 text-white">
+        <h3 className={`relative z-20 font-serif drop-shadow-md leading-tight ${featured ? "text-xl sm:text-2xl md:text-3xl" : "text-base sm:text-xl"}`}>{category.name}</h3>
+        <p className="relative z-20 text-[11px] md:text-xs opacity-90 drop-shadow-md mt-1 hidden sm:block">Explore</p>
       </div>
     </Link>
   );
 }
 
+function Benefit({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="glass-premium rounded-2xl p-5 md:p-8 border border-white/80 text-center flex flex-col items-center shadow-sm transition hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
+      <div className="mb-4 inline-flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-stone-50 text-[color:var(--color-gold)]">{icon}</div>
+      <h3 className="mb-2 md:mb-3 font-serif text-lg md:text-xl text-[color:var(--color-espresso)] leading-tight">{title}</h3>
+      <p className="text-sm text-[color:var(--color-muted-text)] leading-relaxed">{text}</p>
+    </div>
+  );
+}
+
 function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="glass-premium p-2.5 md:p-5 rounded-lg md:rounded-2xl flex flex-col items-center border border-white/60 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
-      <div className="mb-1.5 md:mb-3 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
-      <h4 className="text-[10px] sm:text-sm font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
-      <p className="mt-0.5 md:mt-1 text-[9px] md:text-xs text-[color:var(--color-muted-text)] leading-tight hidden sm:block">{sub}</p>
+    <div className="glass-premium p-4 md:p-6 rounded-2xl flex flex-col items-center border border-white/80 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
+      <div className="mb-2 md:mb-4 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
+      <h4 className="text-sm sm:text-base font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
+      <p className="mt-1 md:mt-2 text-xs md:text-sm text-[color:var(--color-muted-text)] leading-tight">{sub}</p>
     </div>
   );
 }
