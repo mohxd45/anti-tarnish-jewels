@@ -20,7 +20,7 @@ export function StickyCartSummaryBar({ closeDrawer, isPage = false }: StickyCart
   };
 
   return (
-    <div className={`bg-brandCardBg border-t border-brandBorder/30 px-4 py-3 shadow-soft w-full ${isPage ? 'fixed bottom-[60px] left-0 right-0 z-40 md:static md:shadow-none' : 'sticky bottom-0 z-40'}`}>
+    <div className={`bg-brandCardBg border-t border-brandBorder/30 px-4 py-3 shadow-soft w-full ${isPage ? 'fixed bottom-[72px] left-0 right-0 z-40 md:static md:shadow-none' : 'sticky bottom-0 z-40'}`}>
       <div className={`flex items-center justify-between gap-4 ${isPage ? 'max-w-7xl mx-auto' : ''}`}>
         <div className="flex flex-col">
           <span className="text-[11px] uppercase tracking-wider font-semibold text-brandMutedText">Total</span>
