@@ -22,9 +22,9 @@ import { toast } from "sonner";
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{label}</Label>
+      <Label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">{label}</Label>
       {children}
-      {hint && <p className="text-[11px] text-muted-foreground/70">{hint}</p>}
+      {hint && <p className="text-[10px] text-adminMuted/70">{hint}</p>}
     </div>
   );
 }
@@ -153,14 +153,13 @@ export default function AnnouncementsPage() {
       <div className="space-y-6 animate-in fade-in duration-500">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Announcements & Support</h1>
-            <p className="text-muted-foreground mt-1">Configure scrolling ticker, sales, and WhatsApp hotlines</p>
+            <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">Announcements & Support</h1>
+            <p className="text-adminMuted mt-1">Configure scrolling ticker, sales, and WhatsApp hotlines</p>
           </div>
           <Button 
             onClick={() => handleSaveSettings()} 
             disabled={saving}
-            className="rounded-full shadow-sm"
-            style={{ background: "var(--gradient-rose)", color: "white" }}
+            className="rounded-full shadow-md bg-adminRose text-white hover:bg-adminRose/90 border-none"
           >
             {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save Global Settings</>}
           </Button>
@@ -170,12 +169,12 @@ export default function AnnouncementsPage() {
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               
-              <AdminCard title="Announcement Ticker Items">
+              <AdminCard title="Announcement Ticker Items" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                  <div className="flex items-center justify-between border-b border-adminBorder pb-4">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Active</p>
-                      <p className="text-xs text-muted-foreground">Show top scrolling announcement bar</p>
+                      <p className="text-sm font-medium text-adminSidebar">Active</p>
+                      <p className="text-xs text-adminMuted">Show top scrolling announcement bar</p>
                     </div>
                     <Switch 
                       checked={settings.showAnnouncement} 
@@ -188,11 +187,11 @@ export default function AnnouncementsPage() {
                       
                       <div className="space-y-3">
                         {announcements.map((a, i) => (
-                          <div key={a.id} className="flex items-center gap-3 p-3 bg-card/40 border border-border/50 rounded-lg">
-                            <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
+                          <div key={a.id} className="flex items-center gap-3 p-3 bg-white border border-adminBorder rounded-lg shadow-sm">
+                            <GripVertical className="h-4 w-4 text-adminMuted cursor-move" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium">{a.emoji} {a.text}</p>
-                              <div className="flex gap-2 mt-1 text-xs text-muted-foreground">
+                              <p className="text-sm font-medium text-adminSidebar">{a.emoji} {a.text}</p>
+                              <div className="flex gap-2 mt-1 text-xs text-adminMuted">
                                 {a.couponCode && <span>Code: {a.couponCode}</span>}
                                 {a.link && <span className="truncate">Link: {a.link}</span>}
                               </div>
@@ -201,7 +200,7 @@ export default function AnnouncementsPage() {
                               checked={a.isActive} 
                               onCheckedChange={(c) => handleUpdateAnnouncement(a.id, { isActive: c })} 
                             />
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteAnnouncement(a.id)}>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteAnnouncement(a.id)} className="text-red-500 hover:text-red-600 hover:bg-red-50">
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </div>
@@ -209,13 +208,14 @@ export default function AnnouncementsPage() {
                       </div>
 
                       {isAdding ? (
-                        <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-4">
+                        <div className="p-4 bg-adminBg rounded-lg border border-adminBorder space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <Field label="Text (Required)">
                               <Input 
                                 value={newAnnouncement.text} 
                                 onChange={e => setNewAnnouncement({...newAnnouncement, text: e.target.value})} 
                                 placeholder="e.g. Free shipping on all orders!"
+                                className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                               />
                             </Field>
                             <Field label="Emoji (Optional)">
@@ -223,6 +223,7 @@ export default function AnnouncementsPage() {
                                 value={newAnnouncement.emoji} 
                                 onChange={e => setNewAnnouncement({...newAnnouncement, emoji: e.target.value})} 
                                 placeholder="e.g. ✨"
+                                className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                               />
                             </Field>
                             <Field label="Coupon Code (Optional)">
@@ -230,6 +231,7 @@ export default function AnnouncementsPage() {
                                 value={newAnnouncement.couponCode} 
                                 onChange={e => setNewAnnouncement({...newAnnouncement, couponCode: e.target.value})} 
                                 placeholder="e.g. FREESHIP"
+                                className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                               />
                             </Field>
                             <Field label="Link URL (Optional)">
@@ -237,16 +239,17 @@ export default function AnnouncementsPage() {
                                 value={newAnnouncement.link} 
                                 onChange={e => setNewAnnouncement({...newAnnouncement, link: e.target.value})} 
                                 placeholder="e.g. /shop"
+                                className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                               />
                             </Field>
                           </div>
                           <div className="flex justify-end gap-2">
-                            <Button variant="ghost" onClick={() => setIsAdding(false)}>Cancel</Button>
-                            <Button onClick={handleAddAnnouncement}>Add Item</Button>
+                            <Button variant="ghost" onClick={() => setIsAdding(false)} className="rounded-full text-adminSidebar hover:bg-white border-adminBorder">Cancel</Button>
+                            <Button onClick={handleAddAnnouncement} className="rounded-full bg-adminSidebar text-white hover:bg-adminSidebar/90 border-none">Add Item</Button>
                           </div>
                         </div>
                       ) : (
-                        <Button variant="outline" className="w-full" onClick={() => setIsAdding(true)}>
+                        <Button variant="outline" className="w-full rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg" onClick={() => setIsAdding(true)}>
                           <Plus className="h-4 w-4 mr-2" /> Add Announcement Item
                         </Button>
                       )}
@@ -267,12 +270,12 @@ export default function AnnouncementsPage() {
                 </div>
               </AdminCard>
 
-              <AdminCard title="Popups & Sales">
+              <AdminCard title="Popups & Sales" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                  <div className="flex items-center justify-between border-b border-adminBorder pb-4">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Newsletter Popup</p>
-                      <p className="text-xs text-muted-foreground">Display newsletter subscriber popups on user visit</p>
+                      <p className="text-sm font-medium text-adminSidebar">Newsletter Popup</p>
+                      <p className="text-xs text-adminMuted">Display newsletter subscriber popups on user visit</p>
                     </div>
                     <Switch 
                       checked={settings.showNewsletterPopup} 
@@ -285,7 +288,7 @@ export default function AnnouncementsPage() {
                       <Input 
                         value={settings.popupOfferTitle || ""}
                         onChange={(e) => setSettings({ ...settings, popupOfferTitle: e.target.value })}
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar rounded-xl"
                         placeholder="e.g. SPECIAL WELCOME OFFER!"
                       />
                     </Field>
@@ -293,7 +296,7 @@ export default function AnnouncementsPage() {
                       <Input 
                         value={settings.popupOfferText || ""}
                         onChange={(e) => setSettings({ ...settings, popupOfferText: e.target.value })}
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar rounded-xl"
                         placeholder="e.g. Use code WELCOME50 to unlock 50% discount."
                       />
                     </Field>
@@ -304,7 +307,7 @@ export default function AnnouncementsPage() {
                       <Input 
                         value={settings.popupOfferLinkText || ""}
                         onChange={(e) => setSettings({ ...settings, popupOfferLinkText: e.target.value })}
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar rounded-xl"
                         placeholder="e.g. Shop Now"
                       />
                     </Field>
@@ -312,7 +315,7 @@ export default function AnnouncementsPage() {
                       <Input 
                         value={settings.popupOfferLinkUrl || ""}
                         onChange={(e) => setSettings({ ...settings, popupOfferLinkUrl: e.target.value })}
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar rounded-xl"
                         placeholder="e.g. /shop"
                       />
                     </Field>
@@ -339,19 +342,19 @@ export default function AnnouncementsPage() {
                           }
                           setSettings({ ...settings, countdownTimer: val });
                         }}
-                        className="bg-card/40 font-mono text-xs"
+                        className="bg-white border-adminBorder text-adminSidebar font-mono text-xs rounded-xl"
                       />
                     </Field>
                   </div>
                 </div>
               </AdminCard>
 
-              <AdminCard title="WhatsApp Support">
+              <AdminCard title="WhatsApp Support" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                  <div className="flex items-center justify-between border-b border-adminBorder pb-4">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Floating Button</p>
-                      <p className="text-xs text-muted-foreground">Display floating WhatsApp support button</p>
+                      <p className="text-sm font-medium text-adminSidebar">Floating Button</p>
+                      <p className="text-xs text-adminMuted">Display floating WhatsApp support button</p>
                     </div>
                     <Switch 
                       checked={settings.showWhatsAppButton ?? true} 
@@ -365,12 +368,12 @@ export default function AnnouncementsPage() {
                         <Input 
                           value={settings.whatsAppSupport || ""}
                           onChange={(e) => setSettings({ ...settings, whatsAppSupport: e.target.value })}
-                          className="bg-card/40 font-mono text-xs"
+                          className="bg-white border-adminBorder text-adminSidebar font-mono text-xs rounded-xl"
                           placeholder="e.g. 919999999999"
                         />
                       </Field>
                       {!settings.whatsAppSupport?.trim() && (
-                        <div className="mt-2 text-[10px] text-dustyRose bg-dustyRose/10 border border-dustyRose/20 rounded-xl p-3 flex items-start gap-1.5 leading-snug">
+                        <div className="mt-2 text-[10px] text-red-600 bg-red-50 border border-red-100 rounded-xl p-3 flex items-start gap-1.5 leading-snug">
                           <AlertCircle size={12} className="shrink-0 mt-0.5" />
                           <span>No WhatsApp number is configured. The button will be hidden unless a fallback is set.</span>
                         </div>
@@ -380,7 +383,7 @@ export default function AnnouncementsPage() {
                       <Input 
                         value={settings.whatsAppMessage || ""}
                         onChange={(e) => setSettings({ ...settings, whatsAppMessage: e.target.value })}
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar rounded-xl"
                         placeholder="e.g. Hi LONA JEWELS, I need help..."
                       />
                     </Field>
@@ -391,8 +394,8 @@ export default function AnnouncementsPage() {
             </div>
 
             <div className="space-y-6">
-              <AdminCard title="Preview">
-                <div className="rounded-lg overflow-hidden border border-border bg-background shadow-sm">
+              <AdminCard title="Preview" className="bg-white border-adminBorder shadow-sm">
+                <div className="rounded-lg overflow-hidden border border-adminBorder bg-white shadow-sm">
                   {settings.showAnnouncement ? (
                     <div className="py-2 px-4 text-center text-[11px] font-medium tracking-wide text-white" style={{ background: "var(--gradient-rose)" }}>
                       {announcements.filter(a => a.isActive).length > 0 
@@ -400,8 +403,8 @@ export default function AnnouncementsPage() {
                         : (settings.text || "✨ Welcome to LONA JEWELS")}
                     </div>
                   ) : null}
-                  <div className="bg-card/50 p-6 flex flex-col items-center justify-center border-t border-border/40 relative">
-                    <p className="text-xs text-muted-foreground text-center mb-4">— public site preview —</p>
+                  <div className="bg-adminBg/50 p-6 flex flex-col items-center justify-center border-t border-adminBorder relative">
+                    <p className="text-xs text-adminMuted text-center mb-4">— public site preview —</p>
                     
                     {/* Fake WhatsApp Button */}
                     {settings.showWhatsAppButton !== false && (

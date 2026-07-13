@@ -432,7 +432,17 @@ export async function createOrder(orderData: {
     customerPhoneClean: (orderData.address.phone || "").replace(/[^0-9]/g, ""),
     shippingAddress: orderData.address,
     address: orderData.address, // fallback
-    items: orderData.items,
+    items: orderData.items.map(item => ({
+      ...item,
+      productId: item.product.id,
+      name: item.product.name,
+      sku: item.product?.sku || item.sku || "",
+      price: item.product.salePrice,
+      quantity: item.quantity,
+      selectedSize: item.selectedSize || "",
+      selectedColor: item.selectedColor || "",
+      image: item.product.images?.[0] || ""
+    })),
     subtotal: orderData.subtotal,
     shippingFee: orderData.shipping,
     shipping: orderData.shipping, // fallback
@@ -981,13 +991,17 @@ export async function updateOrder(orderId: string, data: Partial<Order>) {
   if (cleanData.items !== undefined) {
     publicFields.items = cleanData.items.map((item: any) => ({
       product: {
-        id: item.product.id,
-        name: item.product.name,
-        slug: item.product.slug,
-        images: item.product.images || [],
-        salePrice: item.product.salePrice
+        id: item.product?.id || item.productId,
+        name: item.product?.name || item.name,
+        slug: item.product?.slug || "",
+        images: item.product?.images || (item.image ? [item.image] : []),
+        salePrice: item.product?.salePrice || item.price,
+        sku: item.sku || item.product?.sku || ""
       },
-      quantity: item.quantity
+      quantity: item.quantity,
+      selectedSize: item.selectedSize || "",
+      selectedColor: item.selectedColor || "",
+      sku: item.sku || item.product?.sku || ""
     }));
   }
   if (cleanData.shippingAddress !== undefined) {

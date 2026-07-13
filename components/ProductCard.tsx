@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart, ShoppingBag } from "lucide-react";
 import { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
@@ -8,6 +9,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
+  const router = useRouter();
   const { addToCart } = useCart();
   const { addToWishlist: addWishlist, removeFromWishlist: removeWishlist, items: wishlist } = useWishlist();
   
@@ -15,6 +17,10 @@ export function ProductCard({ product }: { product: Product }) {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); 
+    if (product.selectedSizeRequired || product.selectedColorRequired) {
+      router.push(`/product/${product.slug || product.id}`);
+      return;
+    }
     addToCart(product, 1);
     toast.success("Added to cart!");
   };

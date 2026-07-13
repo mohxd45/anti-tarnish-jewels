@@ -81,6 +81,8 @@ export async function POST(req: Request) {
           slug: productData.slug || "",
         } as any,
         quantity,
+        selectedSize: item.selectedSize || undefined,
+        selectedColor: item.selectedColor || undefined,
       });
     }
 

@@ -49,16 +49,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const userRole = profile?.role || null;
-  const userStatus = profile?.status || "active";
-
   const isAdminEmail = !!user?.email && (
     user.email === ADMIN_EMAIL ||
     user.email === ADMIN_ENV_EMAIL ||
     user.email === ADDITIONAL_ADMIN
   );
 
-  const isAdmin = isAdminEmail || !!(userRole && ["admin", "owner_admin", "partner_admin", "developer_admin"].includes(userRole));
+  // If user has an admin email but no admin role, override to owner_admin safely in memory
+  let userRole = profile?.role || null;
+  if (isAdminEmail && (!userRole || userRole === "customer")) {
+    userRole = "owner_admin";
+  }
+
+  const userStatus = profile?.status || "active";
+  const isAdmin = !!(userRole && ["admin", "owner", "owner_admin", "partner_admin", "developer_admin", "staff"].includes(userRole));
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -117,10 +121,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profileData.createdAt = new Date().toISOString();
           } else {
             // Only set safe defaults if explicitly missing. Do NOT overwrite existing fields!
-            // WARNING: We must NOT set role to customer if it's undefined because the user might have a typo like 'Role: admin' in the DB.
-            // if (!existingProfile.role) profileData.role = "customer"; // Commented out to prevent overwriting manually fixed roles
             if (!existingProfile.status) profileData.status = "active";
             if (!existingProfile.createdAt) profileData.createdAt = new Date().toISOString();
+            
+            // CRITICAL: Guarantee we never accidentally overwrite an existing user's role
+            // by explicitly removing the role key from profileData if they already exist.
+            delete profileData.role;
           }
           
           // Check for staff invite ONLY if creating a new user or missing a role completely

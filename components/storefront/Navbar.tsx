@@ -48,13 +48,13 @@ export function Navbar({ settings }: { settings?: any }) {
 
           <div className="hidden items-center gap-6 lg:flex">
             <NavItem href="/shop">All Jewellery</NavItem>
-            <NavItem href="/shop?category=Rings">Rings</NavItem>
-            <NavItem href="/shop?category=Earrings">Earrings</NavItem>
-            <NavItem href="/shop?category=Necklaces">Necklaces</NavItem>
-            <NavItem href="/shop?category=Bracelets">Bracelets</NavItem>
+            <NavItem href="/shop?category=rings">Rings</NavItem>
+            <NavItem href="/shop?category=earrings">Earrings</NavItem>
+            <NavItem href="/shop?category=necklaces">Necklaces</NavItem>
+            <NavItem href="/shop?category=bracelets">Bracelets</NavItem>
             <Link
-              href="/sale"
-              className="text-sm font-semibold text-stoneGray transition hover:text-stoneGray"
+              href="/shop?category=sale"
+              className="text-sm font-semibold text-stoneGray transition hover:text-[#3A2428]"
             >
               Sale
             </Link>

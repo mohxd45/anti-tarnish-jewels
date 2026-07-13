@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
 import { getContactMessages, updateContactMessage, deleteContactMessage , logActivity } from "@/lib/firestore";
@@ -89,44 +88,44 @@ export default function MessagesPage() {
       <div className="space-y-6 animate-in fade-in duration-500">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Customer Messages</h1>
-            <p className="text-muted-foreground mt-1">Replies from your contact form</p>
+            <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">Customer Messages</h1>
+            <p className="text-adminMuted mt-1">Replies from your contact form</p>
           </div>
         </div>
 
         {loading ? (
-          <div className="flex h-[40vh] items-center justify-center text-muted-foreground">
+          <div className="flex h-[40vh] items-center justify-center text-adminMuted">
             <HeartLoader text="Loading messages..." />
           </div>
         ) : messages.length === 0 ? (
-          <AdminCard className="p-12 text-center shadow-sm">
-            <div className="bg-secondary/50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Mail className="h-6 w-6 text-muted-foreground" />
+          <AdminCard className="p-12 text-center shadow-sm bg-white border-adminBorder">
+            <div className="bg-adminBg w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Mail className="h-6 w-6 text-adminMuted" />
             </div>
-            <h3 className="text-xl font-display text-foreground">No Messages Received</h3>
-            <p className="text-muted-foreground text-sm mt-2">Emails submitted through the contact page will appear here.</p>
+            <h3 className="text-xl font-serif text-adminSidebar">No Messages Received</h3>
+            <p className="text-adminMuted text-sm mt-2">Emails submitted through the contact page will appear here.</p>
           </AdminCard>
         ) : (
-          <div className="glass-card divide-y divide-border/60 rounded-2xl border border-border/60 shadow-sm bg-card/40">
+          <div className="divide-y divide-adminBorder rounded-2xl border border-adminBorder shadow-sm bg-white overflow-hidden">
             {paginatedMessages.map((m) => {
               const targetId = m.id || m.createdAt;
               return (
-                <div key={targetId} className={`p-4 sm:p-5 flex flex-wrap gap-3 items-start hover:bg-secondary/30 transition-colors ${!m.isRead ? "bg-primary/5" : ""}`}>
-                  <div className="h-10 w-10 rounded-full grid place-items-center text-white text-xs font-semibold shrink-0" style={{ background: "var(--gradient-rose)" }}>
+                <div key={targetId} className={`p-4 sm:p-5 flex flex-wrap gap-3 items-start hover:bg-adminBg transition-colors ${!m.isRead ? "bg-adminRose/5" : ""}`}>
+                  <div className="h-10 w-10 rounded-full grid place-items-center text-white text-xs font-semibold shrink-0 bg-adminRose shadow-sm">
                     {(m.name || "A").split(" ").map((n: string) => n[0]).join("")}
                   </div>
                   
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className={`font-medium ${!m.isRead ? "text-foreground font-semibold" : "text-foreground/80"}`}>{m.name}</span>
-                      <span className="text-xs text-muted-foreground">{m.email}</span>
-                      {m.phone && <span className="text-xs text-muted-foreground">· {m.phone}</span>}
-                      {m.createdAt && <span className="ml-auto text-xs text-muted-foreground">{new Date(m.createdAt).toLocaleString()}</span>}
+                      <span className={`font-serif ${!m.isRead ? "text-adminSidebar font-semibold" : "text-adminSidebar/80"}`}>{m.name}</span>
+                      <span className="text-xs text-adminMuted">{m.email}</span>
+                      {m.phone && <span className="text-xs text-adminMuted">· {m.phone}</span>}
+                      {m.createdAt && <span className="ml-auto text-xs text-adminMuted">{new Date(m.createdAt).toLocaleString()}</span>}
                     </div>
                     
-                    <p className={`text-sm mt-1.5 whitespace-pre-wrap leading-relaxed ${!m.isRead ? "text-foreground" : "text-foreground/70"}`}>{m.message}</p>
+                    <p className={`text-sm mt-1.5 whitespace-pre-wrap leading-relaxed ${!m.isRead ? "text-adminSidebar font-medium" : "text-adminMuted"}`}>{m.message}</p>
                     
-                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-border/30">
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-adminBorder">
                       <StatusBadge status={m.isReplied ? "Replied" : "Pending"} />
                       <span className="ml-auto" />
                       
@@ -135,7 +134,7 @@ export default function MessagesPage() {
                         variant="outline" 
                         disabled={statusLoadingId === targetId}
                         onClick={() => toggleReplied(m)}
-                        className="h-8 text-xs rounded-xl"
+                        className="h-8 text-xs rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg"
                       >
                         {statusLoadingId === targetId ? <HeartLoader size="sm" text="" /> : m.isReplied ? <><Undo2 className="h-3.5 w-3.5 mr-1" /> Unmark Reply</> : <><Check className="h-3.5 w-3.5 mr-1" /> Mark Replied</>}
                       </Button>
@@ -145,7 +144,7 @@ export default function MessagesPage() {
                         variant="outline" 
                         disabled={statusLoadingId === targetId}
                         onClick={() => toggleRead(m)}
-                        className="h-8 text-xs rounded-xl"
+                        className="h-8 text-xs rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg"
                       >
                         {statusLoadingId === targetId ? <HeartLoader size="sm" text="" /> : m.isRead ? <><Mail className="h-3.5 w-3.5 mr-1" /> Mark unread</> : <><CheckCheck className="h-3.5 w-3.5 mr-1" /> Mark read</>}
                       </Button>
@@ -155,7 +154,7 @@ export default function MessagesPage() {
                         variant="ghost" 
                         disabled={deleteLoadingId === targetId}
                         onClick={() => handleDelete(m)}
-                        className="h-8 w-8 rounded-xl text-dustyRose hover:text-dustyRose hover:bg-dustyRose/10"
+                        className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50"
                       >
                         {deleteLoadingId === targetId ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-4 w-4" />}
                       </Button>
@@ -167,8 +166,8 @@ export default function MessagesPage() {
 
             {/* Pagination Controls */}
             {messages.length > ITEMS_PER_PAGE && (
-              <div className="flex items-center justify-between p-4 px-5">
-                <span className="text-xs text-muted-foreground">
+              <div className="flex items-center justify-between p-4 px-5 bg-adminBg/30">
+                <span className="text-xs text-adminMuted">
                   Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, messages.length)} of {messages.length} messages
                 </span>
                 <div className="flex gap-2">
@@ -177,7 +176,7 @@ export default function MessagesPage() {
                     size="sm"
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                    className="h-8 text-xs rounded-xl"
+                    className="h-8 text-xs rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg"
                   >
                     Previous
                   </Button>
@@ -186,7 +185,7 @@ export default function MessagesPage() {
                     size="sm"
                     disabled={currentPage * ITEMS_PER_PAGE >= messages.length}
                     onClick={() => setCurrentPage((prev) => prev + 1)}
-                    className="h-8 text-xs rounded-xl"
+                    className="h-8 text-xs rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg"
                   >
                     Next
                   </Button>

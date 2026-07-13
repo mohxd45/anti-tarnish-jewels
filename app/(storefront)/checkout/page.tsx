@@ -216,16 +216,33 @@ export default function CheckoutPage() {
                         src={getOptimizedImageUrl(it.product.images[0], 150)} 
                         alt="" 
                         className="h-full w-full object-cover" 
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).onerror = null;
+                          (e.target as HTMLImageElement).src = "/product-stack.jpg";
+                        }}
                       />
                     ) : (
-                      <ImageIcon className="h-6 w-6 text-stone-300" />
+                      <img src="/product-stack.jpg" alt="Product" className="h-full w-full object-cover opacity-80" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1 flex flex-col justify-center">
                     <p className="truncate text-sm font-medium text-[#3A2428] line-clamp-2 leading-tight mb-1" style={{ whiteSpace: 'normal' }}>
                       {it.product.name}
                     </p>
-                    <p className="text-xs text-[#8F817B]">Qty {it.quantity}</p>
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-xs text-[#8F817B] font-medium">Qty {it.quantity}</p>
+                      {(it.selectedSize || it.selectedColor) && (
+                        <p className="text-[11px] text-[#8F817B]">
+                          {[
+                            it.selectedSize ? `Size: ${it.selectedSize}` : null,
+                            it.selectedColor ? `Color: ${it.selectedColor}` : null
+                          ].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                      {(it.sku || it.product.sku) && (
+                        <p className="text-[10px] text-[#8F817B] mt-0.5">Item Code: {it.sku || it.product.sku}</p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex flex-col items-end justify-center shrink-0">
                     <p className="text-sm font-semibold text-[#3A2428]">₹{it.product.salePrice * it.quantity}</p>
@@ -249,7 +266,7 @@ export default function CheckoutPage() {
               
               <div className="mt-4 pt-4 border-t border-[#E8D7C8] flex justify-between items-center">
                 <span className="font-serif text-xl font-bold text-[#3A2428]">Total</span>
-                <span className="text-[22px] font-bold text-[#B8955E]">₹{cart.total + (cart.shipping || 0)}</span>
+                <span className="text-[22px] font-bold text-[#B8955E]">₹{cart.total}</span>
               </div>
             </div>
             
@@ -259,17 +276,17 @@ export default function CheckoutPage() {
           </aside>
 
           {/* Sticky Place Order Bar */}
-          <div className="fixed bottom-[72px] left-0 right-0 z-40 bg-[#FFF9FB] border-t border-[#E8D7C8] px-4 py-3 shadow-[0_-6px_20px_rgba(58,36,40,0.06)] lg:static lg:bottom-auto lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:mt-0">
+          <div className="fixed bottom-[60px] md:bottom-0 left-0 right-0 z-[100] bg-[#FFF9FB] border-t border-[#E8D7C8] px-4 py-3 shadow-[0_-6px_20px_rgba(58,36,40,0.06)] lg:static lg:bottom-auto lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:mt-0">
             <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
               <div className="flex flex-col lg:hidden">
                 <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8F817B]">Total</span>
-                <span className="text-[20px] leading-tight font-bold text-[#B8955E]">₹{cart.total + (cart.shipping || 0)}</span>
+                <span className="text-[20px] leading-tight font-bold text-[#B8955E]">₹{cart.total}</span>
               </div>
               <button 
                 type="submit" 
                 form="checkout-form" 
                 disabled={loading || settings?.codEnabled === false} 
-                className="w-[60%] lg:w-full bg-[#B8955E] hover:bg-[#A08050] text-white font-medium py-3.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-[60%] lg:w-full bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] hover:from-[#A08050] hover:to-[#C6AE8B] text-white font-semibold py-3.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? "Processing..." : "Place Order"}
               </button>

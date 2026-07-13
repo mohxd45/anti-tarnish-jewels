@@ -175,55 +175,55 @@ export default function ManageUsersPage() {
       <div className="space-y-6 animate-in fade-in duration-500">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Users & Customers</h1>
-            <p className="text-muted-foreground mt-1">Manage users, view customer spendings, and track guest checkouts.</p>
+            <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">Users & Customers</h1>
+            <p className="text-adminMuted mt-1">Manage users, view customer spendings, and track guest checkouts.</p>
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-adminMuted" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, email, or phone…"
-              className="pl-9 w-full sm:w-64 bg-card/60 rounded-full text-xs"
+              className="pl-9 w-full sm:w-64 bg-white border-adminBorder text-adminSidebar rounded-full text-xs"
             />
           </div>
         </div>
 
         {/* Dashboard Quick Stats */}
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="glass-card p-4 rounded-2xl border border-border/60 bg-card/40 shadow-sm flex flex-col justify-center">
-            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Total Registered</span>
-            <span className="text-3xl font-display font-semibold text-foreground mt-1">{totalRegistered}</span>
+          <div className="p-4 rounded-2xl border border-adminBorder bg-white shadow-sm flex flex-col justify-center">
+            <span className="text-[11px] uppercase tracking-widest text-adminMuted font-semibold">Total Registered</span>
+            <span className="text-3xl font-serif font-semibold text-adminSidebar mt-1">{totalRegistered}</span>
           </div>
-          <div className="glass-card p-4 rounded-2xl border border-border/60 bg-card/40 shadow-sm flex flex-col justify-center">
-            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Guest Customers</span>
-            <span className="text-3xl font-display font-semibold text-foreground mt-1">{totalGuests}</span>
+          <div className="p-4 rounded-2xl border border-adminBorder bg-white shadow-sm flex flex-col justify-center">
+            <span className="text-[11px] uppercase tracking-widest text-adminMuted font-semibold">Guest Customers</span>
+            <span className="text-3xl font-serif font-semibold text-adminSidebar mt-1">{totalGuests}</span>
           </div>
-          <div className="glass-card p-4 rounded-2xl border border-border/60 bg-card/40 shadow-sm flex flex-col justify-center">
-            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Staff & Admins</span>
-            <span className="text-3xl font-display font-semibold text-primary mt-1">{totalAdmins}</span>
+          <div className="p-4 rounded-2xl border border-adminBorder bg-white shadow-sm flex flex-col justify-center">
+            <span className="text-[11px] uppercase tracking-widest text-adminMuted font-semibold">Staff & Admins</span>
+            <span className="text-3xl font-serif font-semibold text-adminGold mt-1">{totalAdmins}</span>
           </div>
         </div>
 
-        <AdminCard className="p-0 overflow-hidden border border-border/60 shadow-sm">
+        <AdminCard className="p-0 overflow-hidden border border-adminBorder shadow-sm bg-white">
           {loading ? (
             <div className="flex h-[400px] flex-col items-center justify-center space-y-4">
               <HeartLoader text="Retrieving customer records..." />
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="bg-secondary/50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Users className="h-6 w-6 text-muted-foreground" />
+              <div className="bg-adminBg w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users className="h-6 w-6 text-adminMuted" />
               </div>
-              <h3 className="text-lg font-display text-foreground">No users found</h3>
-              <p className="text-muted-foreground text-sm mt-1">No customers match your search query.</p>
+              <h3 className="text-lg font-serif text-adminSidebar">No users found</h3>
+              <p className="text-adminMuted text-sm mt-1">No customers match your search query.</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto -mx-2">
                 <table className="w-full text-sm min-w-[1000px]">
-                  <thead className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    <tr className="text-left border-b border-border/40">
+                  <thead className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold bg-adminBg">
+                    <tr className="text-left border-b border-adminBorder">
                       <th className="px-4 py-3 pb-4">Customer</th>
                       <th className="px-4 py-3 pb-4">Role / Type</th>
                       <th className="px-4 py-3 pb-4">Last Order</th>
@@ -232,52 +232,52 @@ export default function ManageUsersPage() {
                       <th className="px-4 py-3 pb-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/40">
+                  <tbody className="divide-y divide-adminBorder">
                     {paginatedUsers.map((user) => {
                       const isStaffOrAdmin = user.role !== "customer";
                       return (
-                        <tr key={user.uid} className="hover:bg-secondary/40 transition-colors">
+                        <tr key={user.uid} className="hover:bg-adminBg/50 transition-colors">
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-3">
                               {user.photoURL ? (
-                                <img src={user.photoURL} alt={user.displayName || "User"} className="h-9 w-9 rounded-full object-cover border border-border" />
+                                <img src={user.photoURL} alt={user.displayName || "User"} className="h-9 w-9 rounded-full object-cover border border-adminBorder" />
                               ) : (
-                                <div className="h-9 w-9 rounded-full grid place-items-center text-white text-xs font-semibold" style={{ background: "var(--gradient-gold)" }}>
+                                <div className="h-9 w-9 rounded-full grid place-items-center text-white text-xs font-semibold bg-adminGold">
                                   {(user.displayName || "A")[0].toUpperCase()}
                                 </div>
                               )}
                               <div>
-                                <div className="font-medium text-foreground">{user.displayName || "Anonymous User"}</div>
-                                {user.email && <div className="text-xs text-muted-foreground mt-0.5">{user.email}</div>}
-                                {user.phone && <div className="text-xs text-muted-foreground mt-0.5">{user.phone}</div>}
+                                <div className="font-medium text-adminSidebar">{user.displayName || "Anonymous User"}</div>
+                                {user.email && <div className="text-xs text-adminMuted mt-0.5">{user.email}</div>}
+                                {user.phone && <div className="text-xs text-adminMuted mt-0.5">{user.phone}</div>}
                               </div>
                             </div>
                           </td>
                           <td className="px-4 py-4">
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
                               isStaffOrAdmin
-                                ? "bg-primary/10 text-primary"
+                                ? "bg-adminRose text-white"
                                 : user.isGuest 
-                                ? "bg-orange-100 text-orange-800"
-                                : "bg-secondary text-muted-foreground"
+                                ? "bg-orange-50 text-orange-600 border border-orange-200"
+                                : "bg-adminBg text-adminSidebar border border-adminBorder"
                             }`}>
                               {isStaffOrAdmin ? <Shield size={12} /> : null}
                               <span>{isStaffOrAdmin ? user.role.replace("_", " ") : (user.isGuest ? "Guest" : "Registered")}</span>
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-xs text-muted-foreground">
+                          <td className="px-4 py-4 text-xs text-adminMuted">
                             {user.lastOrderDate ? new Date(user.lastOrderDate).toLocaleDateString() : "No orders"}
                           </td>
-                          <td className="px-4 py-4 text-center tabular-nums text-foreground font-medium">
+                          <td className="px-4 py-4 text-center tabular-nums text-adminSidebar font-medium">
                             {user.ordersCount || 0}
                           </td>
-                          <td className="px-4 py-4 text-right tabular-nums font-semibold text-foreground">
+                          <td className="px-4 py-4 text-right tabular-nums font-semibold text-adminSidebar">
                             {formatPrice(user.totalSpent || 0)}
                           </td>
                           <td className="px-4 py-4 text-right space-x-2">
                             {user.email && (
                               <Link href={`/admin/orders?search=${encodeURIComponent(user.email)}`}>
-                                <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground hover:text-foreground">
+                                <Button variant="ghost" size="sm" className="h-8 text-xs text-adminMuted hover:text-adminSidebar hover:bg-adminBg">
                                   <ExternalLink size={14} className="mr-1.5" /> Orders
                                 </Button>
                               </Link>
@@ -289,8 +289,8 @@ export default function ManageUsersPage() {
                                 onClick={() => handleToggleBlock(user.uid, !!user.blocked)}
                                 className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium disabled:opacity-50 transition-colors ${
                                   user.blocked
-                                    ? "bg-dustyRose/10 text-dustyRose hover:bg-dustyRose/20"
-                                    : "bg-secondary hover:bg-secondary/80 text-foreground"
+                                    ? "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+                                    : "bg-adminBg hover:bg-adminBg/80 text-adminSidebar border border-adminBorder"
                                 }`}
                               >
                                 {restrictLoadingId === user.uid ? (
@@ -316,8 +316,8 @@ export default function ManageUsersPage() {
               
               {/* Pagination Controls */}
               {filteredUsers.length > ITEMS_PER_PAGE && (
-                <div className="flex items-center justify-between border-t border-border/40 pt-4 mt-2 px-2">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex items-center justify-between border-t border-adminBorder pt-4 mt-2 px-2">
+                  <span className="text-xs text-adminMuted">
                     Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredUsers.length)} of {filteredUsers.length}
                   </span>
                   <div className="flex gap-2">
@@ -326,7 +326,7 @@ export default function ManageUsersPage() {
                       size="sm"
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                      className="h-8 text-xs rounded-xl"
+                      className="h-8 text-xs rounded-xl border-adminBorder text-adminSidebar hover:bg-adminBg"
                     >
                       Previous
                     </Button>
@@ -335,7 +335,7 @@ export default function ManageUsersPage() {
                       size="sm"
                       disabled={currentPage * ITEMS_PER_PAGE >= filteredUsers.length}
                       onClick={() => setCurrentPage((prev) => prev + 1)}
-                      className="h-8 text-xs rounded-xl"
+                      className="h-8 text-xs rounded-xl border-adminBorder text-adminSidebar hover:bg-adminBg"
                     >
                       Next
                     </Button>

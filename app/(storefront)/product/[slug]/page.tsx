@@ -32,5 +32,14 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
 
   const similarProducts = await getSimilarProducts(product.category, product.id, 4);
 
-  return <ProductDetailsClient product={product} initialSimilar={similarProducts} />;
+  return (
+    <>
+      <style>{`
+        .whatsapp-button { display: none !important; }
+      `}</style>
+      <div className="bg-[#FFF0F5] min-h-[100dvh] pb-40 md:pb-24">
+        <ProductDetailsClient product={product} initialSimilar={similarProducts} />
+      </div>
+    </>
+  );
 }

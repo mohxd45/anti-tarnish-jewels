@@ -17,9 +17,9 @@ import { toast } from "sonner";
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{label}</Label>
+      <Label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">{label}</Label>
       {children}
-      {hint && <p className="text-[11px] text-muted-foreground/70">{hint}</p>}
+      {hint && <p className="text-[11px] text-adminMuted/70">{hint}</p>}
     </div>
   );
 }
@@ -83,7 +83,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <Protected adminOnly>
-        <div className="flex h-[50vh] items-center justify-center text-muted-foreground">
+        <div className="flex h-[50vh] items-center justify-center text-adminMuted">
           <HeartLoader text="Loading settings..." />
         </div>
       </Protected>
@@ -96,14 +96,13 @@ export default function SettingsPage() {
         <form onSubmit={handleSave} className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">System Settings</h1>
-              <p className="text-muted-foreground mt-1">Store profile, preferences, and identity</p>
+              <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">System Settings</h1>
+              <p className="text-adminMuted mt-1">Store profile, preferences, and identity</p>
             </div>
             <Button 
               type="submit" 
               disabled={saving}
-              className="rounded-full shadow-sm"
-              style={{ background: "var(--gradient-rose)", color: "white" }}
+              className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md"
             >
               {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save settings</>}
             </Button>
@@ -111,11 +110,11 @@ export default function SettingsPage() {
 
           {settings && (
             <div className="grid lg:grid-cols-2 gap-6">
-              <AdminCard title="Store Identity">
+              <AdminCard title="Store Identity" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-5">
                   <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-2xl grid place-items-center text-white shadow-sm" style={{ background: "var(--gradient-rose)" }}>
-                      <span className="font-display text-2xl">{settings.logoText || (settings.brandName || "A").charAt(0)}</span>
+                    <div className="h-16 w-16 rounded-2xl grid place-items-center text-white bg-adminGold shadow-sm">
+                      <span className="font-serif font-bold text-2xl">{settings.logoText || (settings.brandName || "A").charAt(0)}</span>
                     </div>
                   </div>
                   
@@ -124,7 +123,7 @@ export default function SettingsPage() {
                       value={settings.brandName || ""}
                       onChange={(e) => setSettings({ ...settings, brandName: e.target.value })}
                       required
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                   
@@ -132,7 +131,7 @@ export default function SettingsPage() {
                     <Input 
                       value={settings.subtitle || ""}
                       onChange={(e) => setSettings({ ...settings, subtitle: e.target.value })}
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                       placeholder="e.g. Elegant Anti-Tarnish Jewelry"
                     />
                   </Field>
@@ -142,7 +141,7 @@ export default function SettingsPage() {
                       value={settings.logoText || ""}
                       onChange={(e) => setSettings({ ...settings, logoText: e.target.value })}
                       maxLength={4}
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                   
@@ -151,20 +150,20 @@ export default function SettingsPage() {
                       value={settings.trustBadgeText || ""}
                       onChange={(e) => setSettings({ ...settings, trustBadgeText: e.target.value })}
                       placeholder="e.g. Verified quality"
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                 </div>
               </AdminCard>
 
-              <AdminCard title="Contact & Socials">
+              <AdminCard title="Contact & Socials" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-5">
                   <Field label="WhatsApp Number">
                     <Input 
                       value={settings.whatsAppNumber || ""}
                       onChange={(e) => setSettings({ ...settings, whatsAppNumber: e.target.value })}
                       placeholder="+91..."
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                   
@@ -173,7 +172,7 @@ export default function SettingsPage() {
                       type="email"
                       value={settings.email || ""}
                       onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                   
@@ -181,25 +180,25 @@ export default function SettingsPage() {
                     <Input 
                       value={settings.businessAddress || ""}
                       onChange={(e) => setSettings({ ...settings, businessAddress: e.target.value })}
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                   
                   <Field label="Instagram URL">
                     <div className="flex items-center gap-2">
-                      <div className="h-10 w-10 rounded-xl bg-secondary grid place-items-center"><LinkIcon className="h-4 w-4" /></div>
+                      <div className="h-10 w-10 rounded-xl bg-adminBg text-adminMuted border border-adminBorder grid place-items-center"><LinkIcon className="h-4 w-4" /></div>
                       <Input 
                         value={settings.socialLinks?.instagram || ""}
                         onChange={(e) => setSettings({ ...settings, socialLinks: { ...settings.socialLinks, instagram: e.target.value } })}
                         placeholder="https://instagram.com/..."
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                       />
                     </div>
                   </Field>
                 </div>
               </AdminCard>
 
-              <AdminCard title="Store Policies & Delivery">
+              <AdminCard title="Store Policies & Delivery" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-5">
                   <Field label="Free Delivery Threshold (₹)">
                     <Input 
@@ -207,7 +206,7 @@ export default function SettingsPage() {
                       value={settings.freeDeliveryAmount || ""}
                       onChange={(e) => setSettings({ ...settings, freeDeliveryAmount: Number(e.target.value) })}
                       placeholder="999"
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
 
@@ -217,7 +216,7 @@ export default function SettingsPage() {
                       value={settings.deliveryFee || ""}
                       onChange={(e) => setSettings({ ...settings, deliveryFee: Number(e.target.value) })}
                       placeholder="100"
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
 
@@ -226,7 +225,7 @@ export default function SettingsPage() {
                       value={settings.deliveryText || ""}
                       onChange={(e) => setSettings({ ...settings, deliveryText: e.target.value })}
                       placeholder="Free delivery on prepaid orders"
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
 
@@ -236,9 +235,9 @@ export default function SettingsPage() {
                       id="codEnabled" 
                       checked={settings.codEnabled !== false}
                       onChange={(e) => setSettings({ ...settings, codEnabled: e.target.checked })}
-                      className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-600"
+                      className="h-4 w-4 rounded border-adminBorder text-adminGold focus:ring-adminGold"
                     />
-                    <label htmlFor="codEnabled" className="text-sm font-medium text-pink-900">
+                    <label htmlFor="codEnabled" className="text-sm font-medium text-adminSidebar">
                       Enable Cash on Delivery (COD)
                     </label>
                   </div>
@@ -248,7 +247,7 @@ export default function SettingsPage() {
                       value={settings.codText || ""}
                       onChange={(e) => setSettings({ ...settings, codText: e.target.value })}
                       placeholder="COD is available. Please keep exact change."
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                   
@@ -257,26 +256,26 @@ export default function SettingsPage() {
                       value={settings.checkoutNote || ""}
                       onChange={(e) => setSettings({ ...settings, checkoutNote: e.target.value })}
                       placeholder="All orders are final."
-                      className="bg-card/40"
+                      className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                     />
                   </Field>
                 </div>
               </AdminCard>
 
-              <AdminCard title="Appearance Preferences">
+              <AdminCard title="Appearance Preferences" className="bg-white border-adminBorder shadow-sm">
                 <div className="space-y-5">
                   <div className="grid grid-cols-3 gap-3">
-                    <button type="button" disabled className="rounded-xl p-4 text-sm font-medium text-center ring-1 ring-border opacity-70 cursor-not-allowed" style={{ background: "var(--gradient-rose)", color: "white" }}>
+                    <button type="button" disabled className="rounded-xl p-4 text-sm font-medium text-center ring-1 ring-adminBorder opacity-70 cursor-not-allowed bg-adminRose text-white">
                       Rose
                     </button>
-                    <button type="button" disabled className="rounded-xl p-4 text-sm font-medium text-center ring-1 ring-border opacity-70 cursor-not-allowed" style={{ background: "var(--gradient-gold)", color: "white" }}>
+                    <button type="button" disabled className="rounded-xl p-4 text-sm font-medium text-center ring-1 ring-adminBorder opacity-70 cursor-not-allowed bg-adminGold text-white">
                       Gold
                     </button>
-                    <button type="button" disabled className="rounded-xl p-4 text-sm font-medium text-center ring-1 ring-border opacity-70 cursor-not-allowed" style={{ background: "var(--noir)", color: "var(--cream)" }}>
+                    <button type="button" disabled className="rounded-xl p-4 text-sm font-medium text-center ring-1 ring-adminBorder opacity-70 cursor-not-allowed bg-adminSidebar text-white">
                       Noir
                     </button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">Theme color selection is currently locked to default styling.</p>
+                  <p className="text-xs text-adminMuted mt-2">Theme color selection is currently locked to default styling.</p>
                 </div>
               </AdminCard>
             </div>

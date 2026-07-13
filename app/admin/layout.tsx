@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Protected } from "@/components/Protected";
 import { AdminLayout as LayoutComponent } from "@/components/admin/AdminLayout";
 import { usePathname } from "next/navigation";
@@ -11,8 +10,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (isLoginPage) {
     return (
-      <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center relative">
-        <div className="absolute inset-0 bg-[var(--gradient-spotlight)] pointer-events-none" />
+      <div className="min-h-screen bg-adminBg text-adminSidebar flex flex-col items-center justify-center relative">
+        <div className="absolute inset-0 bg-[var(--gradient-spotlight)] pointer-events-none opacity-50" />
         {children}
       </div>
     );

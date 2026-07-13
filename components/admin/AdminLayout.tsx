@@ -46,18 +46,18 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-[color:var(--color-border)] bg-white">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white" style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-gold-deep))" }}>
+    <div className="flex h-full flex-col bg-adminSidebar text-white">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-white/5">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-adminSidebar bg-adminGold shadow-sm">
           <Gem className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="font-serif text-lg leading-tight truncate text-[color:var(--color-espresso)] font-bold">Anti Tarnish</p>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-muted-text)] font-semibold">Jewels Admin</p>
+          <p className="font-serif text-lg leading-tight truncate text-white font-bold tracking-wide">LONA JEWELS</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-adminGold/80 font-semibold">Admin Panel</p>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin bg-white">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin">
         {nav.filter(item => {
           if (item.adminOnly && !isAdmin) return false;
           if (item.devOnly && userRole !== "developer_admin") return false;
@@ -72,11 +72,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
               className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all duration-200 ${
                 active
-                  ? "bg-beige text-[color:var(--color-espresso)] font-semibold shadow-sm border border-pink-100"
-                  : "text-[color:var(--color-muted-text)] hover:bg-beige/50 hover:text-[color:var(--color-espresso)] border border-transparent"
+                  ? "bg-adminGold text-white shadow-md font-semibold"
+                  : "text-adminMuted hover:bg-white/5 hover:text-white"
               }`}
             >
-              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[color:var(--color-gold)]" : "opacity-70 group-hover:text-[color:var(--color-gold)]"}`} />
+              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-white" : "opacity-70 group-hover:text-adminGold"}`} />
               <span className="truncate">{item.label}</span>
               {active && <ChevronRight className="ml-auto h-3.5 w-3.5 text-[color:var(--color-gold)]" />}
             </Link>
@@ -84,10 +84,10 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="border-t border-[color:var(--color-border)] p-3 bg-white">
+      <div className="border-t border-white/5 p-3">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-[color:var(--color-muted-text)] hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-adminRose hover:bg-adminRose/10 hover:text-white transition-colors"
         >
           <LogOut className="h-4 w-4" />
           <span className="font-medium">Logout</span>
@@ -109,50 +109,50 @@ export function AdminLayout({
   const title = currentNavItem.label;
 
   return (
-    <div className="relative min-h-screen bg-[color:var(--color-main-bg)] text-[color:var(--color-espresso)]">
+    <div className="relative min-h-screen bg-adminBg text-adminSidebar">
       <div className="relative z-10 flex">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:block w-64 shrink-0 sticky top-0 h-screen border-r border-[color:var(--color-border)] bg-white shadow-sm z-30">
+        <aside className="hidden lg:block w-64 shrink-0 sticky top-0 h-screen border-r border-adminBorder/30 bg-adminSidebar shadow-xl z-30">
           <SidebarBody />
         </aside>
 
         {/* Main column */}
         <div className="flex-1 min-w-0 flex flex-col">
           {/* Topbar */}
-          <header className="sticky top-0 z-20 border-b border-[color:var(--color-border)] bg-white/90 backdrop-blur-md shadow-sm">
+          <header className="sticky top-0 z-20 border-b border-adminBorder bg-adminCard/90 backdrop-blur-md shadow-sm">
             <div className="flex items-center gap-3 px-4 sm:px-6 py-3 h-16">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden text-[color:var(--color-espresso)] hover:bg-beige">
+                  <Button variant="ghost" size="icon" className="lg:hidden text-adminSidebar hover:bg-adminBorder/30">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-72 p-0 border-r border-[color:var(--color-border)]">
+                <SheetContent side="left" className="w-72 p-0 border-r border-adminSidebar/10 bg-adminSidebar">
                   <SheetHeader className="sr-only"><SheetTitle>Navigation</SheetTitle></SheetHeader>
                   <SidebarBody onNavigate={() => setOpen(false)} />
                 </SheetContent>
               </Sheet>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-muted-text)] font-semibold mb-0.5">
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-adminMuted font-semibold mb-0.5">
                   <span>Admin</span>
                   <ChevronRight className="h-3 w-3 opacity-50" />
                   <span className="truncate">{title}</span>
                 </div>
-                <h1 className="font-serif text-xl sm:text-2xl leading-none truncate text-[color:var(--color-espresso)] font-bold">{title}</h1>
+                <h1 className="font-serif text-xl sm:text-2xl leading-none truncate text-adminSidebar font-bold">{title}</h1>
               </div>
 
               <div className="hidden md:flex items-center relative">
-                <Search className="absolute left-3 h-4 w-4 text-[color:var(--color-muted-text)]" />
-                <Input placeholder="Search…" className="pl-9 w-64 bg-[color:var(--color-card-bg)] border-[color:var(--color-border)] focus-visible:ring-[color:var(--color-gold)] rounded-xl" />
+                <Search className="absolute left-3 h-4 w-4 text-adminMuted" />
+                <Input placeholder="Search…" className="pl-9 w-64 bg-white border-adminBorder focus-visible:ring-adminGold rounded-xl" />
               </div>
 
-              <Button variant="ghost" size="icon" className="relative text-[color:var(--color-espresso)] hover:bg-beige rounded-full">
+              <Button variant="ghost" size="icon" className="relative text-adminSidebar hover:bg-adminBorder/30 rounded-full">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[color:var(--color-warning)]" />
+                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-adminGold" />
               </Button>
 
-              <div className="h-9 w-9 shrink-0 rounded-full grid place-items-center text-sm font-semibold text-white shadow-sm ml-2" style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-gold-deep))" }}>
+              <div className="h-9 w-9 shrink-0 rounded-full grid place-items-center text-sm font-semibold text-adminSidebar shadow-sm ml-2 bg-adminBorder">
                 AJ
               </div>
             </div>

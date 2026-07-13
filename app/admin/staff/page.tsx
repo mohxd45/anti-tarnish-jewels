@@ -157,16 +157,16 @@ export default function StaffManagementPage() {
     <Protected allowedRoles={["owner_admin", "partner_admin", "developer_admin"]}>
       <div className="space-y-6">
         <div>
-          <h1 className="font-serif text-3xl text-[color:var(--color-espresso)] font-bold mb-2">Staff Management</h1>
-          <p className="text-[color:var(--color-muted-text)]">Manage admin and staff accounts, roles, and access.</p>
+          <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight mb-2">Staff Management</h1>
+          <p className="text-adminMuted">Manage admin and staff accounts, roles, and access.</p>
         </div>
 
         {canManage && (
-          <AdminCard className="p-6">
-            <h2 className="text-lg font-semibold text-[color:var(--color-espresso)] mb-4">Add New Staff</h2>
+          <AdminCard className="p-6 bg-white border-adminBorder shadow-sm">
+            <h2 className="text-lg font-serif font-semibold text-adminSidebar mb-4">Add New Staff</h2>
             <form onSubmit={handleAddStaff} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
               <div>
-                <label className="text-xs font-semibold text-[color:var(--color-muted-text)] uppercase tracking-wider mb-1 block">
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold mb-1 block">
                   Name *
                 </label>
                 <Input 
@@ -174,10 +174,11 @@ export default function StaffManagementPage() {
                   onChange={(e) => setStaffName(e.target.value)} 
                   placeholder="Full Name"
                   required
+                  className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[color:var(--color-muted-text)] uppercase tracking-wider mb-1 block">
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold mb-1 block">
                   Email Address *
                 </label>
                 <Input 
@@ -186,10 +187,11 @@ export default function StaffManagementPage() {
                   onChange={(e) => setStaffEmail(e.target.value)} 
                   placeholder="staff@example.com"
                   required
+                  className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[color:var(--color-muted-text)] uppercase tracking-wider mb-1 block">
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold mb-1 block">
                   Phone (Optional)
                 </label>
                 <Input 
@@ -197,10 +199,11 @@ export default function StaffManagementPage() {
                   value={staffPhone} 
                   onChange={(e) => setStaffPhone(e.target.value)} 
                   placeholder="+1234567890"
+                  className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[color:var(--color-muted-text)] uppercase tracking-wider mb-1 block">
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold mb-1 block">
                   Temporary Password *
                 </label>
                 <Input 
@@ -210,30 +213,31 @@ export default function StaffManagementPage() {
                   placeholder="Min 8 characters"
                   required
                   minLength={8}
+                  className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                 />
               </div>
               
               <div className="md:col-span-2 pt-2">
-                <Button type="submit" disabled={isAdding} className="w-full md:w-auto">
+                <Button type="submit" disabled={isAdding} className="w-full md:w-auto bg-adminRose text-white hover:bg-adminRose/90 border-none rounded-full shadow-md">
                   {isAdding ? "Creating Account..." : "Create Staff Account"}
                 </Button>
               </div>
             </form>
-            <p className="text-xs text-[color:var(--color-muted-text)] mt-4 bg-blue-50 p-2 rounded">
-              <strong>Security Note:</strong> This creates a <code>staff</code> role account directly. The user can log in immediately with the email and temporary password provided above.
+            <p className="text-xs text-adminMuted mt-4 bg-adminBg p-3 rounded-xl border border-adminBorder">
+              <strong className="text-adminSidebar">Security Note:</strong> This creates a <code>staff</code> role account directly. The user can log in immediately with the email and temporary password provided above.
             </p>
           </AdminCard>
         )}
 
-        <AdminCard className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-[color:var(--color-border)] bg-gray-50 flex items-center justify-between">
-            <h2 className="font-semibold text-[color:var(--color-espresso)] flex items-center gap-2">
-              <Shield className="h-4 w-4" /> Active Staff & Admins ({staffUsers.length})
+        <AdminCard className="p-0 overflow-hidden bg-white border-adminBorder shadow-sm">
+          <div className="p-4 border-b border-adminBorder bg-adminBg flex items-center justify-between">
+            <h2 className="font-serif font-semibold text-adminSidebar flex items-center gap-2">
+              <Shield className="h-4 w-4 text-adminGold" /> Active Staff & Admins ({staffUsers.length})
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-white border-b border-[color:var(--color-border)] text-[color:var(--color-muted-text)] font-medium">
+              <thead className="bg-adminBg border-b border-adminBorder text-[11px] uppercase tracking-wider text-adminMuted font-semibold">
                 <tr>
                   <th className="px-6 py-4">Name / Email</th>
                   <th className="px-6 py-4">Role</th>
@@ -242,17 +246,17 @@ export default function StaffManagementPage() {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[color:var(--color-border)]">
+              <tbody className="divide-y divide-adminBorder">
                 {staffUsers.map(staff => (
-                  <tr key={staff.uid} className="hover:bg-pink-50/30 transition-colors">
+                  <tr key={staff.uid} className="hover:bg-adminBg/50 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-medium text-[color:var(--color-espresso)]">{staff.name || "Unknown"}</div>
-                      <div className="text-xs text-[color:var(--color-muted-text)]">{staff.email}</div>
+                      <div className="font-medium text-adminSidebar">{staff.name || "Unknown"}</div>
+                      <div className="text-xs text-adminMuted">{staff.email}</div>
                     </td>
                     <td className="px-6 py-4">
                       {canManage && staff.uid !== user?.uid && userRole === "developer_admin" ? (
                         <select 
-                          className="text-xs border border-[color:var(--color-border)] rounded px-2 py-1 bg-white"
+                          className="text-xs border border-adminBorder rounded-lg px-2 py-1 bg-white text-adminSidebar outline-none focus:ring-1 focus:ring-adminGold"
                           value={staff.role}
                           onChange={(e) => handleUpdateRole(staff.uid, staff.role, e.target.value as UserRole)}
                         >
@@ -262,21 +266,21 @@ export default function StaffManagementPage() {
                           <option value="developer_admin">Dev Admin</option>
                         </select>
                       ) : (
-                        <span className="inline-flex items-center rounded-full bg-champagne/20 px-2.5 py-0.5 text-xs font-semibold text-charcoalBrown">
+                        <span className="inline-flex items-center rounded-full bg-adminBg border border-adminBorder px-2.5 py-0.5 text-xs font-semibold text-adminSidebar">
                           {staff.role}
                         </span>
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        (staff.status || 'active') === 'active' ? 'bg-green-100 text-green-800' :
-                        staff.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                        (staff.status || 'active') === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
+                        staff.status === 'suspended' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                        'bg-red-50 text-red-700 border-red-200'
                       }`}>
                         {(staff.status || 'active').toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-[color:var(--color-muted-text)]">
+                    <td className="px-6 py-4 text-xs text-adminMuted">
                       {staff.lastLoginAt ? new Date(staff.lastLoginAt).toLocaleDateString() : "Never"}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">

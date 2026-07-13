@@ -18,9 +18,9 @@ import { toast } from "sonner";
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{label}</Label>
+      <Label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">{label}</Label>
       {children}
-      {hint && <p className="text-[11px] text-muted-foreground/70">{hint}</p>}
+      {hint && <p className="text-[11px] text-adminMuted/70">{hint}</p>}
     </div>
   );
 }
@@ -77,7 +77,7 @@ export default function SEOPage() {
   if (loading) {
     return (
       <Protected adminOnly>
-        <div className="flex h-[50vh] items-center justify-center text-muted-foreground">
+        <div className="flex h-[50vh] items-center justify-center text-adminMuted">
           <HeartLoader text="Loading SEO metrics..." />
         </div>
       </Protected>
@@ -90,14 +90,13 @@ export default function SEOPage() {
         <form onSubmit={handleSave} className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">SEO Settings</h1>
-              <p className="text-muted-foreground mt-1">Optimize for search engines and social shares</p>
+              <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">SEO Settings</h1>
+              <p className="text-adminMuted mt-1">Optimize for search engines and social shares</p>
             </div>
             <Button 
               type="submit" 
               disabled={saving}
-              className="rounded-full shadow-sm"
-              style={{ background: "var(--gradient-rose)", color: "white" }}
+              className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md"
             >
               {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save SEO Settings</>}
             </Button>
@@ -106,14 +105,14 @@ export default function SEOPage() {
           {seo && (
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                <AdminCard title="Homepage SEO">
+                <AdminCard title="Homepage SEO" className="bg-white border-adminBorder shadow-sm">
                   <div className="space-y-5">
                     <Field label="Meta Title" hint="50–60 chars recommended">
                       <Input 
                         value={seo.homepageTitle || ""}
                         onChange={(e) => setSeo({ ...seo, homepageTitle: e.target.value })}
                         required
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                       />
                     </Field>
                     <Field label="Meta Description" hint="150–160 chars">
@@ -122,40 +121,40 @@ export default function SEOPage() {
                         value={seo.homepageDescription || ""}
                         onChange={(e) => setSeo({ ...seo, homepageDescription: e.target.value })}
                         required
-                        className="bg-card/40 resize-none"
+                        className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md resize-none"
                       />
                     </Field>
                     <Field label="Social Sharing Text" hint="Text displayed when users share links on WhatsApp/Facebook.">
                       <Input 
                         value={seo.socialText || ""}
                         onChange={(e) => setSeo({ ...seo, socialText: e.target.value })}
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                       />
                     </Field>
                   </div>
                 </AdminCard>
 
-                <AdminCard title="Product Pages Template">
+                <AdminCard title="Product Pages Template" className="bg-white border-adminBorder shadow-sm">
                   <div className="space-y-4">
                     <Field label="Title Pattern" hint="Use '%s' as a placeholder for the product name.">
                       <Input 
                         value={seo.productTitleTemplate || ""}
                         onChange={(e) => setSeo({ ...seo, productTitleTemplate: e.target.value })}
                         required
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                       />
                     </Field>
                   </div>
                 </AdminCard>
 
-                <AdminCard title="Category Pages Template">
+                <AdminCard title="Category Pages Template" className="bg-white border-adminBorder shadow-sm">
                   <div className="space-y-4">
                     <Field label="Title Pattern" hint="Use '%s' as a placeholder for the category name.">
                       <Input 
                         value={seo.categoryTitleTemplate || ""}
                         onChange={(e) => setSeo({ ...seo, categoryTitleTemplate: e.target.value })}
                         required
-                        className="bg-card/40"
+                        className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
                       />
                     </Field>
                   </div>
@@ -163,10 +162,10 @@ export default function SEOPage() {
               </div>
 
               <div className="space-y-6">
-                <AdminCard title="Social Preview">
-                  <div className="rounded-2xl overflow-hidden border border-border/60 bg-card shadow-sm">
+                <AdminCard title="Social Preview" className="bg-white border-adminBorder shadow-sm">
+                  <div className="rounded-2xl overflow-hidden border border-adminBorder shadow-sm">
                     {seo.ogImage || ogFile ? (
-                      <div className="aspect-[1.91/1] relative bg-secondary/50">
+                      <div className="aspect-[1.91/1] relative bg-adminBg/50">
                         <img 
                           src={ogFile ? URL.createObjectURL(ogFile) : seo.ogImage} 
                           alt="OG Social Preview" 
@@ -174,28 +173,28 @@ export default function SEOPage() {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-[1.91/1] grid place-items-center text-white" style={{ background: "var(--gradient-rose)" }}>
-                        <span className="font-display text-2xl drop-shadow-md tracking-tight">{seo.homepageTitle || "LONA JEWELS"}</span>
+                      <div className="aspect-[1.91/1] grid place-items-center text-white bg-adminGold">
+                        <span className="font-serif font-bold text-2xl drop-shadow-sm tracking-tight">{seo.homepageTitle || "LONA JEWELS"}</span>
                       </div>
                     )}
                     
-                    <div className="p-4 bg-card">
-                      <p className="text-[10px] uppercase text-muted-foreground tracking-wider font-semibold">antitarnishjewels.com</p>
-                      <p className="text-sm font-semibold mt-1 leading-tight text-foreground line-clamp-1">{seo.homepageTitle || "Your Website Title"}</p>
-                      <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{seo.homepageDescription || "Your website description will appear here..."}</p>
+                    <div className="p-4 bg-white">
+                      <p className="text-[10px] uppercase text-adminMuted tracking-wider font-semibold">antitarnishjewels.com</p>
+                      <p className="text-sm font-semibold mt-1 leading-tight text-adminSidebar line-clamp-1">{seo.homepageTitle || "Your Website Title"}</p>
+                      <p className="text-xs text-adminMuted mt-1.5 line-clamp-2">{seo.homepageDescription || "Your website description will appear here..."}</p>
                     </div>
                   </div>
 
                   <div className="mt-5 space-y-3">
-                    <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">OpenGraph Preview Image</Label>
+                    <Label className="text-xs uppercase tracking-wider text-adminMuted font-semibold">OpenGraph Preview Image</Label>
                     <div className="flex gap-2">
                       <Input
                         value={seo.ogImage || ""}
                         onChange={(e) => setSeo({ ...seo, ogImage: e.target.value })}
-                        className="flex-1 bg-card/40 text-xs"
+                        className="flex-1 bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold text-xs rounded-md"
                         placeholder="Image URL link"
                       />
-                      <Label className="inline-flex items-center justify-center rounded-xl bg-secondary hover:bg-secondary/80 px-4 py-2 text-xs font-semibold text-foreground cursor-pointer transition-colors border border-border/60">
+                      <Label className="inline-flex items-center justify-center rounded-xl bg-adminBg hover:bg-adminBg/80 px-4 py-2 text-xs font-semibold text-adminSidebar cursor-pointer transition-colors border border-adminBorder">
                         <Upload className="mr-2 h-3.5 w-3.5" />
                         <span>Upload</span>
                         <input

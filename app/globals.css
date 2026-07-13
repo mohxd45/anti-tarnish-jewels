@@ -30,6 +30,15 @@
   --color-cream: #3A2428;
   --color-charcoal: #FFF9FB;
   
+  /* LONA JEWELS Luxury Admin Theme Tokens */
+  --admin-sidebar: #2A171A;       /* Deep charcoal brown */
+  --admin-bg: #FFF0F5;            /* Soft blush background */
+  --admin-card: #FFF9FB;          /* Warm cream cards */
+  --admin-gold: #B8955E;          /* Champagne gold accent */
+  --admin-rose: #D6A6A1;          /* Rose gold highlight */
+  --admin-muted: #8B6F75;         /* Muted mauve text */
+  --admin-border: #E8D7C8;        /* Soft gold border */
+  
   --border-radius: 1.5rem;
   --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, Cambria, 'Times New Roman', serif;
   --font-sans: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;

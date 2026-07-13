@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { getSiteContent, saveSiteContent , logActivity } from "@/lib/firestore";
 import { SiteContent } from "@/types";
 import { Save, AlertCircle, CheckCircle } from "lucide-react";
-import { PageLoader } from "@/components/ui/PageLoader";
-import { LoadingButton } from "@/components/ui/LoadingButton";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { Button } from "@/components/ui/button";
+import { AdminCard } from "@/components/admin/Bits";
 
 type TabId = "home" | "about" | "faq" | "policies";
 
@@ -65,17 +66,21 @@ export default function SiteContentPage() {
   }
 
   if (loading) {
-    return <PageLoader text="Loading content data..." />;
+    return (
+      <div className="flex h-[50vh] items-center justify-center text-adminMuted">
+        <HeartLoader text="Loading content data..." />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-8 max-w-4xl animate-fade-in">
+    <div className="space-y-8 animate-in fade-in duration-500">
       {/* Toast Alert */}
       {toast && (
-        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 rounded-2xl px-5 py-3 shadow-lg border text-sm transition-all ${
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 rounded-2xl px-5 py-3 shadow-sm border text-sm transition-all ${
           toast.type === "success" 
-            ? "bg-emerald-950/90 text-emerald-400 border-emerald-500/20" 
-            : "bg-rose-950/90 text-rose-400 border-rose-500/20"
+            ? "bg-emerald-50 text-emerald-600 border-emerald-200" 
+            : "bg-red-50 text-red-600 border-red-200"
         }`}>
           {toast.type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
           <span>{toast.msg}</span>
@@ -83,12 +88,12 @@ export default function SiteContentPage() {
       )}
 
       <div>
-        <h1 className="text-3xl font-serif font-semibold text-gold tracking-wide">Website Content copy</h1>
-        <p className="text-sm text-cream/55 mt-1">Manage global website headings, customer statements, FAQs, and policies.</p>
+        <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">Website Content Copy</h1>
+        <p className="text-adminMuted mt-1">Manage global website headings, customer statements, FAQs, and policies.</p>
       </div>
 
       {/* Tabs bar */}
-      <div className="flex border-b border-gold/15 pb-2 gap-6 text-sm font-medium uppercase tracking-wider">
+      <div className="flex border-b border-adminBorder pb-2 gap-6 text-sm font-medium uppercase tracking-wider overflow-x-auto">
         {[
           { id: "home", label: "Homepage Hero & Footer" },
           { id: "about", label: "About Copy" },
@@ -98,10 +103,10 @@ export default function SiteContentPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as TabId)}
-            className={`pb-2 border-b-2 transition-all ${
+            className={`pb-2 border-b-2 transition-all whitespace-nowrap ${
               activeTab === tab.id 
-                ? "text-gold border-gold" 
-                : "text-cream/40 border-transparent hover:text-cream/80"
+                ? "text-adminSidebar border-adminGold" 
+                : "text-adminMuted border-transparent hover:text-adminSidebar"
             }`}
           >
             {tab.label}
@@ -110,178 +115,186 @@ export default function SiteContentPage() {
       </div>
 
       {/* Forms Area */}
-      <div className="rounded-[2rem] border border-gold/15 bg-white/[0.03] p-6 md:p-8 shadow-jewel">
+      <div className="max-w-4xl">
         {/* HOMEPAGE TABS */}
         {activeTab === "home" && (
-          <div className="space-y-6">
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Hero Small Title (Above Main)</label>
-              <input
-                value={form.heroSmallTitle || ""}
-                onChange={(e) => setForm({ ...form, heroSmallTitle: e.target.value })}
-                className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
-                placeholder="e.g. Timeless Elegance"
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Homepage Main Heading (H1)</label>
-              <input
-                value={form.heroMainHeading || form.heroTitle || ""}
-                onChange={(e) => setForm({ ...form, heroMainHeading: e.target.value, heroTitle: e.target.value })}
-                className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
-                placeholder="e.g. Next-Gen Tech & Premium Devices"
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Homepage Hero Subtitle</label>
-              <textarea
-                value={form.heroSubtitle || ""}
-                onChange={(e) => setForm({ ...form, heroSubtitle: e.target.value })}
-                rows={3}
-                className="w-full rounded-3xl border border-gold/20 bg-noir px-5 py-3.5 outline-none text-cream"
-                placeholder="Brief introduction displayed on the banner."
-              />
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
+          <AdminCard title="Homepage Copy" className="bg-white border-adminBorder shadow-sm">
+            <div className="space-y-6">
               <div>
-                <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Hero Button CTA text</label>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Hero Small Title (Above Main)</label>
                 <input
-                  value={form.heroCtaText || ""}
-                  onChange={(e) => setForm({ ...form, heroCtaText: e.target.value })}
-                  className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
-                  placeholder="e.g. Shop Now"
+                  value={form.heroSmallTitle || ""}
+                  onChange={(e) => setForm({ ...form, heroSmallTitle: e.target.value })}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                  placeholder="e.g. Timeless Elegance"
                 />
               </div>
               <div>
-                <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Hero Button CTA Link</label>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Homepage Main Heading (H1)</label>
                 <input
-                  value={form.heroCtaLink || ""}
-                  onChange={(e) => setForm({ ...form, heroCtaLink: e.target.value })}
-                  className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
-                  placeholder="e.g. /shop"
+                  value={form.heroMainHeading || form.heroTitle || ""}
+                  onChange={(e) => setForm({ ...form, heroMainHeading: e.target.value, heroTitle: e.target.value })}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                  placeholder="e.g. Next-Gen Tech & Premium Devices"
                 />
               </div>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Promotional Section text</label>
-                <input
-                  value={form.promotionalText || ""}
-                  onChange={(e) => setForm({ ...form, promotionalText: e.target.value })}
-                  className="w-full rounded-full border border-gold/20 bg-noir px-5 py-3 outline-none text-cream"
-                  placeholder="Additional subtext for sales banner panels"
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Homepage Hero Subtitle</label>
+                <textarea
+                  value={form.heroSubtitle || ""}
+                  onChange={(e) => setForm({ ...form, heroSubtitle: e.target.value })}
+                  rows={3}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar resize-none"
+                  placeholder="Brief introduction displayed on the banner."
                 />
               </div>
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Footer Description copy</label>
-              <textarea
-                value={form.footerText || ""}
-                onChange={(e) => setForm({ ...form, footerText: e.target.value })}
-                rows={2}
-                className="w-full rounded-3xl border border-gold/20 bg-noir px-5 py-3.5 outline-none text-cream"
-                placeholder="About wording displayed in the bottom footer row."
-              />
-            </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Hero Button CTA text</label>
+                  <input
+                    value={form.heroCtaText || ""}
+                    onChange={(e) => setForm({ ...form, heroCtaText: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="e.g. Shop Now"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Hero Button CTA Link</label>
+                  <input
+                    value={form.heroCtaLink || ""}
+                    onChange={(e) => setForm({ ...form, heroCtaLink: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="e.g. /shop"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Promotional Section text</label>
+                  <input
+                    value={form.promotionalText || ""}
+                    onChange={(e) => setForm({ ...form, promotionalText: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="Additional subtext for sales banner panels"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Footer Description copy</label>
+                <textarea
+                  value={form.footerText || ""}
+                  onChange={(e) => setForm({ ...form, footerText: e.target.value })}
+                  rows={2}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar resize-none"
+                  placeholder="About wording displayed in the bottom footer row."
+                />
+              </div>
 
-            <LoadingButton
-              onClick={() => handleSave("home", ["heroSmallTitle", "heroTitle", "heroMainHeading", "heroSubtitle", "heroCtaText", "heroCtaLink", "promotionalText", "footerText"])}
-              loading={saving}
-              loadingText="Saving..."
-              className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
-            >
-              <Save size={16} />
-              Save Homepage Copy
-            </LoadingButton>
-          </div>
+              <div className="pt-4 border-t border-adminBorder flex justify-end">
+                <Button
+                  onClick={() => handleSave("home", ["heroSmallTitle", "heroTitle", "heroMainHeading", "heroSubtitle", "heroCtaText", "heroCtaLink", "promotionalText", "footerText"])}
+                  disabled={saving}
+                  className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-sm"
+                >
+                  {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save Homepage Copy</>}
+                </Button>
+              </div>
+            </div>
+          </AdminCard>
         )}
 
         {/* ABOUT TAB */}
         {activeTab === "about" && (
-          <div className="space-y-6">
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">About Page main text</label>
-              <textarea
-                value={form.aboutText || ""}
-                onChange={(e) => setForm({ ...form, aboutText: e.target.value })}
-                rows={8}
-                className="w-full rounded-3xl border border-gold/20 bg-noir px-5 py-4 outline-none text-cream leading-7"
-                placeholder="Write about your company history, values, and shipping guarantees..."
-              />
-            </div>
+          <AdminCard title="About Page Copy" className="bg-white border-adminBorder shadow-sm">
+            <div className="space-y-6">
+              <div>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">About Page main text</label>
+                <textarea
+                  value={form.aboutText || ""}
+                  onChange={(e) => setForm({ ...form, aboutText: e.target.value })}
+                  rows={12}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-3 outline-none text-adminSidebar leading-7 resize-y"
+                  placeholder="Write about your company history, values, and shipping guarantees..."
+                />
+              </div>
 
-            <LoadingButton
-              onClick={() => handleSave("about", ["aboutText"])}
-              loading={saving}
-              loadingText="Saving..."
-              className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
-            >
-              <Save size={16} />
-              Save About copy
-            </LoadingButton>
-          </div>
+              <div className="pt-4 border-t border-adminBorder flex justify-end">
+                <Button
+                  onClick={() => handleSave("about", ["aboutText"])}
+                  disabled={saving}
+                  className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-sm"
+                >
+                  {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save About Copy</>}
+                </Button>
+              </div>
+            </div>
+          </AdminCard>
         )}
 
         {/* FAQ TAB */}
         {activeTab === "faq" && (
-          <div className="space-y-6">
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">FAQ Page Introductory Description</label>
-              <textarea
-                value={form.faqText || ""}
-                onChange={(e) => setForm({ ...form, faqText: e.target.value })}
-                rows={6}
-                className="w-full rounded-3xl border border-gold/20 bg-noir px-5 py-4 outline-none text-cream leading-7"
-                placeholder="Intro text before the questions accordion..."
-              />
-            </div>
+          <AdminCard title="FAQ Page Copy" className="bg-white border-adminBorder shadow-sm">
+            <div className="space-y-6">
+              <div>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">FAQ Page Introductory Description</label>
+                <textarea
+                  value={form.faqText || ""}
+                  onChange={(e) => setForm({ ...form, faqText: e.target.value })}
+                  rows={8}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-3 outline-none text-adminSidebar leading-7 resize-y"
+                  placeholder="Intro text before the questions accordion..."
+                />
+              </div>
 
-            <LoadingButton
-              onClick={() => handleSave("faq", ["faqText"])}
-              loading={saving}
-              loadingText="Saving..."
-              className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
-            >
-              <Save size={16} />
-              Save FAQ Content
-            </LoadingButton>
-          </div>
+              <div className="pt-4 border-t border-adminBorder flex justify-end">
+                <Button
+                  onClick={() => handleSave("faq", ["faqText"])}
+                  disabled={saving}
+                  className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-sm"
+                >
+                  {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save FAQ Content</>}
+                </Button>
+              </div>
+            </div>
+          </AdminCard>
         )}
 
         {/* POLICIES TAB */}
         {activeTab === "policies" && (
-          <div className="space-y-6">
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Return & Refund Policy Description</label>
-              <textarea
-                value={form.returnPolicyText || ""}
-                onChange={(e) => setForm({ ...form, returnPolicyText: e.target.value })}
-                rows={6}
-                className="w-full rounded-3xl border border-gold/20 bg-noir px-5 py-4 outline-none text-cream leading-7"
-                placeholder="Details about shipping thresholds, dynamic exceptions, packaging bounds..."
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-gold font-semibold block mb-2">Privacy Policy Description</label>
-              <textarea
-                value={form.privacyPolicyText || ""}
-                onChange={(e) => setForm({ ...form, privacyPolicyText: e.target.value })}
-                rows={6}
-                className="w-full rounded-3xl border border-gold/20 bg-noir px-5 py-4 outline-none text-cream leading-7"
-                placeholder="Details about customer profiles and personal information processing..."
-              />
-            </div>
+          <AdminCard title="Policies Copy" className="bg-white border-adminBorder shadow-sm">
+            <div className="space-y-6">
+              <div>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Return & Refund Policy Description</label>
+                <textarea
+                  value={form.returnPolicyText || ""}
+                  onChange={(e) => setForm({ ...form, returnPolicyText: e.target.value })}
+                  rows={8}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-3 outline-none text-adminSidebar leading-7 resize-y"
+                  placeholder="Details about shipping thresholds, dynamic exceptions, packaging bounds..."
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Privacy Policy Description</label>
+                <textarea
+                  value={form.privacyPolicyText || ""}
+                  onChange={(e) => setForm({ ...form, privacyPolicyText: e.target.value })}
+                  rows={8}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-3 outline-none text-adminSidebar leading-7 resize-y"
+                  placeholder="Details about customer profiles and personal information processing..."
+                />
+              </div>
 
-            <LoadingButton
-              onClick={() => handleSave("policies", ["returnPolicyText", "privacyPolicyText"])}
-              loading={saving}
-              loadingText="Saving..."
-              className="rounded-full bg-gold px-6 py-3 font-semibold text-noir hover:bg-gold-light transition-all flex items-center gap-2"
-            >
-              <Save size={16} />
-              Save Policies Copy
-            </LoadingButton>
-          </div>
+              <div className="pt-4 border-t border-adminBorder flex justify-end">
+                <Button
+                  onClick={() => handleSave("policies", ["returnPolicyText", "privacyPolicyText"])}
+                  disabled={saving}
+                  className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-sm"
+                >
+                  {saving ? <HeartLoader size="sm" text="Saving..." /> : <><Save className="h-4 w-4 mr-2" />Save Policies Copy</>}
+                </Button>
+              </div>
+            </div>
+          </AdminCard>
         )}
       </div>
     </div>

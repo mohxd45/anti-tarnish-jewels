@@ -2,6 +2,7 @@ export type Product = {
   id: string;
   name: string;
   slug: string;
+  sku?: string;
   category: string;
   categoryId?: string;
   categorySlug?: string;
@@ -39,7 +40,18 @@ export type Product = {
   isActive?: boolean;
   thumbnail?: string;
   searchKeywords?: string[];
-  variants?: any[];
+  variants?: {
+    id: string;
+    size?: string;
+    color?: string;
+    stock: number;
+    sku?: string;
+    imageUrl?: string;
+  }[];
+  sizeOptions?: string[];
+  colorOptions?: string[];
+  selectedSizeRequired?: boolean;
+  selectedColorRequired?: boolean;
   tags?: string[];
   badges?: string[];
   faqs?: { question: string; answer: string; }[];
@@ -48,8 +60,15 @@ export type Product = {
 };
 
 export type CartItem = {
+  cartItemId?: string;
   product: Product;
   quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+  sku?: string;
+  name?: string;
+  price?: number;
+  productId?: string;
 };
 
 export type OrderStatus =

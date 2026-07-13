@@ -153,11 +153,11 @@ export default function AdminPage() {
         ].map((a) => {
           const I = a.icon;
           return (
-            <Link key={a.to} href={a.to} className="glass-card px-4 py-4 flex items-center gap-3 hover:shadow-lg transition-shadow">
-              <div className="h-10 w-10 rounded-lg grid place-items-center text-white" style={{ background: "var(--gradient-rose, linear-gradient(135deg, #d8a7b1, #3a2428))" }}>
+            <Link key={a.to} href={a.to} className="bg-adminCard border border-adminBorder rounded-2xl px-4 py-4 flex items-center gap-3 hover:shadow-lg transition-shadow">
+              <div className="h-10 w-10 rounded-lg grid place-items-center text-white" style={{ background: "linear-gradient(135deg, var(--admin-rose), var(--admin-sidebar))" }}>
                 <I className="h-4 w-4" />
               </div>
-              <span className="text-sm font-medium truncate">{a.label}</span>
+              <span className="text-sm font-medium truncate text-adminSidebar">{a.label}</span>
             </Link>
           );
         })}
@@ -174,34 +174,34 @@ export default function AdminPage() {
                     className="w-full rounded-t-md transition-all"
                     style={{
                       height: `${(d.value / maxChartValue) * 100}%`,
-                      background: "var(--gradient-rose, linear-gradient(135deg, #d8a7b1, #3a2428))",
+                      background: "linear-gradient(135deg, var(--admin-gold), var(--admin-rose))",
                       boxShadow: "0 4px 12px rgba(184, 149, 94, 0.25)",
                     }}
                   />
                 </div>
-                <div className="text-[11px] text-muted-foreground">{d.day}</div>
-                <div className="text-[10px] font-medium tabular-nums">{d.value > 0 ? `₹${(d.value / 1000).toFixed(1)}k` : "0"}</div>
+                <div className="text-[11px] text-adminMuted">{d.day}</div>
+                <div className="text-[10px] font-medium tabular-nums text-adminSidebar">{d.value > 0 ? `₹${(d.value / 1000).toFixed(1)}k` : "0"}</div>
               </div>
             ))}
           </div>
         </AdminCard>
 
         {/* Low stock */}
-        <AdminCard title="Low Stock Alert" action={<Link href="/admin/products" className="text-xs text-primary hover:underline">View all</Link>}>
+        <AdminCard title="Low Stock Alert" action={<Link href="/admin/products" className="text-xs text-adminGold hover:underline">View all</Link>}>
           {lowStockProducts.length === 0 ? (
-            <div className="text-sm text-muted-foreground py-4 text-center">All products have healthy stock.</div>
+            <div className="text-sm text-adminMuted py-4 text-center">All products have healthy stock.</div>
           ) : (
             <ul className="divide-y divide-border/60">
               {lowStockProducts.slice(0, 5).map((p) => (
                 <li key={p.id} className="py-3 flex items-center gap-3 min-w-0">
-                  <div className="h-10 w-10 rounded-lg bg-secondary overflow-hidden shrink-0">
+                  <div className="h-10 w-10 rounded-lg bg-white overflow-hidden shrink-0 border border-adminBorder">
                     <img src={p.images?.[0] || "/placeholder.png"} alt={p.name} className="h-full w-full object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate">{p.name}</p>
-                    <p className="text-xs text-muted-foreground">{p.category}</p>
+                    <p className="text-sm font-medium truncate text-adminSidebar">{p.name}</p>
+                    <p className="text-xs text-adminMuted">{p.category}</p>
                   </div>
-                  <span className="text-xs font-semibold text-amber-700 shrink-0">{p.stock} left</span>
+                  <span className="text-xs font-semibold text-adminRose shrink-0">{p.stock} left</span>
                 </li>
               ))}
             </ul>
@@ -210,10 +210,10 @@ export default function AdminPage() {
       </div>
 
       {/* Recent orders */}
-      <AdminCard title="Recent Orders" className="mt-6" action={<Link href="/admin/orders" className="text-xs text-primary hover:underline">View all →</Link>}>
+      <AdminCard title="Recent Orders" className="mt-6" action={<Link href="/admin/orders" className="text-xs text-adminGold hover:underline">View all →</Link>}>
         <div className="overflow-x-auto -mx-2">
           <table className="w-full text-sm">
-            <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+            <thead className="text-xs uppercase tracking-wider text-adminMuted border-b border-adminBorder/50">
               <tr className="text-left">
                 <th className="px-2 py-2 font-medium">Order</th>
                 <th className="px-2 py-2 font-medium">Customer</th>
@@ -222,14 +222,14 @@ export default function AdminPage() {
                 <th className="px-2 py-2 font-medium hidden md:table-cell">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/60">
+            <tbody className="divide-y divide-adminBorder/50">
               {orders.slice(0, 5).map((o) => (
-                <tr key={o.id}>
-                  <td className="px-2 py-3 font-mono text-xs">{o.id ? o.id.slice(-6).toUpperCase() : "N/A"}</td>
-                  <td className="px-2 py-3">{o.customerName || "Unknown"}</td>
-                  <td className="px-2 py-3 tabular-nums font-medium">{formatPrice(o.total || 0)}</td>
+                <tr key={o.id} className="hover:bg-adminBg/50 transition-colors">
+                  <td className="px-2 py-3 font-mono text-xs text-adminMuted">{o.id ? o.id.slice(-6).toUpperCase() : "N/A"}</td>
+                  <td className="px-2 py-3 text-adminSidebar font-medium">{o.customerName || "Unknown"}</td>
+                  <td className="px-2 py-3 tabular-nums font-medium text-adminSidebar">{formatPrice(o.total || 0)}</td>
                   <td className="px-2 py-3"><StatusBadge status={o.status || "Pending"} /></td>
-                  <td className="px-2 py-3 text-muted-foreground hidden md:table-cell">
+                  <td className="px-2 py-3 text-adminMuted hidden md:table-cell">
                     {o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "Unknown Date"}
                   </td>
                 </tr>

@@ -34,6 +34,7 @@ export default function ManageProductsPage() {
 
   // Edit fields state
   const [editName, setEditName] = useState("");
+  const [editSku, setEditSku] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editSubCategory, setEditSubCategory] = useState("");
@@ -71,6 +72,23 @@ export default function ManageProductsPage() {
   const [editIsFlashDeal, setEditIsFlashDeal] = useState(false);
   const [editIsTrending, setEditIsTrending] = useState(false);
   const [editIsActive, setEditIsActive] = useState(true);
+
+  // Product Options
+  const [editSizeOptions, setEditSizeOptions] = useState<string[]>([]);
+  const [editColorOptions, setEditColorOptions] = useState<string[]>([]);
+  const [editSelectedSizeRequired, setEditSelectedSizeRequired] = useState(false);
+  const [editSelectedColorRequired, setEditSelectedColorRequired] = useState(false);
+  const [newCustomSize, setNewCustomSize] = useState("");
+  const [newCustomColor, setNewCustomColor] = useState("");
+
+  const DEFAULT_COLORS = ["Gold", "Silver", "Rose Gold", "Black", "White", "Pearl", "Green", "Red", "Pink", "Blue", "Multi Color"];
+  const SIZES_RINGS = ["Adjustable", "Size 5", "Size 6", "Size 7", "Size 8", "Size 9", "Size 10"];
+  const SIZES_BANGLES = ["2.2", "2.4", "2.6", "2.8", "Adjustable"];
+  const SIZES_BRACELETS = ["Small", "Medium", "Large", "Adjustable"];
+  const SIZES_ANKLETS = ["9 inch", "10 inch", "11 inch", "Adjustable"];
+  const SIZES_NECKLACES = ["Choker", "16 inch", "18 inch", "20 inch", "22 inch", "Adjustable"];
+  const SIZES_FREE_ADJ = ["Free Size", "Adjustable"];
+  const SIZES_HAIR = ["Free Size", "Small", "Medium", "Large", "Adjustable"];
 
   const [newImageUrl, setNewImageUrl] = useState("");
 
@@ -116,6 +134,7 @@ export default function ManageProductsPage() {
   function openEditDrawer(p: Product) {
     setEditingProduct(p);
     setEditName(p.name || "");
+    setEditSku(p.sku || "");
     setEditDescription(p.description || "");
     setEditCategory(p.category || "");
     setEditSubCategory(p.subCategory || "");
@@ -166,7 +185,26 @@ export default function ManageProductsPage() {
     setEditIsFlashDeal(!!p.isFlashDeal);
     setEditIsTrending(!!p.isTrending);
     setEditIsActive(p.isActive !== false);
+
+    setEditSizeOptions(p.sizeOptions || []);
+    setEditColorOptions(p.colorOptions || []);
+    setEditSelectedSizeRequired(!!p.selectedSizeRequired);
+    setEditSelectedColorRequired(!!p.selectedColorRequired);
   }
+
+  useEffect(() => {
+    // Only auto-suggest if no sizes exist and we are editing
+    if (editingProduct && editSizeOptions.length === 0 && editCategory && !editingProduct.sizeOptions) {
+      const catLow = editCategory.toLowerCase();
+      if (catLow.includes("ring")) setEditSizeOptions(SIZES_RINGS);
+      else if (catLow.includes("bangle")) setEditSizeOptions(SIZES_BANGLES);
+      else if (catLow.includes("bracelet")) setEditSizeOptions(SIZES_BRACELETS);
+      else if (catLow.includes("anklet")) setEditSizeOptions(SIZES_ANKLETS);
+      else if (catLow.includes("necklace") || catLow.includes("chain")) setEditSizeOptions(SIZES_NECKLACES);
+      else if (catLow.includes("hair")) setEditSizeOptions(SIZES_HAIR);
+      else if (catLow.includes("bridal") || catLow.includes("set") || catLow.includes("tikka") || catLow.includes("haathphool")) setEditSizeOptions(SIZES_FREE_ADJ);
+    }
+  }, [editCategory, editingProduct]);
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -233,6 +271,7 @@ export default function ManageProductsPage() {
 
       const updatedFields: Partial<Product> = {
         name: editName.trim(),
+        sku: editSku.trim(),
         slug: uniqueSlug,
         description: (editDescription || "").trim(),
         category: editCategory.trim(),
@@ -248,6 +287,10 @@ export default function ManageProductsPage() {
         returnPolicy: (editReturnPolicy || "").trim(),
         specifications: specsObj,
         badges: finalBadges,
+        sizeOptions: editSizeOptions,
+        colorOptions: editColorOptions,
+        selectedSizeRequired: editSelectedSizeRequired,
+        selectedColorRequired: editSelectedColorRequired,
         isFeatured: editIsFeatured,
         isBestSeller: editIsBestSeller,
         isNewArrival: editIsNewArrival,
@@ -321,7 +364,7 @@ export default function ManageProductsPage() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-full ring-1 ring-inset bg-card/60 text-foreground/70 ring-border outline-none"
+            className="px-3 py-1.5 text-xs rounded-full border border-adminBorder bg-adminCard text-adminSidebar outline-none"
           >
             <option value="All">All Categories</option>
             {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -329,7 +372,7 @@ export default function ManageProductsPage() {
           <select
             value={badgeFilter}
             onChange={(e) => setBadgeFilter(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-full ring-1 ring-inset bg-card/60 text-foreground/70 ring-border outline-none"
+            className="px-3 py-1.5 text-xs rounded-full border border-adminBorder bg-adminCard text-adminSidebar outline-none"
           >
             <option value="All">All Tags/Status</option>
             <option value="Active">Active Only</option>
@@ -346,10 +389,10 @@ export default function ManageProductsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products…"
-              className="pl-9 w-48 bg-card/60 rounded-full text-xs"
+              className="pl-9 w-48 bg-adminCard border-adminBorder rounded-full text-xs text-adminSidebar"
             />
           </div>
-          <Button asChild className="rounded-full bg-[var(--gradient-rose,linear-gradient(135deg,#d8a7b1,#3a2428))] text-white border-none hover:opacity-90">
+          <Button asChild className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none transition-colors">
             <Link href="/admin/add-product"><Plus className="h-4 w-4 mr-1" />Add Product</Link>
           </Button>
         </div>
@@ -368,7 +411,7 @@ export default function ManageProductsPage() {
         ) : (
           <div className="overflow-x-auto -mx-2">
             <table className="w-full text-sm min-w-[800px]">
-              <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+              <thead className="text-xs uppercase tracking-wider text-adminMuted border-b border-adminBorder/50">
                 <tr className="text-left">
                   <th className="px-2 py-2 font-medium">Product</th>
                   <th className="px-2 py-2 font-medium">Category</th>
@@ -380,45 +423,45 @@ export default function ManageProductsPage() {
                   <th className="px-2 py-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
+              <tbody className="divide-y divide-adminBorder/50">
                 {filtered.map((p) => (
-                  <tr key={p.id} className="hover:bg-secondary/40 transition-colors">
+                  <tr key={p.id} className="hover:bg-adminBg/50 transition-colors">
                     <td className="px-2 py-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-11 w-11 shrink-0 rounded-lg bg-secondary grid place-items-center overflow-hidden">
-                          {p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" /> : <ImageIcon className="h-5 w-5 text-muted-foreground" />}
+                        <div className="h-11 w-11 shrink-0 rounded-lg bg-white border border-adminBorder grid place-items-center overflow-hidden">
+                          {p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" /> : <ImageIcon className="h-5 w-5 text-adminMuted" />}
                         </div>
                         <div className="min-w-0">
-                          <div className="font-medium truncate">{p.name}</div>
-                          <div className="text-[11px] text-muted-foreground">SKU #{p.id.slice(-6).toUpperCase()}</div>
+                          <div className="font-medium truncate text-adminSidebar">{p.name}</div>
+                          <div className="text-[11px] text-adminMuted">SKU #{p.id.slice(-6).toUpperCase()}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-2 py-3 text-xs">{p.category}</td>
-                    <td className="px-2 py-3 tabular-nums text-muted-foreground line-through text-xs">
+                    <td className="px-2 py-3 text-xs text-adminSidebar">{p.category}</td>
+                    <td className="px-2 py-3 tabular-nums text-adminMuted line-through text-xs">
                       {formatPrice(p.regularPrice)}
                     </td>
-                    <td className="px-2 py-3 tabular-nums font-semibold text-charcoalBrown">
+                    <td className="px-2 py-3 tabular-nums font-semibold text-adminSidebar">
                       {formatPrice(p.salePrice)}
                     </td>
                     <td className="px-2 py-3">
-                      <span className={`tabular-nums text-xs font-medium ${p.stock < 10 ? "text-amber-600" : "text-emerald-600"}`}>
+                      <span className={`tabular-nums text-xs font-medium ${p.stock < 10 ? "text-adminRose" : "text-emerald-600"}`}>
                         {p.stock}
                       </span>
                     </td>
                     <td className="px-2 py-3">
                       <div className="flex gap-1 flex-wrap">
-                        {p.isFeatured && <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-500/20 inline-flex items-center gap-0.5"><Star className="h-2.5 w-2.5" />Featured</span>}
-                        {p.isBestSeller && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[rgba(184,149,94,0.1)] text-[rgba(184,149,94,1)] ring-1 ring-[rgba(184,149,94,0.3)]">Bestseller</span>}
-                        {p.isFlashDeal && <span className="text-[10px] px-1.5 py-0.5 rounded bg-dustyRose/10 text-dustyRose ring-1 ring-dustyRose/30">Flash Deal</span>}
+                        {p.isFeatured && <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 inline-flex items-center gap-0.5"><Star className="h-2.5 w-2.5" />Featured</span>}
+                        {p.isBestSeller && <span className="text-[10px] px-1.5 py-0.5 rounded bg-adminGold/10 text-adminGold border border-adminGold/30">Bestseller</span>}
+                        {p.isFlashDeal && <span className="text-[10px] px-1.5 py-0.5 rounded bg-adminRose/10 text-adminRose border border-adminRose/30">Flash Deal</span>}
                       </div>
                     </td>
                     <td className="px-2 py-3"><StatusBadge status={p.isActive !== false ? "Active" : "Inactive"} /></td>
                     <td className="px-2 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Button size="icon" variant="ghost" onClick={() => openEditDrawer(p)}><Edit2 className="h-4 w-4" /></Button>
-                        <Button size="icon" variant="ghost" disabled={deletingId === p.id} onClick={() => handleDelete(p.id)}>
-                          {deletingId === p.id ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-4 w-4 text-dustyRose" />}
+                        <Button size="icon" variant="ghost" onClick={() => openEditDrawer(p)} className="text-adminSidebar hover:bg-adminBg"><Edit2 className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" disabled={deletingId === p.id} onClick={() => handleDelete(p.id)} className="text-adminRose hover:bg-adminRose/10 hover:text-adminRose">
+                          {deletingId === p.id ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-4 w-4" />}
                         </Button>
                       </div>
                     </td>
@@ -432,16 +475,16 @@ export default function ManageProductsPage() {
 
       {/* Edit Drawer (retained from old UI, just visually updated a bit to match) */}
       {editingProduct && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex justify-end">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-end">
           <div className="fixed inset-0" onClick={() => setEditingProduct(null)} />
-          <div className="relative w-full max-w-2xl bg-[var(--background)] shadow-2xl h-screen flex flex-col border-l border-border/60 animate-in slide-in-from-right">
+          <div className="relative w-full max-w-2xl bg-adminBg shadow-2xl h-screen flex flex-col border-l border-adminBorder animate-in slide-in-from-right">
             
-            <div className="flex justify-between items-center border-b border-border/60 p-5 bg-card/40 backdrop-blur-sm">
+            <div className="flex justify-between items-center border-b border-adminBorder p-5 bg-adminCard">
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Product Customizer</span>
-                <h3 className="text-xl font-display font-semibold text-foreground mt-1 truncate max-w-md">Edit: {editingProduct.name}</h3>
+                <span className="text-[10px] uppercase tracking-widest text-adminGold font-semibold">Product Customizer</span>
+                <h3 className="text-xl font-serif font-semibold text-adminSidebar mt-1 truncate max-w-md">Edit: {editingProduct.name}</h3>
               </div>
-              <button onClick={() => setEditingProduct(null)} className="rounded-full p-2 text-muted-foreground hover:bg-secondary transition-colors">
+              <button onClick={() => setEditingProduct(null)} className="rounded-full p-2 text-adminMuted hover:bg-adminBg transition-colors">
                 <X size={18} />
               </button>
             </div>
@@ -449,95 +492,158 @@ export default function ManageProductsPage() {
             <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-thin">
               {/* Basic Details */}
               <div className="space-y-4">
-                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Basic Details</h4>
+                <h4 className="text-xs font-semibold text-adminGold uppercase tracking-widest border-b border-adminBorder pb-2">Basic Details</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Product Name</label>
-                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="rounded-xl" />
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Product Name *</label>
+                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="rounded-xl border-adminBorder bg-white" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Item Code / SKU</label>
+                    <Input value={editSku} onChange={(e) => setEditSku(e.target.value)} placeholder="Example: LJ-RNG-001" className="rounded-xl border-adminBorder bg-white" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Category</label>
+                      <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Category *</label>
                       <select
                         value={editCategory}
                         onChange={(e) => setEditCategory(e.target.value)}
-                        className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                        className="w-full rounded-xl border border-adminBorder bg-white px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-adminGold"
                       >
                         <option value="">Select</option>
                         {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Subcategory</label>
-                      <Input value={editSubCategory} onChange={(e) => setEditSubCategory(e.target.value)} className="rounded-xl" />
+                      <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Subcategory</label>
+                      <Input value={editSubCategory} onChange={(e) => setEditSubCategory(e.target.value)} className="rounded-xl border-adminBorder bg-white" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Description</label>
-                    <textarea rows={3} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring resize-none" />
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Description</label>
+                    <textarea rows={3} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} className="w-full rounded-xl border border-adminBorder bg-white px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-adminGold resize-none" />
                   </div>
                 </div>
               </div>
 
               {/* Pricing & Stock */}
               <div className="space-y-4 pt-2">
-                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Pricing & Inventory</h4>
+                <h4 className="text-xs font-semibold text-adminGold uppercase tracking-widest border-b border-adminBorder pb-2">Pricing & Inventory</h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Regular (MRP)</label>
-                    <Input type="number" value={editRegularPrice} onChange={(e) => setEditRegularPrice(Number(e.target.value))} className="rounded-xl" />
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Regular (MRP)</label>
+                    <Input type="number" value={editRegularPrice} onChange={(e) => setEditRegularPrice(Number(e.target.value))} className="rounded-xl border-adminBorder bg-white" />
                   </div>
                   <div>
-                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Sale Price</label>
-                    <Input type="number" value={editSalePrice} onChange={(e) => setEditSalePrice(Number(e.target.value))} className="rounded-xl" />
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Sale Price</label>
+                    <Input type="number" value={editSalePrice} onChange={(e) => setEditSalePrice(Number(e.target.value))} className="rounded-xl border-adminBorder bg-white" />
                   </div>
                   <div>
-                    <label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground block mb-1">Stock</label>
-                    <Input type="number" value={editStock} onChange={(e) => setEditStock(Number(e.target.value))} className="rounded-xl" />
+                    <label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted block mb-1">Stock</label>
+                    <Input type="number" value={editStock} onChange={(e) => setEditStock(Number(e.target.value))} className="rounded-xl border-adminBorder bg-white" />
                   </div>
                 </div>
               </div>
 
               {/* Flags / Status */}
               <div className="space-y-4 pt-2">
-                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Flags & Status</h4>
-                <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                <h4 className="text-xs font-semibold text-adminGold uppercase tracking-widest border-b border-adminBorder pb-2">Flags & Status</h4>
+                <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm text-adminSidebar">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={editIsActive} onChange={(e) => setEditIsActive(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Active (Visible)
+                    <input type="checkbox" checked={editIsActive} onChange={(e) => setEditIsActive(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> Active (Visible)
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={editIsFeatured} onChange={(e) => setEditIsFeatured(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Featured
+                    <input type="checkbox" checked={editIsFeatured} onChange={(e) => setEditIsFeatured(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> Featured
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={editIsBestSeller} onChange={(e) => setEditIsBestSeller(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Best Seller
+                    <input type="checkbox" checked={editIsBestSeller} onChange={(e) => setEditIsBestSeller(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> Best Seller
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={editIsFlashDeal} onChange={(e) => setEditIsFlashDeal(e.target.checked)} className="rounded text-primary focus:ring-primary" /> Flash Deal
+                    <input type="checkbox" checked={editIsFlashDeal} onChange={(e) => setEditIsFlashDeal(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> Flash Deal
                   </label>
+                </div>
+              </div>
+
+              {/* Product Options */}
+              <div className="space-y-4 pt-2">
+                <h4 className="text-xs font-semibold text-adminGold uppercase tracking-widest border-b border-adminBorder pb-2">Product Options (Size & Color)</h4>
+                
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">Available Colors / Finishes</label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-adminSidebar">
+                      <input type="checkbox" checked={editSelectedColorRequired} onChange={e => setEditSelectedColorRequired(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" />
+                      Required
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {DEFAULT_COLORS.map(c => {
+                      const isSelected = editColorOptions.includes(c);
+                      return (
+                        <button key={c} type="button" onClick={() => {
+                          if (isSelected) setEditColorOptions(editColorOptions.filter(x => x !== c));
+                          else setEditColorOptions([...editColorOptions, c]);
+                        }} className={`px-3 py-1 text-xs rounded-full border transition-colors ${isSelected ? 'bg-adminGold text-white border-transparent shadow-sm' : 'bg-white text-adminMuted border-adminBorder hover:border-adminGold/50'}`}>
+                          {c}
+                        </button>
+                      );
+                    })}
+                    {editColorOptions.filter(c => !DEFAULT_COLORS.includes(c)).map(c => (
+                        <button key={c} type="button" onClick={() => setEditColorOptions(editColorOptions.filter(x => x !== c))} className="px-3 py-1 text-xs rounded-full border bg-adminGold text-white border-transparent shadow-sm">
+                          {c} <X className="inline h-3 w-3 ml-1" />
+                        </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 max-w-sm">
+                    <Input value={newCustomColor} onChange={e => setNewCustomColor(e.target.value)} placeholder="Custom color..." className="h-8 text-xs rounded-xl border-adminBorder bg-white" />
+                    <Button type="button" variant="secondary" size="sm" onClick={() => { if(newCustomColor) { setEditColorOptions([...editColorOptions, newCustomColor.trim()]); setNewCustomColor(""); }}} className="rounded-xl border border-adminBorder bg-white hover:bg-adminBg">Add</Button>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">Available Sizes</label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-adminSidebar">
+                      <input type="checkbox" checked={editSelectedSizeRequired} onChange={e => setEditSelectedSizeRequired(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" />
+                      Required
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {editSizeOptions.map(s => (
+                      <button key={s} type="button" onClick={() => setEditSizeOptions(editSizeOptions.filter(x => x !== s))} className="px-3 py-1 text-xs rounded-full border bg-adminGold text-white border-transparent shadow-sm">
+                        {s} <X className="inline h-3 w-3 ml-1" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 max-w-sm">
+                    <Input value={newCustomSize} onChange={e => setNewCustomSize(e.target.value)} placeholder="Add size..." className="h-8 text-xs rounded-xl border-adminBorder bg-white" />
+                    <Button type="button" variant="secondary" size="sm" onClick={() => { if(newCustomSize && !editSizeOptions.includes(newCustomSize.trim())) { setEditSizeOptions([...editSizeOptions, newCustomSize.trim()]); setNewCustomSize(""); }}} className="rounded-xl border border-adminBorder bg-white hover:bg-adminBg">Add</Button>
+                  </div>
+                  <p className="text-[10px] text-adminMuted mt-2">Click the X to remove sizes you don't stock.</p>
                 </div>
               </div>
 
               {/* Images */}
               <div className="space-y-4 pt-2">
-                <h4 className="text-xs font-semibold text-[rgba(184,149,94,1)] uppercase tracking-widest border-b border-border/60 pb-2">Images</h4>
+                <h4 className="text-xs font-semibold text-adminGold uppercase tracking-widest border-b border-adminBorder pb-2">Images</h4>
                 <div className="grid grid-cols-4 gap-3">
                   {editImages.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-lg border border-border overflow-hidden group bg-secondary/50">
+                    <div key={idx} className="relative aspect-square rounded-lg border border-adminBorder overflow-hidden group bg-adminBg">
                       <img src={img} alt="" className="w-full h-full object-cover" />
                       <button type="button" onClick={() => handleRemoveImage(idx)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"><X size={12}/></button>
                     </div>
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Input value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Image URL..." className="rounded-xl flex-1" />
-                  <Button type="button" variant="secondary" onClick={handleAddImageUrl} className="rounded-xl">Add URL</Button>
+                  <Input value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Image URL..." className="rounded-xl flex-1 border-adminBorder bg-white" />
+                  <Button type="button" variant="secondary" onClick={handleAddImageUrl} className="rounded-xl border border-adminBorder bg-white hover:bg-adminBg">Add URL</Button>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-border/60 p-5 bg-card/40 backdrop-blur-sm flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setEditingProduct(null)} className="rounded-full">Cancel</Button>
-              <Button onClick={handleSaveProduct} disabled={saveLoading} className="rounded-full bg-[var(--gradient-rose)] text-white hover:opacity-90 border-none">
+            <div className="border-t border-adminBorder p-5 bg-adminCard flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setEditingProduct(null)} className="rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg">Cancel</Button>
+              <Button onClick={handleSaveProduct} disabled={saveLoading} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none">
                 {saveLoading ? "Saving..." : "Save Product"}
               </Button>
             </div>

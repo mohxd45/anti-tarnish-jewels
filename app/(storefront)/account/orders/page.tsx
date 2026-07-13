@@ -65,10 +65,10 @@ export default function AccountOrdersPage() {
   }
 
   return (
-    <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
+    <div className="bg-[#FFF9FB] shadow-[0_8px_24px_rgba(58,36,40,0.04)] border border-[#E8D7C8]/50 rounded-[2rem] p-6 sm:p-10 mb-8 pb-20">
       <div className="mb-8">
-        <h1 className="font-serif text-2xl md:text-3xl text-charcoalBrown mb-2">My Orders</h1>
-        <p className="text-stoneGray text-sm">Track the shipping progress and view order summaries of your purchases.</p>
+        <h1 className="font-serif text-2xl md:text-4xl text-[#3A2428] mb-2">My Orders</h1>
+        <p className="text-[#3A2428]/70 text-sm sm:text-base">Track the shipping progress and view order summaries of your purchases.</p>
       </div>
 
       <div className="grid gap-6">
@@ -77,7 +77,7 @@ export default function AccountOrdersPage() {
             <HeartLoader text="Finding your orders..." />
           </div>
         ) : error ? (
-          <div className="rounded-[2rem] border border-dustyRose/20 bg-dustyRose/5 p-8 text-center text-dustyRose">
+          <div className="rounded-[2rem] border border-red-200 bg-red-50 p-8 text-center text-red-700">
             <p className="font-serif font-semibold text-lg">{error}</p>
             <p className="text-sm mt-2 opacity-80">Please check your connection and try again.</p>
           </div>
@@ -89,15 +89,15 @@ export default function AccountOrdersPage() {
             const isReturned = order.status === "Returned";
 
             return (
-              <div key={order.id} className="rounded-[1.5rem] border border-stone-200 bg-white overflow-hidden shadow-sm transition-all">
+              <div key={order.id} className="rounded-[1.5rem] border border-[#E8D7C8]/50 bg-[#FFF0F5] overflow-hidden shadow-sm transition-all hover:border-[#B8955E]/30">
                 {/* Header Summary */}
                 <div
                   onClick={() => toggleExpand(order.id)}
-                  className="p-5 cursor-pointer flex flex-wrap items-center justify-between gap-4 hover:bg-stone-50/30 transition-all"
+                  className="p-5 sm:p-6 cursor-pointer flex flex-wrap items-center justify-between gap-4 hover:bg-[#E8D7C8]/10 transition-all"
                 >
                   <div className="space-y-1">
-                    <p className="text-xs uppercase tracking-wider text-stoneGray">Order Reference</p>
-                    <h3 className="text-base font-serif font-semibold text-charcoalBrown">{order.orderNumber || `#${order.id}`}</h3>
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-[#B8955E]">Order Reference</p>
+                    <h3 className="text-base sm:text-lg font-serif font-semibold text-[#3A2428]">{order.orderNumber || `#${order.id}`}</h3>
                     <p className="text-xs text-stoneGray">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
                   </div>
 

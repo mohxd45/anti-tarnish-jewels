@@ -160,8 +160,8 @@ export default function ManageOrdersPage() {
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 text-xs rounded-full ring-1 ring-inset transition-colors ${
               filter === f
-                ? "bg-[rgba(184,149,94,1)] text-white ring-[rgba(184,149,94,1)] shadow-sm"
-                : "bg-card/60 text-foreground/70 ring-border hover:bg-secondary"
+                ? "bg-adminGold text-white ring-adminGold shadow-sm"
+                : "bg-white text-adminSidebar ring-adminBorder hover:bg-adminBg"
             }`}
           >
             {f}
@@ -169,12 +169,12 @@ export default function ManageOrdersPage() {
         ))}
         <div className="ml-auto flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-adminMuted" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search order…"
-              className="pl-9 w-48 bg-card/60 rounded-full text-xs"
+              className="pl-9 w-48 bg-white border-adminBorder text-adminSidebar rounded-full text-xs"
             />
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function ManageOrdersPage() {
         ) : (
           <div className="overflow-x-auto -mx-2">
             <table className="w-full text-sm min-w-[860px]">
-              <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+              <thead className="text-xs uppercase tracking-wider text-adminMuted bg-adminBg">
                 <tr className="text-left">
                   <th className="px-2 py-2 font-medium">Order ID</th>
                   <th className="px-2 py-2 font-medium">Customer</th>
@@ -198,16 +198,16 @@ export default function ManageOrdersPage() {
                   <th className="px-2 py-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
+              <tbody className="divide-y divide-adminBorder">
                 {filtered.map((o) => {
                   const addr = o.shippingAddress || o.address;
                   const status = o.status || o.orderStatus || "Pending";
                   return (
-                    <tr key={o.id} className="hover:bg-secondary/40">
+                    <tr key={o.id} className="hover:bg-adminBg/50 text-adminSidebar">
                       <td className="px-2 py-3 font-mono text-xs">{o.orderNumber || (o.id ? o.id.slice(-6).toUpperCase() : "N/A")}</td>
                       <td className="px-2 py-3">
                         <div className="font-medium">{o.customerName || addr?.fullName || "Unknown"}</div>
-                        <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        <div className="text-xs text-adminMuted truncate max-w-[200px]">
                           {addr ? `${addr.city || ""}${addr.state ? `, ${addr.state}` : ""}` : "No address"}
                         </div>
                       </td>
@@ -221,7 +221,7 @@ export default function ManageOrdersPage() {
                       <td className="px-2 py-3">
                         <StatusBadge status={status} />
                       </td>
-                      <td className="px-2 py-3 text-xs text-muted-foreground">
+                      <td className="px-2 py-3 text-xs text-adminMuted">
                         {o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "Unknown"}
                       </td>
                       <td className="px-2 py-3">
@@ -277,7 +277,7 @@ export default function ManageOrdersPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="py-10 text-center text-sm text-muted-foreground">
+                    <td colSpan={8} className="py-10 text-center text-sm text-adminMuted">
                       No orders match your filters.
                     </td>
                   </tr>
@@ -308,9 +308,9 @@ export default function ManageOrdersPage() {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-1.5 text-sm border-b border-border/40 last:border-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="text-right font-medium">{value || "—"}</span>
+    <div className="flex items-start justify-between gap-4 py-1.5 text-sm border-b border-adminBorder last:border-0">
+      <span className="text-adminMuted">{label}</span>
+      <span className="text-right font-medium text-adminSidebar">{value || "—"}</span>
     </div>
   );
 }
@@ -332,19 +332,19 @@ function ViewOrderDialog({
 
   return (
     <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-adminBorder">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">
+          <DialogTitle className="font-serif text-2xl text-adminSidebar">
             Order {order.orderNumber || (order.id ? order.id.slice(-6).toUpperCase() : "N/A")}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-adminMuted">
             Placed on {order.createdAt ? new Date(order.createdAt).toLocaleString() : "Unknown"} ·{" "}
             <StatusBadge status={status} />
           </DialogDescription>
         </DialogHeader>
-        <div className="grid md:grid-cols-2 gap-6 bg-card/40 p-4 rounded-xl border border-border/60">
+        <div className="grid md:grid-cols-2 gap-6 bg-adminBg p-4 rounded-xl border border-adminBorder">
           <div>
-            <h3 className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3 border-b border-border/60 pb-2">
+            <h3 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-3 border-b border-adminBorder pb-2">
               Customer
             </h3>
             <Row label="Name" value={order.customerName || addr?.fullName} />
@@ -352,7 +352,7 @@ function ViewOrderDialog({
             <Row label="Email" value={order.customerEmail} />
           </div>
           <div>
-            <h3 className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3 border-b border-border/60 pb-2">
+            <h3 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-3 border-b border-adminBorder pb-2">
               Delivery
             </h3>
             <Row label="Address" value={`${addr?.line1 || ""} ${addr?.line2 || ""}`} />
@@ -362,36 +362,38 @@ function ViewOrderDialog({
         </div>
 
         {order.trackingNumber && (
-          <div className="bg-card/40 p-4 rounded-xl border border-border/60">
-            <h3 className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3 border-b border-border/60 pb-2">
+          <div className="bg-adminBg p-4 rounded-xl border border-adminBorder">
+            <h3 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-3 border-b border-adminBorder pb-2">
               Tracking & Shipment
             </h3>
             <Row label="Courier" value={order.courierName || "Standard Shipping"} />
             <Row label="Tracking Number" value={<span className="font-mono">{order.trackingNumber}</span>} />
             {order.trackingUrl && (
-              <Row label="Tracking URL" value={<a href={order.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate max-w-[200px] block">{order.trackingUrl}</a>} />
+              <Row label="Tracking URL" value={<a href={order.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-adminGold hover:underline truncate max-w-[200px] block">{order.trackingUrl}</a>} />
             )}
           </div>
         )}
 
         <div>
-          <h3 className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3">
+          <h3 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-3">
             Items
           </h3>
-          <div className="rounded-xl border border-border/60 overflow-hidden bg-card/40">
+          <div className="rounded-xl border border-adminBorder overflow-hidden bg-white">
             <table className="w-full text-sm">
-              <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground">
+              <thead className="bg-adminBg text-[11px] uppercase tracking-wider text-adminMuted">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium">Product</th>
+                  <th className="text-left px-4 py-3 font-medium">Item Code</th>
                   <th className="text-right px-4 py-3 font-medium">Qty</th>
                   <th className="text-right px-4 py-3 font-medium">Price</th>
                   <th className="text-right px-4 py-3 font-medium">Subtotal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
+              <tbody className="divide-y divide-adminBorder">
                 {(order.items || []).map((it, i) => (
-                  <tr key={i}>
-                    <td className="px-4 py-3 font-medium">{it.product?.name || "Unknown Item"}</td>
+                  <tr key={i} className="text-adminSidebar">
+                    <td className="px-4 py-3 font-medium">{it.product?.name || it.name || "Unknown Item"}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-adminMuted">{it.sku || it.product?.sku || "N/A"}</td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {it.quantity}
                     </td>
@@ -406,12 +408,12 @@ function ViewOrderDialog({
               </tbody>
             </table>
           </div>
-          <div className="flex justify-end mt-4 text-sm bg-card/40 p-4 rounded-xl border border-border/60">
+          <div className="flex justify-end mt-4 text-sm bg-adminBg p-4 rounded-xl border border-adminBorder">
             <div className="w-64 space-y-2">
               <Row label="Subtotal" value={formatPrice(order.subtotal || 0)} />
               {order.discount > 0 && <Row label={`Discount ${order.couponCode ? `(${order.couponCode})` : ""}`} value={`-${formatPrice(order.discount)}`} />}
               <Row label="Shipping" value={(order.shippingFee ?? order.shipping ?? 0) === 0 ? "Free" : formatPrice(order.shippingFee ?? order.shipping ?? 0)} />
-              <div className="flex items-center justify-between pt-2 border-t border-border/60 font-semibold text-base text-[rgba(184,149,94,1)]">
+              <div className="flex items-center justify-between pt-2 border-t border-adminBorder font-semibold text-base text-adminGold">
                 <span>Total</span>
                 <span>{formatPrice(order.total || 0)}</span>
               </div>
@@ -420,18 +422,18 @@ function ViewOrderDialog({
         </div>
         
         {order.notes && (
-          <div className="bg-card/40 p-4 rounded-xl border border-border/60">
-            <h4 className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">
+          <div className="bg-adminBg p-4 rounded-xl border border-adminBorder">
+            <h4 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-2">
               Admin Notes
             </h4>
-            <p className="text-sm italic">{order.notes}</p>
+            <p className="text-sm italic text-adminSidebar">{order.notes}</p>
           </div>
         )}
         <DialogFooter className="gap-2 mt-4">
-          <Button variant="outline" onClick={() => onPrint(order)} className="rounded-full">
-            <Printer className="h-4 w-4 mr-2 text-muted-foreground" /> Print
+          <Button variant="outline" onClick={() => onPrint(order)} className="rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg">
+            <Printer className="h-4 w-4 mr-2 text-adminMuted" /> Print
           </Button>
-          <Button onClick={() => onEdit(order)} className="rounded-full bg-[var(--gradient-gold,linear-gradient(135deg,#b8955e,#d8a7b1))] text-white border-none shadow-md">
+          <Button onClick={() => onEdit(order)} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md">
             <Pencil className="h-4 w-4 mr-2" /> Edit Order
           </Button>
         </DialogFooter>
@@ -476,12 +478,12 @@ function EditOrderDialog({
 
   return (
     <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto bg-white border-adminBorder">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">
+          <DialogTitle className="font-serif text-2xl text-adminSidebar">
             Update Order & Tracking
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-adminMuted">
             Update fulfillment status, tracking link, and internal notes.
           </DialogDescription>
         </DialogHeader>
@@ -493,12 +495,12 @@ function EditOrderDialog({
                 value={status}
                 onValueChange={(v) => setStatus(v as OrderStatus)}
               >
-                <SelectTrigger className="w-full rounded-xl">
+                <SelectTrigger className="w-full rounded-xl border-adminBorder bg-white text-adminSidebar">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border-adminBorder">
                   {STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>
+                    <SelectItem key={s} value={s} className="hover:bg-adminBg text-adminSidebar focus:bg-adminBg">
                       {s}
                     </SelectItem>
                   ))}
@@ -512,7 +514,7 @@ function EditOrderDialog({
                   value={courierName}
                   onChange={(e) => setCourierName(e.target.value)}
                   placeholder="e.g. Delhivery"
-                  className="rounded-xl"
+                  className="rounded-xl border-adminBorder bg-white"
                 />
               </Field>
               <Field label="Tracking Number">
@@ -520,7 +522,7 @@ function EditOrderDialog({
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   placeholder="e.g. 1234567890"
-                  className="rounded-xl"
+                  className="rounded-xl border-adminBorder bg-white"
                 />
               </Field>
             </div>
@@ -531,29 +533,29 @@ function EditOrderDialog({
                 value={trackingUrl}
                 onChange={(e) => setTrackingUrl(e.target.value)}
                 placeholder="https://..."
-                className="rounded-xl"
+                className="rounded-xl border-adminBorder bg-white"
               />
             </Field>
           </section>
 
-          <section className="space-y-4 pt-4 border-t border-border/60">
+          <section className="space-y-4 pt-4 border-t border-adminBorder">
             <Field label="Admin Notes (Internal only)">
               <Textarea
                 rows={4}
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
                 placeholder="Internal notes about fulfillment..."
-                className="rounded-xl resize-none"
+                className="rounded-xl resize-none border-adminBorder bg-white"
               />
             </Field>
           </section>
         </div>
 
         <DialogFooter className="gap-2 pt-6">
-          <Button variant="outline" onClick={onClose} disabled={saving} className="rounded-full">
+          <Button variant="outline" onClick={onClose} disabled={saving} className="rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving} className="rounded-full bg-[var(--gradient-gold,linear-gradient(135deg,#b8955e,#d8a7b1))] text-white border-none shadow-md">
+          <Button onClick={handleSave} disabled={saving} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md">
             {saving ? "Saving…" : "Save Changes"}
           </Button>
         </DialogFooter>
@@ -573,7 +575,7 @@ function Field({
 }) {
   return (
     <div className={`space-y-1.5 ${className}`}>
-      <Label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">{label}</Label>
+      <Label className="text-[11px] uppercase tracking-wider font-semibold text-adminMuted">{label}</Label>
       {children}
     </div>
   );
@@ -589,10 +591,11 @@ function printInvoice(o: Order) {
     .map(
       (it) => `
       <tr>
-        <td>${escapeHtml(it.product?.name || "Unknown Item")}</td>
+        <td>${escapeHtml(it.sku || it.product?.sku || "N/A")}</td>
+        <td>${escapeHtml(it.product?.name || it.name || "Unknown Item")}</td>
         <td style="text-align:right">${it.quantity}</td>
-        <td style="text-align:right">${formatPrice(it.product?.salePrice || 0)}</td>
-        <td style="text-align:right">${formatPrice((it.product?.salePrice || 0) * (it.quantity || 1))}</td>
+        <td style="text-align:right">${formatPrice(it.product?.salePrice || it.price || 0)}</td>
+        <td style="text-align:right">${formatPrice((it.product?.salePrice || it.price || 0) * (it.quantity || 1))}</td>
       </tr>`
     )
     .join("");
@@ -641,7 +644,7 @@ function printInvoice(o: Order) {
       </div>
     </div>
     <table>
-      <thead><tr><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th><th style="text-align:right">Subtotal</th></tr></thead>
+      <thead><tr><th>Item Code</th><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th><th style="text-align:right">Subtotal</th></tr></thead>
       <tbody>${itemsHtml}</tbody>
     </table>
     <div class="total">Total: ${formatPrice(o.total || 0)}</div>

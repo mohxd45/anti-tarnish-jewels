@@ -21,7 +21,7 @@ import { useAuth } from "@/context/AuthContext";
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-adminMuted font-semibold">{label}</Label>
       {children}
     </div>
   );
@@ -37,6 +37,7 @@ export default function AddProductPage() {
 
   // Form Fields State
   const [name, setName] = useState("");
+  const [sku, setSku] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
@@ -62,9 +63,40 @@ export default function AddProductPage() {
   // Image input
   const [newImageUrl, setNewImageUrl] = useState("");
 
+  // Product Options
+  const [sizeOptions, setSizeOptions] = useState<string[]>([]);
+  const [colorOptions, setColorOptions] = useState<string[]>([]);
+  const [selectedSizeRequired, setSelectedSizeRequired] = useState(false);
+  const [selectedColorRequired, setSelectedColorRequired] = useState(false);
+  const [newCustomSize, setNewCustomSize] = useState("");
+  const [newCustomColor, setNewCustomColor] = useState("");
+
+  const DEFAULT_COLORS = ["Gold", "Silver", "Rose Gold", "Black", "White", "Pearl", "Green", "Red", "Pink", "Blue", "Multi Color"];
+  const SIZES_RINGS = ["Adjustable", "Size 5", "Size 6", "Size 7", "Size 8", "Size 9", "Size 10"];
+  const SIZES_BANGLES = ["2.2", "2.4", "2.6", "2.8", "Adjustable"];
+  const SIZES_BRACELETS = ["Small", "Medium", "Large", "Adjustable"];
+  const SIZES_ANKLETS = ["9 inch", "10 inch", "11 inch", "Adjustable"];
+  const SIZES_NECKLACES = ["Choker", "16 inch", "18 inch", "20 inch", "22 inch", "Adjustable"];
+  const SIZES_FREE_ADJ = ["Free Size", "Adjustable"];
+  const SIZES_HAIR = ["Free Size", "Small", "Medium", "Large", "Adjustable"];
+
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    // Only auto-suggest if no sizes exist
+    if (sizeOptions.length === 0 && category) {
+      const catLow = category.toLowerCase();
+      if (catLow.includes("ring")) setSizeOptions(SIZES_RINGS);
+      else if (catLow.includes("bangle")) setSizeOptions(SIZES_BANGLES);
+      else if (catLow.includes("bracelet")) setSizeOptions(SIZES_BRACELETS);
+      else if (catLow.includes("anklet")) setSizeOptions(SIZES_ANKLETS);
+      else if (catLow.includes("necklace") || catLow.includes("chain")) setSizeOptions(SIZES_NECKLACES);
+      else if (catLow.includes("hair")) setSizeOptions(SIZES_HAIR);
+      else if (catLow.includes("bridal") || catLow.includes("set") || catLow.includes("tikka") || catLow.includes("haathphool")) setSizeOptions(SIZES_FREE_ADJ);
+    }
+  }, [category]);
 
   async function loadCategories() {
     setLoading(true);
@@ -135,6 +167,7 @@ export default function AddProductPage() {
       const productPayload: Omit<Product, "id"> = {
         name: name.trim(),
         slug: uniqueSlug,
+        sku: sku.trim(),
         category: catName.trim(),
         categoryId: category.trim(),
         categorySlug: category.trim(),
@@ -150,6 +183,10 @@ export default function AddProductPage() {
         specifications: {},
         variants: [],
         badges: finalBadges,
+        sizeOptions,
+        colorOptions,
+        selectedSizeRequired,
+        selectedColorRequired,
         isFeatured,
         isBestSeller,
         isNewArrival,
@@ -203,12 +240,12 @@ export default function AddProductPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Add Product</h1>
-          <p className="text-muted-foreground mt-1">Create a new listing for the catalog</p>
+          <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">Add Product</h1>
+          <p className="text-adminMuted mt-1">Create a new listing for the catalog</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" asChild><Link href="/admin/products"><X className="h-4 w-4 mr-1" />Discard</Link></Button>
-          <Button onClick={handleSubmit} disabled={saving} className="bg-[var(--gradient-rose)] text-white hover:opacity-90 border-none min-w-[120px]">
+          <Button variant="outline" asChild className="border-adminBorder text-adminSidebar hover:bg-adminBg"><Link href="/admin/products"><X className="h-4 w-4 mr-1" />Discard</Link></Button>
+          <Button onClick={handleSubmit} disabled={saving} className="bg-adminRose text-white hover:bg-adminRose/90 border-none min-w-[120px]">
             {saving ? <HeartLoader size="sm" text="" /> : <><Save className="h-4 w-4 mr-1" /> Publish</>}
           </Button>
         </div>
@@ -223,34 +260,37 @@ export default function AddProductPage() {
             <AdminCard title="Basic Information">
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Product Name">
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Rose Gold Pearl Necklace" />
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Rose Gold Pearl Necklace" className="border-adminBorder bg-white" />
+                </Field>
+                <Field label="Item Code / SKU">
+                  <Input value={sku} onChange={(e) => setSku(e.target.value)} placeholder="e.g. LJ-RNG-001" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Category">
                   <select 
                     value={category} 
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-card/60 px-3 text-sm outline-none focus:ring-1 focus:ring-ring"
+                    className="w-full h-9 rounded-md border border-adminBorder bg-white px-3 text-sm outline-none focus:ring-1 focus:ring-adminGold"
                   >
                     {categories.map((c) => <option key={c.id} value={c.slug || slugify(c.name)}>{c.name}</option>)}
                   </select>
                 </Field>
                 <Field label="Regular Price (₹)">
-                  <Input type="number" value={regularPrice || ""} onChange={(e) => setRegularPrice(Number(e.target.value))} placeholder="4999" />
+                  <Input type="number" value={regularPrice || ""} onChange={(e) => setRegularPrice(Number(e.target.value))} placeholder="4999" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Sale Price (₹)">
-                  <Input type="number" value={salePrice || ""} onChange={(e) => setSalePrice(Number(e.target.value))} placeholder="3499" />
+                  <Input type="number" value={salePrice || ""} onChange={(e) => setSalePrice(Number(e.target.value))} placeholder="3499" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Stock">
-                  <Input type="number" value={stock} onChange={(e) => setStock(Number(e.target.value))} placeholder="50" />
+                  <Input type="number" value={stock} onChange={(e) => setStock(Number(e.target.value))} placeholder="50" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Custom Tags">
-                  <Input value={badgesText} onChange={(e) => setBadgesText(e.target.value)} placeholder="rose-gold, pearl, bridal (comma separated)" />
+                  <Input value={badgesText} onChange={(e) => setBadgesText(e.target.value)} placeholder="rose-gold, pearl, bridal (comma separated)" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Brand">
-                  <Input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="e.g. LONA JEWELS" />
+                  <Input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="e.g. LONA JEWELS" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Subcategory">
-                  <Input value={subCategory} onChange={(e) => setSubCategory(e.target.value)} placeholder="e.g. Chokers" />
+                  <Input value={subCategory} onChange={(e) => setSubCategory(e.target.value)} placeholder="e.g. Chokers" className="border-adminBorder bg-white" />
                 </Field>
               </div>
             </AdminCard>
@@ -259,43 +299,43 @@ export default function AddProductPage() {
             <AdminCard title="Product Images">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {images.map((img, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-xl border border-border bg-secondary/50 overflow-hidden group">
+                  <div key={idx} className="relative aspect-square rounded-xl border border-adminBorder bg-adminBg overflow-hidden group">
                     <img src={img} alt="" className="w-full h-full object-cover" />
                     <button type="button" onClick={() => handleRemoveImage(idx)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <X size={12}/>
                     </button>
-                    {idx === 0 && <span className="absolute bottom-1 left-1 text-[8px] bg-primary/20 text-primary uppercase font-bold px-1 py-0.5 rounded backdrop-blur">Cover</span>}
+                    {idx === 0 && <span className="absolute bottom-1 left-1 text-[8px] bg-adminGold/20 text-adminGold uppercase font-bold px-1 py-0.5 rounded backdrop-blur">Cover</span>}
                   </div>
                 ))}
                 
-                <label className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/20 grid place-items-center cursor-pointer hover:border-primary transition-colors">
+                <label className="aspect-square rounded-xl border-2 border-dashed border-adminBorder bg-adminBg grid place-items-center cursor-pointer hover:border-adminGold transition-colors">
                   <div className="text-center px-2">
-                    {uploadingImg ? <Loader className="h-5 w-5 mx-auto text-muted-foreground animate-spin" /> : <Upload className="h-5 w-5 mx-auto text-muted-foreground" />}
-                    <p className="text-[11px] text-muted-foreground mt-1">Upload</p>
+                    {uploadingImg ? <Loader className="h-5 w-5 mx-auto text-adminMuted animate-spin" /> : <Upload className="h-5 w-5 mx-auto text-adminMuted" />}
+                    <p className="text-[11px] text-adminMuted mt-1">Upload</p>
                   </div>
                   <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImg} className="hidden" />
                 </label>
               </div>
               
               <div className="flex gap-2 mt-4">
-                <Input value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Or add via URL link..." className="text-sm" />
-                <Button variant="secondary" onClick={handleAddImageUrl}>Add</Button>
+                <Input value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Or add via URL link..." className="text-sm border-adminBorder bg-white" />
+                <Button variant="secondary" onClick={handleAddImageUrl} className="border border-adminBorder bg-white hover:bg-adminBg">Add</Button>
               </div>
-              <p className="text-[11px] text-muted-foreground mt-3">PNG, JPG up to 5MB. First image becomes the cover.</p>
+              <p className="text-[11px] text-adminMuted mt-3">PNG, JPG up to 5MB. First image becomes the cover.</p>
             </AdminCard>
 
             {/* Description */}
             <AdminCard title="Description & Details">
               <div className="space-y-4">
                 <Field label="Description">
-                  <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A timeless rose gold necklace finished with freshwater pearls…" />
+                  <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A timeless rose gold necklace finished with freshwater pearls…" className="border-adminBorder bg-white" />
                 </Field>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Field label="Material">
-                    <Input value={material} onChange={(e) => setMaterial(e.target.value)} placeholder="316L Stainless Steel, 18k Rose Gold Plated" />
+                    <Input value={material} onChange={(e) => setMaterial(e.target.value)} placeholder="316L Stainless Steel, 18k Rose Gold Plated" className="border-adminBorder bg-white" />
                   </Field>
                   <Field label="Care Instructions">
-                    <Input value={careInstructions} onChange={(e) => setCareInstructions(e.target.value)} placeholder="Avoid water, perfume; store in pouch" />
+                    <Input value={careInstructions} onChange={(e) => setCareInstructions(e.target.value)} placeholder="Avoid water, perfume; store in pouch" className="border-adminBorder bg-white" />
                   </Field>
                 </div>
               </div>
@@ -303,36 +343,93 @@ export default function AddProductPage() {
           </div>
 
           <div className="space-y-6">
-            {/* Visibility / Badges */}
             <AdminCard title="Visibility">
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Active</p>
-                    <p className="text-xs text-muted-foreground">Visible on storefront</p>
+                    <p className="text-sm font-medium text-adminSidebar">Active</p>
+                    <p className="text-xs text-adminMuted">Visible on storefront</p>
                   </div>
-                  <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
+                  <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="w-4 h-4 rounded border-adminBorder text-adminGold focus:ring-adminGold" />
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Featured</p>
-                    <p className="text-xs text-muted-foreground">Show on homepage</p>
+                    <p className="text-sm font-medium text-adminSidebar">Featured</p>
+                    <p className="text-xs text-adminMuted">Show on homepage</p>
                   </div>
-                  <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
+                  <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="w-4 h-4 rounded border-adminBorder text-adminGold focus:ring-adminGold" />
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Bestseller</p>
-                    <p className="text-xs text-muted-foreground">Highlight as bestseller</p>
+                    <p className="text-sm font-medium text-adminSidebar">Bestseller</p>
+                    <p className="text-xs text-adminMuted">Highlight as bestseller</p>
                   </div>
-                  <input type="checkbox" checked={isBestSeller} onChange={(e) => setIsBestSeller(e.target.checked)} className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
+                  <input type="checkbox" checked={isBestSeller} onChange={(e) => setIsBestSeller(e.target.checked)} className="w-4 h-4 rounded border-adminBorder text-adminGold focus:ring-adminGold" />
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-foreground">New Arrival</p>
-                    <p className="text-xs text-muted-foreground">Highlight as new</p>
+                    <p className="text-sm font-medium text-adminSidebar">New Arrival</p>
+                    <p className="text-xs text-adminMuted">Highlight as new</p>
                   </div>
-                  <input type="checkbox" checked={isNewArrival} onChange={(e) => setIsNewArrival(e.target.checked)} className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
+                  <input type="checkbox" checked={isNewArrival} onChange={(e) => setIsNewArrival(e.target.checked)} className="w-4 h-4 rounded border-adminBorder text-adminGold focus:ring-adminGold" />
+                </div>
+              </div>
+            </AdminCard>
+
+            <AdminCard title="Product Options (Size & Color)">
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">Available Colors / Finishes</Label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-adminSidebar">
+                      <input type="checkbox" checked={selectedColorRequired} onChange={e => setSelectedColorRequired(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" />
+                      Required
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {DEFAULT_COLORS.map(c => {
+                      const isSelected = colorOptions.includes(c);
+                      return (
+                        <button key={c} type="button" onClick={() => {
+                          if (isSelected) setColorOptions(colorOptions.filter(x => x !== c));
+                          else setColorOptions([...colorOptions, c]);
+                        }} className={`px-3 py-1 text-xs rounded-full border transition-colors ${isSelected ? 'bg-adminGold text-white border-transparent shadow-sm' : 'bg-white text-adminMuted border-adminBorder hover:border-adminGold/50'}`}>
+                          {c}
+                        </button>
+                      );
+                    })}
+                    {colorOptions.filter(c => !DEFAULT_COLORS.includes(c)).map(c => (
+                        <button key={c} type="button" onClick={() => setColorOptions(colorOptions.filter(x => x !== c))} className="px-3 py-1 text-xs rounded-full border bg-adminGold text-white border-transparent shadow-sm">
+                          {c} <X className="inline h-3 w-3 ml-1" />
+                        </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 max-w-sm">
+                    <Input value={newCustomColor} onChange={e => setNewCustomColor(e.target.value)} placeholder="Custom color..." className="h-8 text-xs rounded-xl border-adminBorder bg-white" />
+                    <Button type="button" variant="secondary" size="sm" onClick={() => { if(newCustomColor) { setColorOptions([...colorOptions, newCustomColor.trim()]); setNewCustomColor(""); }}} className="rounded-xl border border-adminBorder bg-white hover:bg-adminBg">Add</Button>
+                  </div>
+                </div>
+
+                <div className="border-t border-adminBorder/50 pt-5">
+                  <div className="flex justify-between items-center mb-2">
+                    <Label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">Available Sizes</Label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-adminSidebar">
+                      <input type="checkbox" checked={selectedSizeRequired} onChange={e => setSelectedSizeRequired(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" />
+                      Required
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {sizeOptions.map(s => (
+                      <button key={s} type="button" onClick={() => setSizeOptions(sizeOptions.filter(x => x !== s))} className="px-3 py-1 text-xs rounded-full border bg-adminGold text-white border-transparent shadow-sm">
+                        {s} <X className="inline h-3 w-3 ml-1" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 max-w-sm">
+                    <Input value={newCustomSize} onChange={e => setNewCustomSize(e.target.value)} placeholder="Add size..." className="h-8 text-xs rounded-xl border-adminBorder bg-white" />
+                    <Button type="button" variant="secondary" size="sm" onClick={() => { if(newCustomSize && !sizeOptions.includes(newCustomSize.trim())) { setSizeOptions([...sizeOptions, newCustomSize.trim()]); setNewCustomSize(""); }}} className="rounded-xl border border-adminBorder bg-white hover:bg-adminBg">Add</Button>
+                  </div>
+                  <p className="text-[10px] text-adminMuted mt-2">Sizes are auto-suggested based on category. Click the X to remove sizes you don't stock.</p>
                 </div>
               </div>
             </AdminCard>
@@ -340,10 +437,10 @@ export default function AddProductPage() {
             <AdminCard title="Store Policies">
               <div className="space-y-4">
                 <Field label="Warranty">
-                  <Input value={warranty} onChange={(e) => setWarranty(e.target.value)} placeholder="e.g. 1 Year Manufacturer Warranty" />
+                  <Input value={warranty} onChange={(e) => setWarranty(e.target.value)} placeholder="e.g. 1 Year Manufacturer Warranty" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Return Policy">
-                  <Input value={returnPolicy} onChange={(e) => setReturnPolicy(e.target.value)} placeholder="e.g. 7 Days Replacement Policy" />
+                  <Input value={returnPolicy} onChange={(e) => setReturnPolicy(e.target.value)} placeholder="e.g. 7 Days Replacement Policy" className="border-adminBorder bg-white" />
                 </Field>
               </div>
             </AdminCard>

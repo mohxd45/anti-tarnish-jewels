@@ -48,7 +48,16 @@ const config: Config = {
         charcoalBrown: "#3A2428",
         stoneGray: "#8A626B",
         goldBeige: "#F2C8D3",
-        dustyRose: "#F3B6C6"
+        dustyRose: "#F3B6C6",
+        
+        // Admin Theme Colors
+        adminSidebar: "var(--admin-sidebar)",
+        adminBg: "var(--admin-bg)",
+        adminCard: "var(--admin-card)",
+        adminGold: "var(--admin-gold)",
+        adminRose: "var(--admin-rose)",
+        adminMuted: "var(--admin-muted)",
+        adminBorder: "var(--admin-border)"
       },
       boxShadow: {
         glow: "0 20px 60px -15px oklch(0.74 0.105 45 / 0.45)",

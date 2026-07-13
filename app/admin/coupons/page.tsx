@@ -17,7 +17,7 @@ import { HeartLoader } from "@/components/ui/HeartLoader";
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</Label>
+      <Label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold">{label}</Label>
       {children}
     </div>
   );
@@ -223,34 +223,34 @@ export default function CouponsPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-display font-semibold text-foreground tracking-tight">Discount Coupons</h1>
-          <p className="text-muted-foreground mt-1">Create and manage promotions</p>
+          <h1 className="text-3xl font-serif font-semibold text-adminSidebar tracking-tight">Discount Coupons</h1>
+          <p className="text-adminMuted mt-1">Create and manage promotions</p>
         </div>
         
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-adminMuted" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search codes…"
-              className="pl-9 w-48 bg-card/60 rounded-full text-xs"
+              className="pl-9 w-48 bg-white border-adminBorder text-adminSidebar rounded-full text-xs"
             />
           </div>
-          <Button onClick={openCreate} className="bg-[var(--gradient-rose)] text-white hover:opacity-90 border-none shrink-0 w-fit rounded-full">
+          <Button onClick={openCreate} className="bg-adminRose text-white hover:bg-adminRose/90 border-none shrink-0 w-fit rounded-full shadow-md">
             <Plus className="h-4 w-4 mr-1" /> New Coupon
           </Button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex h-[40vh] items-center justify-center text-muted-foreground">
+        <div className="flex h-[40vh] items-center justify-center text-adminMuted">
           <HeartLoader text="Loading coupons..." />
         </div>
       ) : filteredCoupons.length === 0 ? (
         <AdminCard className="p-12 text-center shadow-sm">
-          <h3 className="text-xl font-display text-foreground">No Coupons Found</h3>
-          <p className="text-muted-foreground text-sm mt-2">Try adjusting your search or add a new coupon.</p>
+          <h3 className="text-xl font-serif text-adminSidebar">No Coupons Found</h3>
+          <p className="text-adminMuted text-sm mt-2">Try adjusting your search or add a new coupon.</p>
         </AdminCard>
       ) : (
         <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
@@ -260,14 +260,14 @@ export default function CouponsPage() {
             const pct = limit > 0 ? Math.round((used / limit) * 100) : 0;
             
             return (
-              <div key={c.id} className="glass-card p-5 flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/60 transition-colors shadow-sm">
+              <div key={c.id} className="p-5 flex flex-col gap-3 rounded-2xl border border-adminBorder bg-white hover:bg-adminBg/50 transition-colors shadow-sm">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <Ticket className="h-4 w-4 text-primary" />
-                      <span className="font-mono text-lg font-semibold tracking-wider text-foreground">{c.code}</span>
+                      <Ticket className="h-4 w-4 text-adminGold" />
+                      <span className="font-mono text-lg font-semibold tracking-wider text-adminSidebar">{c.code}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-adminMuted mt-1">
                       {c.expiryDate ? `Expires ${new Date(c.expiryDate).toLocaleDateString()}` : "No Expiry"}
                     </p>
                   </div>
@@ -276,30 +276,30 @@ export default function CouponsPage() {
                   </button>
                 </div>
 
-                <div className="rounded-lg p-3 text-white text-center mt-2 shadow-sm" style={{ background: "var(--gradient-rose)" }}>
-                  <p className="text-[10px] uppercase tracking-widest opacity-80">{c.type === "percentage" || c.type === "percent" ? "Percentage" : "Fixed Amount"}</p>
-                  <p className="font-display text-2xl font-semibold mt-1">
+                <div className="rounded-lg p-3 text-white text-center mt-2 shadow-sm bg-adminGold">
+                  <p className="text-[10px] uppercase tracking-widest opacity-90">{c.type === "percentage" || c.type === "percent" ? "Percentage" : "Fixed Amount"}</p>
+                  <p className="font-serif text-2xl font-semibold mt-1">
                     {c.type === "percentage" || c.type === "percent" ? `${c.value}%` : formatPrice(c.value)}
                   </p>
                 </div>
 
                 <div className="mt-2">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Usage</span>
-                    <span className="tabular-nums font-medium text-foreground">{used.toLocaleString("en-IN")} {limit > 0 ? ` / ${limit.toLocaleString("en-IN")}` : " Used"}</span>
+                    <span className="text-adminMuted">Usage</span>
+                    <span className="tabular-nums font-medium text-adminSidebar">{used.toLocaleString("en-IN")} {limit > 0 ? ` / ${limit.toLocaleString("en-IN")}` : " Used"}</span>
                   </div>
                   {limit > 0 && (
-                    <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                      <div className="h-full transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%`, background: "var(--gradient-gold)" }} />
+                    <div className="h-1.5 rounded-full bg-adminBg overflow-hidden border border-adminBorder">
+                      <div className="h-full transition-all duration-500 bg-adminGold" style={{ width: `${Math.min(pct, 100)}%` }} />
                     </div>
                   )}
                 </div>
 
                 <div className="flex gap-1.5 mt-auto pt-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(c)} className="flex-1 rounded-xl h-8 text-xs">
+                  <Button size="sm" variant="outline" onClick={() => handleEdit(c)} className="flex-1 rounded-xl h-8 text-xs border-adminBorder text-adminSidebar hover:bg-adminBg">
                     <Edit2 className="h-3 w-3 mr-1" />Edit
                   </Button>
-                  <Button size="icon" variant="ghost" disabled={deletingId === c.id} onClick={() => handleDelete(c.id)} className="h-8 w-8 rounded-xl text-dustyRose hover:text-dustyRose hover:bg-dustyRose/10">
+                  <Button size="icon" variant="ghost" disabled={deletingId === c.id} onClick={() => handleDelete(c.id)} className="h-8 w-8 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50">
                     {deletingId === c.id ? <HeartLoader size="sm" text="" /> : <Trash2 className="h-3.5 w-3.5" />}
                   </Button>
                 </div>
@@ -313,16 +313,16 @@ export default function CouponsPage() {
       {editorOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 flex justify-end animate-in fade-in">
           <div className="fixed inset-0" onClick={handleCancelEdit} />
-          <aside className="relative h-full w-[400px] max-w-[100vw] border-l border-border/60 bg-[var(--background)] shadow-2xl overflow-y-auto flex flex-col animate-in slide-in-from-right">
+          <aside className="relative h-full w-[400px] max-w-[100vw] border-l border-adminBorder bg-white shadow-2xl overflow-y-auto flex flex-col animate-in slide-in-from-right">
             
-            <div className="flex justify-between items-center border-b border-border/60 p-5 bg-card/40 backdrop-blur-sm">
+            <div className="flex justify-between items-center border-b border-adminBorder p-5 bg-adminBg backdrop-blur-sm">
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Promotion Configurator</span>
-                <h3 className="text-xl font-display font-semibold text-foreground mt-1">
+                <span className="text-[10px] uppercase tracking-widest text-adminMuted font-semibold">Promotion Configurator</span>
+                <h3 className="text-xl font-serif font-semibold text-adminSidebar mt-1">
                   {editingCoupon ? `Edit: ${editingCoupon.code}` : "New Coupon"}
                 </h3>
               </div>
-              <button type="button" onClick={handleCancelEdit} className="rounded-full p-2 text-muted-foreground hover:bg-secondary transition-colors">
+              <button type="button" onClick={handleCancelEdit} className="rounded-full p-2 text-adminMuted hover:bg-white transition-colors">
                 <X size={18} />
               </button>
             </div>
@@ -336,7 +336,7 @@ export default function CouponsPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     placeholder="e.g. WELCOME10"
-                    className="rounded-xl uppercase font-mono tracking-widest"
+                    className="rounded-xl uppercase font-mono tracking-widest border-adminBorder bg-white text-adminSidebar"
                   />
                 </Field>
 
@@ -345,7 +345,7 @@ export default function CouponsPage() {
                     <select
                       value={type}
                       onChange={(e) => setType(e.target.value as "fixed" | "percentage")}
-                      className="w-full h-9 rounded-xl border border-input bg-transparent px-3 text-sm outline-none focus:ring-1 focus:ring-ring"
+                      className="w-full h-9 rounded-xl border border-adminBorder bg-white text-adminSidebar px-3 text-sm outline-none focus:ring-1 focus:ring-adminGold"
                     >
                       <option value="percentage">Percentage (%)</option>
                       <option value="fixed">Fixed (₹)</option>
@@ -360,7 +360,7 @@ export default function CouponsPage() {
                       value={value || ""}
                       onChange={(e) => setValue(Number(e.target.value))}
                       placeholder={type === "percentage" ? "10" : "500"}
-                      className="rounded-xl"
+                      className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                     />
                   </Field>
                 </div>
@@ -373,7 +373,7 @@ export default function CouponsPage() {
                       onChange={(e) => setMinimumOrderAmount(Number(e.target.value))}
                       placeholder="e.g. 999"
                       min={0}
-                      className="rounded-xl"
+                      className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                     />
                   </Field>
 
@@ -384,7 +384,7 @@ export default function CouponsPage() {
                       onChange={(e) => setMaximumDiscount(Number(e.target.value))}
                       placeholder="e.g. 500"
                       min={0}
-                      className="rounded-xl"
+                      className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                       disabled={type === "fixed"}
                     />
                   </Field>
@@ -396,7 +396,7 @@ export default function CouponsPage() {
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="rounded-xl"
+                      className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                     />
                   </Field>
 
@@ -405,7 +405,7 @@ export default function CouponsPage() {
                       type="date"
                       value={expiryDate}
                       onChange={(e) => setExpiryDate(e.target.value)}
-                      className="rounded-xl"
+                      className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                     />
                   </Field>
                 </div>
@@ -417,22 +417,22 @@ export default function CouponsPage() {
                     onChange={(e) => setUsageLimit(Number(e.target.value))}
                     placeholder="e.g. 100"
                     min={0}
-                    className="rounded-xl"
+                    className="rounded-xl border-adminBorder bg-white text-adminSidebar"
                   />
                 </Field>
 
                 {editingCoupon && (
                   <div className="pt-2">
-                    <label className="flex items-center gap-3 text-sm cursor-pointer select-none border border-border/60 bg-card/40 p-3 rounded-xl hover:bg-card/60 transition-colors">
+                    <label className="flex items-center gap-3 text-sm cursor-pointer select-none border border-adminBorder bg-adminBg p-3 rounded-xl hover:bg-adminBg/80 transition-colors">
                       <input
                         type="checkbox"
                         checked={!!editingCoupon.active}
                         onChange={(e) => handleToggleActive(editingCoupon)}
-                        className="accent-primary h-4 w-4 rounded border-border text-primary"
+                        className="accent-adminRose h-4 w-4 rounded border-adminBorder text-adminRose"
                       />
                       <div>
-                        <div className="font-medium">Active Status</div>
-                        <div className="text-[10px] text-muted-foreground">Customers can apply this code</div>
+                        <div className="font-medium text-adminSidebar">Active Status</div>
+                        <div className="text-[10px] text-adminMuted">Customers can apply this code</div>
                       </div>
                     </label>
                   </div>
@@ -441,9 +441,9 @@ export default function CouponsPage() {
               </form>
             </div>
 
-            <div className="border-t border-border/60 p-5 bg-card/40 backdrop-blur-sm flex justify-end gap-3 mt-auto">
-              <Button variant="outline" onClick={handleCancelEdit} className="rounded-full">Cancel</Button>
-              <Button form="coupon-form" type="submit" disabled={saving} className="rounded-full bg-[var(--gradient-rose)] text-white hover:opacity-90 border-none min-w-[120px]">
+            <div className="border-t border-adminBorder p-5 bg-white backdrop-blur-sm flex justify-end gap-3 mt-auto">
+              <Button variant="outline" onClick={handleCancelEdit} className="rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg">Cancel</Button>
+              <Button form="coupon-form" type="submit" disabled={saving} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none min-w-[120px] shadow-md">
                 {saving ? <HeartLoader size="sm" text="" /> : <><Save className="h-4 w-4 mr-1" /> {editingCoupon ? "Save Changes" : "Create Coupon"}</>}
               </Button>
             </div>

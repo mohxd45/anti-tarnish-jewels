@@ -1,0 +1,80 @@
+export const LONA_CATEGORIES = [
+  {
+    name: "All Jewellery",
+    slug: "all",
+    description: "Explore our complete luxury collection.",
+    image: "/images/categories/all.png",
+  },
+  {
+    name: "Rings",
+    slug: "rings",
+    description: "Elegance at your fingertips.",
+    image: "/images/categories/rings.png",
+  },
+  {
+    name: "Earrings",
+    slug: "earrings",
+    description: "Radiant framing for your face.",
+    image: "/images/categories/earrings.png",
+  },
+  {
+    name: "Necklaces",
+    slug: "necklaces",
+    description: "Close to your heart.",
+    image: "/images/categories/necklaces.png",
+  },
+  {
+    name: "Bracelets",
+    slug: "bracelets",
+    description: "Delicate wrist adornments.",
+    image: "/images/categories/bracelets.png",
+  },
+  {
+    name: "Bangles",
+    slug: "bangles",
+    description: "Timeless traditional elegance.",
+    image: "/images/categories/bangles.png",
+  },
+  {
+    name: "Anklets",
+    slug: "anklets",
+    description: "Grace in every step.",
+    image: "/images/categories/anklets.png",
+  },
+  {
+    name: "Hair Accessories",
+    slug: "hair-accessories",
+    description: "Crowning glory pieces.",
+    image: "/images/categories/hair-accessories.png",
+  },
+  {
+    name: "Bridal Collection",
+    slug: "bridal-collection",
+    description: "For your special day.",
+    image: "/images/categories/bridal-collection.png",
+  },
+  {
+    name: "Daily Wear",
+    slug: "daily-wear",
+    description: "Subtle everyday shine.",
+    image: "/images/categories/daily-wear.png",
+  },
+  {
+    name: "Party Wear",
+    slug: "party-wear",
+    description: "Make a statement tonight.",
+    image: "/images/categories/party-wear.png",
+  },
+  {
+    name: "Gift Sets",
+    slug: "gift-sets",
+    description: "The perfect present.",
+    image: "/images/categories/gift-sets.png",
+  },
+  {
+    name: "Sale",
+    slug: "sale",
+    description: "Forever shine, gentler price.",
+    image: "/images/categories/sale.png",
+  },
+];

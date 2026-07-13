@@ -18,7 +18,7 @@ export function MobileBottomNav() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: user ? "/account" : "/login", label: user ? "Account" : "Log in", icon: User },
-    { href: "/shop", label: "Collections", icon: LayoutGrid },
+    { href: "/collections", label: "Collections", icon: LayoutGrid },
     { href: "/wishlist", label: "Wishlist", icon: Heart, count: wishlist.length },
   ];
 

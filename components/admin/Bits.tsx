@@ -1,36 +1,27 @@
 import type { ReactNode } from "react";
 
-const tones: Record<string, string> = {
-  Pending: "bg-amber-100 text-amber-800 ring-amber-200",
-  Processing: "bg-sky-100 text-sky-800 ring-sky-200",
-  Shipped: "bg-indigo-100 text-indigo-800 ring-indigo-200",
-  Delivered: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  Cancelled: "bg-rose-100 text-rose-800 ring-rose-200",
-  Active: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  Inactive: "bg-stone-200 text-stone-700 ring-stone-300",
-  Unread: "bg-rose-100 text-rose-800 ring-rose-200",
-  Read: "bg-stone-100 text-stone-700 ring-stone-200",
-  Replied: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  Approved: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  Rejected: "bg-rose-100 text-rose-800 ring-rose-200",
-};
+import { AdminBadge } from "./AdminBadge";
 
 export function StatusBadge({ status }: { status: string }) {
-  const cls = tones[status] ?? "bg-stone-100 text-stone-700 ring-stone-200";
+  const normalized = status.toLowerCase().replace(" ", "-");
+  
+  // Try to map known statuses to our AdminBadge variants
+  const validVariants = ["active", "inactive", "pending", "processing", "shipped", "delivered", "cancelled", "low-stock", "featured", "bestseller", "paid", "cod"];
+  const variant = validVariants.includes(normalized) ? (normalized as any) : "default";
+
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ring-inset ${cls}`}>
-      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-70" />
+    <AdminBadge variant={variant}>
       {status}
-    </span>
+    </AdminBadge>
   );
 }
 
 export function AdminCard({ children, className = "", title, action }: { children: ReactNode; className?: string; title?: string; action?: ReactNode }) {
   return (
-    <section className={`bg-white shadow-sm border border-[color:var(--color-border)] rounded-2xl p-5 sm:p-6 ${className}`}>
+    <section className={`bg-adminCard shadow-sm border border-adminBorder rounded-2xl p-5 sm:p-6 ${className}`}>
       {(title || action) && (
         <header className="flex items-center justify-between gap-3 mb-6">
-          {title && <h2 className="font-serif text-xl text-[color:var(--color-espresso)] font-semibold">{title}</h2>}
+          {title && <h2 className="font-serif text-xl text-adminSidebar font-semibold">{title}</h2>}
           {action}
         </header>
       )}

@@ -59,33 +59,33 @@ export default function AuditLogsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-3xl text-[color:var(--color-espresso)] font-bold mb-2">Activity Logs</h1>
-            <p className="text-[color:var(--color-muted-text)]">
+            <h1 className="font-serif text-3xl text-adminSidebar tracking-tight font-semibold mb-2">Activity Logs</h1>
+            <p className="text-adminMuted">
               {isDevAdmin ? "View all admin and staff activity across the system." : "View staff activity."}
             </p>
           </div>
         </div>
 
-        <AdminCard className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-[color:var(--color-border)] bg-gray-50 flex items-center justify-between">
-            <h2 className="font-semibold text-[color:var(--color-espresso)] flex items-center gap-2">
+        <AdminCard className="p-0 overflow-hidden bg-white border-adminBorder shadow-sm">
+          <div className="p-4 border-b border-adminBorder bg-adminBg/50 flex items-center justify-between">
+            <h2 className="font-semibold text-adminSidebar flex items-center gap-2 font-serif text-lg">
               <Activity className="h-4 w-4" /> System Audit Trail
             </h2>
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-[color:var(--color-muted-text)]" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-adminMuted" />
               <Input
                 type="text"
                 placeholder="Search logs..."
-                className="pl-9 h-9 w-64 text-sm"
+                className="pl-9 h-9 w-64 text-sm bg-white border-adminBorder text-adminSidebar rounded-full focus:ring-1 focus:ring-adminGold"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
           
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-sm text-left">
-              <thead className="bg-white border-b border-[color:var(--color-border)] text-[color:var(--color-muted-text)] font-medium">
+              <thead className="bg-adminBg/80 border-b border-adminBorder text-adminMuted font-semibold text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-4 w-48">Timestamp</th>
                   <th className="px-6 py-4">Actor</th>
@@ -94,34 +94,37 @@ export default function AuditLogsPage() {
                   <th className="px-6 py-4">Document</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[color:var(--color-border)]">
+              <tbody className="divide-y divide-adminBorder">
                 {filteredLogs.length > 0 ? filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-pink-50/30 transition-colors">
-                    <td className="px-6 py-4 text-xs text-[color:var(--color-muted-text)]">
+                  <tr key={log.id} className="hover:bg-adminBg/40 transition-colors">
+                    <td className="px-6 py-4 text-xs text-adminMuted">
                       {log.createdAt && typeof log.createdAt === 'object' && 'toDate' in log.createdAt 
                         ? log.createdAt.toDate().toLocaleString()
                         : new Date(log.createdAt).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-[color:var(--color-espresso)]">{log.actorName}</div>
-                      <div className="text-xs text-[color:var(--color-muted-text)]">{log.actorEmail} ({log.actorRole})</div>
+                      <div className="font-semibold text-adminSidebar">{log.actorName}</div>
+                      <div className="text-xs text-adminMuted mt-0.5">{log.actorEmail} ({log.actorRole})</div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-[color:var(--color-espresso)]">
+                    <td className="px-6 py-4 font-medium text-adminSidebar">
                       {log.action}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center rounded-full bg-champagne/20 px-2.5 py-0.5 text-xs font-semibold text-charcoalBrown">
+                      <span className="inline-flex items-center rounded-md bg-adminGold/10 px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider text-adminGold border border-adminGold/20">
                         {log.section}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs font-mono text-[color:var(--color-muted-text)]">
+                    <td className="px-6 py-4 text-xs font-mono text-adminMuted">
                       {log.documentChanged}
                     </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-[color:var(--color-muted-text)]">
-                      No activity logs found.
+                    <td colSpan={5} className="px-6 py-12 text-center text-adminMuted">
+                      <div className="flex flex-col items-center justify-center">
+                        <Activity className="h-8 w-8 text-adminMuted/50 mb-3" />
+                        <p>No activity logs found.</p>
+                      </div>
                     </td>
                   </tr>
                 )}

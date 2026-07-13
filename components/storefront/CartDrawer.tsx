@@ -76,20 +76,20 @@ export function CartDrawer() {
             className="fixed inset-y-0 right-0 w-full max-w-[420px] bg-brandMainBg z-[150] shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-brandCardBg border-b border-brandBorder/30 shrink-0">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-[#FFF9FB] border-b border-[#E8D7C8]/50 shrink-0">
               <div className="flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5 text-brandGold" />
-                <h2 className="text-lg font-semibold text-brandEspresso font-serif">Your Cart</h2>
-                <span className="bg-brandMainBg border border-stone-200 text-brandEspresso text-[11px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                <ShoppingBag className="h-[18px] w-[18px] text-[#B8955E]" />
+                <h2 className="text-base font-semibold text-[#3A2428] font-serif">Your Cart</h2>
+                <span className="bg-white border border-[#E8D7C8] text-[#3A2428] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   {items.length}
                 </span>
               </div>
               <button
                 onClick={closeDrawer}
-                className="p-2 -mr-2 text-stone-400 hover:text-charcoalBrown hover:bg-stone-50 rounded-full transition-colors"
+                className="p-1.5 -mr-1.5 text-stone-400 hover:text-[#3A2428] hover:bg-stone-50 rounded-full transition-colors"
                 aria-label="Close cart"
               >
-                <X className="h-5 w-5" />
+                <X className="h-[18px] w-[18px]" />
               </button>
             </div>
             
@@ -121,7 +121,7 @@ export function CartDrawer() {
                   <div className="px-4 pt-2 pb-4 space-y-3">
                     {items.map((item) => (
                       <CartItemCard 
-                        key={item.product.id} 
+                        key={item.cartItemId || item.product.id} 
                         item={item} 
                         increase={increase}
                         decrease={decrease}

@@ -63,10 +63,10 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="bg-[#FAF9F6]/95 backdrop-blur-sm shadow-sm border border-stone-200 rounded-2xl">
+    <div className="bg-[#FFF9FB] shadow-[0_8px_24px_rgba(58,36,40,0.04)] border border-[#E8D7C8]/50 rounded-[2rem] p-6 sm:p-10 mb-8 pb-20">
       <div className="mb-8">
-        <h1 className="font-serif text-2xl md:text-3xl text-charcoalBrown mb-2">My Profile</h1>
-        <p className="text-stoneGray text-sm">Manage your personal information and contact details.</p>
+        <h1 className="font-serif text-2xl md:text-4xl text-[#3A2428] mb-2">My Profile</h1>
+        <p className="text-[#3A2428]/70 text-sm sm:text-base">Manage your personal information and contact details.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -176,13 +176,13 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-stone-200">
-          <button 
-            type="submit" 
+        <div className="mt-8 flex justify-end">
+          <button
+            type="submit"
             disabled={saving}
-            className="btn-primary-gold px-8 py-3 w-full md:w-auto"
+            className="w-full sm:w-auto bg-[#B8955E] text-white px-8 py-3.5 rounded-full font-semibold transition-all hover:bg-[#A38250] shadow-[0_4px_14px_rgba(184,149,94,0.3)] hover:shadow-[0_6px_20px_rgba(184,149,94,0.4)] disabled:opacity-70 disabled:cursor-not-allowed tracking-wide"
           >
-            {saving ? "Saving Changes..." : "Save Changes"}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

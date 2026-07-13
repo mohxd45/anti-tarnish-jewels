@@ -7,14 +7,13 @@ import { getProducts, getCategories } from "@/lib/firestore";
 import { Product } from "@/types";
 import Link from "next/link";
 import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { LONA_CATEGORIES } from "@/lib/categories";
 
 function ShopContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category") || "all";
   
-  const [categories, setCategories] = useState<any[]>([
-    { slug: "all", name: "All Jewellery", blurb: "Explore our complete collection" }
-  ]);
+  const [categories, setCategories] = useState<any[]>(LONA_CATEGORIES);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -42,42 +41,26 @@ function ShopContent() {
     async function load() {
       try {
         setLoading(true);
-        const [allProds, allCats] = await Promise.all([
-          getProducts(),
-          getCategories()
+        const [allProds] = await Promise.all([
+          getProducts()
         ]);
         
         const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false) : [];
-        
-        if (allCats && allCats.length > 0) {
-          const formattedCats = allCats.filter(c => c.isActive !== false).map(c => ({
-            slug: c.slug || c.name.toLowerCase().replace(/\s+/g, '-'),
-            name: c.name,
-            blurb: c.description || "Explore our collection",
-          }));
-          setCategories([
-            { slug: "all", name: "All", blurb: "Explore our complete collection" },
-            ...formattedCats,
-            { slug: "sale", name: "Sale", blurb: "Forever shine, gentler price." }
-          ]);
-        }
-
         const highestPrice = active.length > 0 ? Math.max(...active.map(p => p.salePrice || p.regularPrice || 0)) : 10000;
         setMaxPrice(highestPrice);
         setPriceRange([0, highestPrice]);
 
         // Filter robustly by category slug, category name, or category id
-        if (categoryParam.toLowerCase() === "all") {
+        const cleanParam = categoryParam.toLowerCase().trim();
+        if (cleanParam === "all" || cleanParam === "all jewellery" || cleanParam === "") {
           setProducts(active);
-        } else if (categoryParam.toLowerCase() === "sale") {
+        } else if (cleanParam === "sale") {
           setProducts(active.filter(p => p.regularPrice && p.regularPrice > p.salePrice));
         } else {
           setProducts(active.filter(p => {
-            const catStr = String(p.category || "").toLowerCase();
-            const paramStr = categoryParam.toLowerCase();
-            return catStr === paramStr || 
-                   String(p.categoryId || "").toLowerCase() === paramStr ||
-                   String(p.categorySlug || "").toLowerCase() === paramStr;
+            const catStr = String(p.category || "").toLowerCase().trim();
+            const catSlugStr = String(p.categorySlug || "").toLowerCase().trim();
+            return catStr === cleanParam || catSlugStr === cleanParam;
           }));
         }
       } catch (err) {
@@ -95,8 +78,8 @@ function ShopContent() {
     // (price range resets when products load)
   }, [categoryParam]);
 
-  const activeCategory = categories.find(c => c.slug.toLowerCase() === categoryParam.toLowerCase()) || categories[0];
-  const displayTitle = activeCategory.name === "All" ? "All Jewellery" : activeCategory.name;
+  const activeCategory = categories.find(c => c.slug.toLowerCase() === categoryParam.toLowerCase().trim()) || categories[0];
+  const displayTitle = activeCategory.name;
 
   const availableMaterials = Array.from(new Set(products.map(p => p.material).filter(Boolean))) as string[];
   const availableColors = Array.from(new Set(products.map(p => p.color).filter(Boolean))) as string[];
@@ -138,14 +121,22 @@ function ShopContent() {
       </div>
 
       <div className="mx-auto mt-6 max-w-7xl px-4">
-        <div className="mb-8 flex flex-wrap gap-2">
+        <div className="mb-6 flex overflow-x-auto gap-2 pb-2 scrollbar-hide snap-x [&::-webkit-scrollbar]:hidden">
           {categories.map((cat, i) => {
-            const isActive = categoryParam.toLowerCase() === cat.slug.toLowerCase();
+            const cleanParam = categoryParam.toLowerCase().trim();
+            const isActive = 
+              (cat.slug === "all" && (cleanParam === "" || cleanParam === "all" || cleanParam === "all jewellery")) || 
+              cleanParam === cat.slug;
+            
             return (
               <Link
                 key={i}
-                href={`/shop?category=${cat.slug}`}
-                className={isActive ? "btn-primary-gold text-sm" : "btn-liquid text-sm"}
+                href={cat.slug === "all" ? "/shop" : `/shop?category=${cat.slug}`}
+                className={`snap-start shrink-0 px-4 py-1.5 rounded-full text-sm transition-colors border ${
+                  isActive 
+                    ? "bg-[#3A2428] text-white border-transparent shadow-sm font-medium" 
+                    : "bg-white text-[#8F817B] border-[#E8D7C8] hover:border-[#3A2428] hover:text-[#3A2428]"
+                }`}
               >
                 {cat.name}
               </Link>

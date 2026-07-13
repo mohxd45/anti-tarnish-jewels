@@ -7,7 +7,7 @@ import { useAuth } from "./AuthContext";
 
 type CartContextType = {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product, quantity?: number, selectedSize?: string, selectedColor?: string) => void;
   removeFromCart: (id: string) => void;
   increase: (id: string) => void;
   decrease: (id: string) => void;
@@ -64,14 +64,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           let updated = false;
           
           items.forEach(localItem => {
-            const existing = merged.find(r => r.product.id === localItem.product.id);
+            const localId = localItem.cartItemId || `${localItem.product.id}-${localItem.selectedSize || 'none'}-${localItem.selectedColor || 'none'}`;
+            const existing = merged.find(r => (r.cartItemId || `${r.product.id}-${r.selectedSize || 'none'}-${r.selectedColor || 'none'}`) === localId);
             if (existing) {
               if (localItem.quantity > existing.quantity) {
                 existing.quantity = localItem.quantity;
                 updated = true;
               }
             } else {
-              merged.push(localItem);
+              merged.push({ ...localItem, cartItemId: localId });
               updated = true;
             }
           });
@@ -191,19 +192,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<CartContextType>(() => ({
     items,
-    addToCart: (product, quantity = 1) => {
+    addToCart: (product, quantity = 1, selectedSize, selectedColor) => {
       setItems((prev) => {
-        const found = prev.find((item) => item.product.id === product.id);
+        const cId = `${product.id}-${selectedSize || 'none'}-${selectedColor || 'none'}`;
+        const found = prev.find((item) => (item.cartItemId || `${item.product.id}-${item.selectedSize || 'none'}-${item.selectedColor || 'none'}`) === cId);
         if (found) {
-          return prev.map((item) => item.product.id === product.id ? { ...item, quantity: item.quantity + quantity } : item);
+          return prev.map((item) => {
+             const itemId = item.cartItemId || `${item.product.id}-${item.selectedSize || 'none'}-${item.selectedColor || 'none'}`;
+             return itemId === cId ? { ...item, quantity: item.quantity + quantity } : item;
+          });
         }
-        return [...prev, { product, quantity }];
+        return [...prev, { cartItemId: cId, product, quantity, selectedSize, selectedColor, sku: product.sku }];
       });
       setIsDrawerOpen(true); // Auto-open drawer when adding to cart
     },
-    removeFromCart: (id) => setItems((prev) => prev.filter((item) => item.product.id !== id)),
-    increase: (id) => setItems((prev) => prev.map((item) => item.product.id === id ? { ...item, quantity: item.quantity + 1 } : item)),
-    decrease: (id) => setItems((prev) => prev.map((item) => item.product.id === id ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item)),
+    removeFromCart: (id) => setItems((prev) => prev.filter((item) => (item.cartItemId || item.product.id) !== id)),
+    increase: (id) => setItems((prev) => prev.map((item) => (item.cartItemId || item.product.id) === id ? { ...item, quantity: item.quantity + 1 } : item)),
+    decrease: (id) => setItems((prev) => prev.map((item) => (item.cartItemId || item.product.id) === id ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item)),
     clearCart: () => {
       setItems([]);
       setActiveCoupon(null);
