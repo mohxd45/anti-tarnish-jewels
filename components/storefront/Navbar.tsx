@@ -26,10 +26,10 @@ export function Navbar({ settings }: { settings?: any }) {
   return (
     <>
       <nav className="bg-white/95 backdrop-blur-md border-b border-stone-100 shadow-sm fixed left-0 right-0 top-0 z-50 px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 relative">
+          <div className="flex min-w-0 items-center gap-3 relative z-10">
             <Link href="/" className="flex min-w-0 items-center gap-2">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--gradient-gold, linear-gradient(135deg, #D4AF37, #B8860B))" }}>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm" style={{ background: "var(--gradient-gold, linear-gradient(135deg, #D4AF37, #B8860B))" }}>
                 <span className="font-serif text-lg font-bold text-white">{logoText}</span>
               </div>
               <div className="hidden min-w-0 sm:block">
@@ -37,6 +37,13 @@ export function Navbar({ settings }: { settings?: any }) {
                 {subtitle && <p className="-mt-1 text-xs text-stoneGray">{subtitle}</p>}
               </div>
             </Link>
+          </div>
+
+          {/* Centered Mobile Wordmark */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 sm:hidden">
+             <Link href="/" className="pointer-events-auto flex flex-col items-center justify-center mt-0.5">
+                <h1 className="font-serif text-[15px] leading-tight text-[#3A2428] tracking-[0.08em] font-bold">{brandName}</h1>
+             </Link>
           </div>
 
           <div className="hidden items-center gap-6 lg:flex">

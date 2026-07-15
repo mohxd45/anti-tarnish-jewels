@@ -34,7 +34,10 @@ export default async function HomePage() {
   let heroMainHeading = (content?.heroMainHeading || content?.heroTitle) || "SUMMER SALE";
   let heroSubtitle = content?.heroSubtitle || "Verified quality jewellery for every occasion.";
   let heroCtaText = content?.heroCtaText || "Shop The Collection";
-  const heroCtaLink = content?.heroCtaLink || "/shop";
+  let heroCtaLink = content?.heroCtaLink || "/collections";
+  if (heroCtaLink === "/shop" || heroCtaLink === "/collection") {
+    heroCtaLink = "/collections";
+  }
 
   // Force fix spelling error
   heroSmallTitle = heroSmallTitle.replace(/SUMMER SELL/gi, "SUMMER SALE");
