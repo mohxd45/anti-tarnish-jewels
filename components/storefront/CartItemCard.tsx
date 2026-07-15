@@ -22,12 +22,14 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
         className="relative h-[76px] w-[76px] flex-shrink-0 overflow-hidden rounded-xl bg-white border border-[#E8D7C8]/50 block"
         onClick={closeDrawer}
       >
-        <Image
-          src={product.images[0] || "/images/placeholder.jpg"}
+        <img
+          src={product.images[0] || "/product-stack.jpg"}
           alt={product.name || "Product image"}
-          fill
-          className="object-cover"
-          sizes="76px"
+          className="h-full w-full object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).onerror = null;
+            (e.target as HTMLImageElement).src = "/product-stack.jpg";
+          }}
         />
       </Link>
       

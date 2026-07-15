@@ -93,7 +93,7 @@ export function CartRewardTracker({ subtotal }: CartRewardTrackerProps) {
       </div>
 
       {/* Vertical Milestones */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5 mt-1">
         {milestones.map((milestone, idx) => {
           const isReached = subtotal >= milestone.amount;
           const Icon = idx === 0 ? Truck : idx === 1 ? Gift : Package;
@@ -101,27 +101,27 @@ export function CartRewardTracker({ subtotal }: CartRewardTrackerProps) {
           return (
             <div 
               key={idx} 
-              className={`flex items-center gap-2 px-2 py-1 rounded-lg border transition-all duration-300 ${
+              className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border transition-all duration-500 ${
                 isReached 
-                  ? 'bg-gradient-to-r from-[#B8955E]/10 to-transparent border-[#B8955E]/30 ring-1 ring-[#B8955E]/10 shadow-[0_0_8px_rgba(184,149,94,0.1)]' 
+                  ? 'bg-gradient-to-r from-[#B8955E]/10 to-[#FFF9FB] border-[#B8955E]/30 shadow-sm' 
                   : 'bg-white/50 border-stone-100'
               }`}
             >
               {/* Circle Icon */}
               <div 
-                className={`flex items-center justify-center w-[22px] h-[22px] shrink-0 rounded-full shadow-sm transition-colors duration-300 ${
-                  isReached ? 'bg-[#B8955E] text-white shadow-md' : 'bg-stone-100 text-stone-400'
+                className={`flex items-center justify-center w-6 h-6 shrink-0 rounded-full shadow-sm transition-all duration-500 ${
+                  isReached ? 'bg-[#B8955E] text-white shadow-md scale-105' : 'bg-stone-50 text-stone-300'
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="w-3.5 h-3.5" />
               </div>
               
               {/* Labels */}
               <div className="flex-1 flex justify-between items-center">
-                <span className={`text-[11px] font-semibold transition-colors duration-300 ${isReached ? 'text-[#3A2428]' : 'text-stone-500'}`}>
+                <span className={`text-[11px] font-bold tracking-wide transition-colors duration-300 ${isReached ? 'text-[#3A2428]' : 'text-stone-400'}`}>
                   {milestone.label}
                 </span>
-                <span className={`text-[10px] font-bold transition-colors duration-300 ${isReached ? 'text-[#B8955E]' : 'text-stone-400'}`}>
+                <span className={`text-[11px] font-bold transition-colors duration-300 ${isReached ? 'text-[#B8955E]' : 'text-stone-300'}`}>
                   {currency}{milestone.amount}
                 </span>
               </div>

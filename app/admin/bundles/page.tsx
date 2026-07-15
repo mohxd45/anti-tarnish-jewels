@@ -252,10 +252,10 @@ export default function AdminBundlesPage() {
                 {filteredBundles.map(bundle => (
                   <tr key={bundle.id} className="hover:bg-adminBg/50 transition-colors">
                     <td className="px-6 py-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-adminBg border border-adminBorder">
-                        {bundle.images?.[0] ? <img src={bundle.images[0]} alt={bundle.name} className="w-full h-full object-cover" /> : <ImageIcon className="w-5 h-5 m-auto mt-2.5 text-adminMuted" />}
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-adminBg border border-adminBorder shrink-0">
+                        {bundle.images?.[0] ? <img src={bundle.images[0]} alt={bundle.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} /> : <ImageIcon className="w-5 h-5 m-auto mt-2.5 text-adminMuted" />}
                       </div>
-                      <span className="font-medium text-adminSidebar">{bundle.name}</span>
+                      <span className="font-medium text-adminSidebar min-w-0 line-clamp-2 leading-tight">{bundle.name}</span>
                     </td>
                     <td className="px-6 py-4 text-adminMuted">{bundle.sku || "-"}</td>
                     <td className="px-6 py-4 text-adminMuted">{bundle.includedItems?.length || 0}</td>
@@ -338,23 +338,23 @@ export default function AdminBundlesPage() {
               </div>
             </div>
 
-            <div className="space-y-4 border border-adminBorder p-4 rounded-xl bg-adminBg/50">
-              <h3 className="font-semibold text-adminGold">Included Products *</h3>
+            <div className="space-y-4 border border-adminBorder p-5 rounded-2xl bg-stone-50/50">
+              <h3 className="font-semibold text-adminGold text-sm">Included Products *</h3>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-adminMuted" />
                 <Input 
                   placeholder="Search products to add..." 
                   value={prodSearchTerm}
                   onChange={e => setProdSearchTerm(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 bg-white rounded-xl"
                 />
                 {prodSearchTerm && searchedProducts.length > 0 && (
                   <div className="absolute z-10 top-full mt-1 w-full bg-white border border-adminBorder rounded-xl shadow-lg p-2 space-y-1">
                     {searchedProducts.map(p => (
                       <div key={p.id} className="flex items-center justify-between p-2 hover:bg-adminBg rounded-lg cursor-pointer" onClick={() => handleAddProduct(p)}>
                         <div className="flex items-center gap-3">
-                          {p.images?.[0] && <img src={p.images[0]} className="w-8 h-8 rounded object-cover" />}
-                          <span className="text-sm">{p.name} <span className="text-xs text-adminMuted">({p.sku})</span></span>
+                          {p.images?.[0] && <img src={p.images[0]} className="w-8 h-8 rounded object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />}
+                          <span className="text-sm font-medium">{p.name} <span className="text-xs text-adminMuted font-normal">({p.sku})</span></span>
                         </div>
                         <Plus className="w-4 h-4 text-adminGold" />
                       </div>
@@ -368,33 +368,33 @@ export default function AdminBundlesPage() {
                   {includedItems.map((item, idx) => {
                     const originalProd = products.find(p => p.id === item.productId);
                     return (
-                      <div key={item.productId} className="flex flex-col gap-3 p-3 bg-white border border-adminBorder rounded-xl shadow-sm relative">
-                        <div className="flex justify-between items-center">
+                      <div key={item.productId} className="flex flex-col gap-3 p-3.5 bg-white border border-adminBorder rounded-xl shadow-sm relative">
+                        <div className="flex justify-between items-start gap-2">
                           <div className="flex items-center gap-3">
-                            <img src={item.image} className="w-10 h-10 rounded object-cover" />
+                            <img src={item.image} className="w-10 h-10 rounded-lg border border-adminBorder/50 object-cover shrink-0" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />
                             <div>
-                              <div className="text-sm font-medium">{item.name}</div>
-                              <div className="text-xs text-adminMuted">{item.sku}</div>
+                              <div className="text-[13px] font-semibold leading-tight line-clamp-1">{item.name}</div>
+                              <div className="text-[11px] text-adminMuted mt-0.5 font-mono">{item.sku}</div>
                             </div>
                           </div>
-                          <Button variant="ghost" size="icon" onClick={() => removeIncludedItem(idx)} className="h-6 w-6 text-red-500 rounded-full hover:bg-red-50">
-                            <X className="w-3 h-3" />
+                          <Button variant="ghost" size="icon" onClick={() => removeIncludedItem(idx)} className="h-6 w-6 text-red-500 rounded-full hover:bg-red-50 shrink-0">
+                            <X className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                         
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-3 gap-3">
                           <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider text-adminMuted">Qty</label>
-                            <Input type="number" min="1" value={item.quantity} onChange={e => updateIncludedItem(idx, "quantity", Number(e.target.value))} className="h-8 text-sm" />
+                            <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Qty</label>
+                            <Input type="number" min="1" value={item.quantity} onChange={e => updateIncludedItem(idx, "quantity", Number(e.target.value))} className="h-8 text-xs bg-stone-50/50" />
                           </div>
                           
                           {(originalProd?.sizeOptions?.length || 0) > 0 && (
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-adminMuted">Fixed Size</label>
+                              <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Fixed Size</label>
                               <select 
                                 value={item.selectedSize || ""} 
                                 onChange={e => updateIncludedItem(idx, "selectedSize", e.target.value)}
-                                className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
+                                className="flex h-8 w-full rounded-md border border-input bg-stone-50/50 px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
                               >
                                 {originalProd?.sizeOptions?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                               </select>
@@ -403,11 +403,11 @@ export default function AdminBundlesPage() {
                           
                           {(originalProd?.colorOptions?.length || 0) > 0 && (
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-adminMuted">Fixed Color</label>
+                              <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Fixed Color</label>
                               <select 
                                 value={item.selectedColor || ""} 
                                 onChange={e => updateIncludedItem(idx, "selectedColor", e.target.value)}
-                                className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
+                                className="flex h-8 w-full rounded-md border border-input bg-stone-50/50 px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
                               >
                                 {originalProd?.colorOptions?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                               </select>

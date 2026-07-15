@@ -80,12 +80,14 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
               className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-brandCardBg border border-brandBorder/30 mb-2 block"
               onClick={closeDrawer}
             >
-              <Image
-                src={product.images?.[0] || "/images/placeholder.jpg"}
+              <img
+                src={product.images?.[0] || "/product-stack.jpg"}
                 alt={product.name}
-                fill
-                className="object-cover transition-transform group-hover:scale-105 duration-500"
-                sizes="(max-width: 640px) 50vw, 180px"
+                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).onerror = null;
+                  (e.target as HTMLImageElement).src = "/product-stack.jpg";
+                }}
               />
               {product.salePrice < product.regularPrice && (
                 <div className="absolute top-1 left-1 bg-brandSale text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">

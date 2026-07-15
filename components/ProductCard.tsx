@@ -55,6 +55,10 @@ export function ProductCard({ product }: { product: Product }) {
           alt={product.name}
           loading="lazy"
           className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+          onError={(e) => {
+            (e.target as HTMLImageElement).onerror = null;
+            (e.target as HTMLImageElement).src = "/product-stack.jpg";
+          }}
         />
         {badge && (
           <span className={`absolute left-2 top-2 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wide shadow-sm ${badge.cls}`}>

@@ -28,13 +28,6 @@ export function Navbar({ settings }: { settings?: any }) {
       <nav className="bg-white/95 backdrop-blur-md border-b border-stone-100 shadow-sm fixed left-0 right-0 top-0 z-50 px-4 py-3 md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <button
-              onClick={() => setOpen(true)}
-              className="text-stone-900 lg:hidden"
-              aria-label="Open menu"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
             <Link href="/" className="flex min-w-0 items-center gap-2">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--gradient-gold, linear-gradient(135deg, #D4AF37, #B8860B))" }}>
                 <span className="font-serif text-lg font-bold text-white">{logoText}</span>
@@ -70,7 +63,7 @@ export function Navbar({ settings }: { settings?: any }) {
             >
               <Search className="h-5 w-5" />
             </button>
-            <Link href="/wishlist" className="relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Wishlist">
+            <Link href="/wishlist" className="hidden lg:flex relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
               {wishlist.length > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-stone-500 px-1 text-[10px] font-bold text-white">
@@ -78,7 +71,7 @@ export function Navbar({ settings }: { settings?: any }) {
                 </span>
               )}
             </Link>
-            <button onClick={openDrawer} className="relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Cart">
+            <button onClick={openDrawer} className="hidden lg:flex relative rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Cart">
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
                 <span
@@ -89,7 +82,7 @@ export function Navbar({ settings }: { settings?: any }) {
                 </span>
               )}
             </button>
-            <Link href={user ? "/account" : "/login"} className="rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Profile">
+            <Link href={user ? "/account" : "/login"} className="hidden lg:flex rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60" aria-label="Profile">
               <User className="h-5 w-5" />
             </Link>
             {isAdmin && (
@@ -97,6 +90,13 @@ export function Navbar({ settings }: { settings?: any }) {
                 <Shield className="h-5 w-5" />
               </Link>
             )}
+            <button
+              onClick={() => setOpen(true)}
+              className="text-stone-900 lg:hidden rounded-full p-2 transition hover:bg-stone-50/50/60"
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
           </div>
         </div>
       </nav>
