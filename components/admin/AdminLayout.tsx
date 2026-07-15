@@ -21,6 +21,7 @@ const nav: NavItem[] = [
   { to: "/admin/banners", label: "Banner & Ads", icon: ImageIcon, adminOnly: true },
   { to: "/admin/homepage-sections", label: "Home Layout", icon: LayoutGrid, adminOnly: true },
   { to: "/admin/products", label: "Product Catalog", icon: Package },
+  { to: "/admin/bundles", label: "Bundles & Combos", icon: Package, adminOnly: true },
   { to: "/admin/add-product", label: "Add Product", icon: Plus },
   { to: "/admin/categories", label: "Categories", icon: FolderTree, adminOnly: true },
   { to: "/admin/orders", label: "Orders Tracking", icon: ShoppingBag },

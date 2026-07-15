@@ -37,7 +37,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
     }
   }, [p]);
 
-  const images = p.images && p.images.length > 0 ? p.images : ["/placeholder.png"];
+  const images = p.images && p.images.length > 0 ? p.images : ["/product-stack.jpg"];
   const isWishlisted = wishlist.some(item => item.id === p.id);
 
   const handleAddToCart = () => {
@@ -71,22 +71,28 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
         <div className="grid grid-cols-1 gap-6 md:gap-10 lg:grid-cols-2">
           {/* Gallery */}
           <div className="flex flex-col gap-3">
-            <div className="bg-[#FFF9FB] border border-[#E8D7C8]/50 shadow-sm overflow-hidden rounded-2xl flex items-center justify-center">
+            <div className="bg-[#FFF9FB] border border-[#E8D7C8]/50 shadow-sm overflow-hidden rounded-[24px] flex items-center justify-center relative aspect-square sm:aspect-[4/5] md:aspect-auto md:h-[480px]">
               <img
-                src={images[activeImg]}
+                src={images[activeImg] || "/product-stack.jpg"}
+                onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }}
                 alt={p.name}
-                className="h-[340px] sm:h-[400px] md:h-[480px] w-full object-contain md:object-cover mix-blend-multiply"
+                className="w-full h-full object-contain mix-blend-multiply p-4"
               />
             </div>
             {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{`
+                  .scrollbar-hide::-webkit-scrollbar {
+                      display: none;
+                  }
+                `}</style>
                 {images.map((src: string, i: number) => (
                   <button
                     key={i}
                     onClick={() => setActiveImg(i)}
-                    className={`h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-xl bg-[#FFF9FB] border transition-all ${i === activeImg ? "border-[#B8955E] ring-1 ring-[#B8955E]" : "border-[#E8D7C8] opacity-70 hover:opacity-100"}`}
+                    className={`h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-2xl bg-[#FFF9FB] transition-all ${i === activeImg ? "ring-2 ring-offset-2 ring-[#B8955E] border-transparent" : "border border-[#E8D7C8] opacity-70 hover:opacity-100"}`}
                   >
-                    <img src={src} alt="" className="h-full w-full object-cover mix-blend-multiply" />
+                    <img src={src || "/product-stack.jpg"} onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} alt="" className="h-full w-full object-cover mix-blend-multiply p-1" />
                   </button>
                 ))}
               </div>
@@ -95,29 +101,32 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
 
           {/* Info */}
           <div className="flex flex-col">
-            <div className="mb-3 flex flex-wrap gap-2 items-center">
-              {p.tags?.[0] && <span className="rounded-full bg-[#3A2428] border border-[#3A2428] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">{p.tags[0]}</span>}
-              {p.isBestSeller && <span className="rounded-full bg-[#FFF9FB] border border-[#B8955E] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#B8955E]">Bestseller</span>}
-              {isSale && <span className="rounded-full bg-[#B8955E] border border-[#B8955E] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">Sale</span>}
-              <span className="rounded-full bg-[#FFF9FB] border border-[#E8D7C8] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#8F817B]">Anti-Tarnish</span>
+            <div className="mb-4 flex flex-wrap gap-2 items-center">
+              {p.tags?.[0] && <span className="rounded-full bg-[#3A2428] border border-[#3A2428] px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">{p.tags[0]}</span>}
+              {p.isBestSeller && <span className="rounded-full bg-[#FFF9FB] border border-[#B8955E] px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-[#B8955E] shadow-sm">Bestseller</span>}
+              {isSale && <span className="rounded-full bg-[#B8955E] border border-[#B8955E] px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">Sale</span>}
+              <span className="rounded-full bg-[#FFF9FB] border border-[#E8D7C8] px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-[#8F817B] shadow-sm">Anti-Tarnish</span>
             </div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#8F817B]">{(p.categorySlug || p.category || "").replace("-", " ")}</p>
-            {p.sku && (
-              <p className="mb-1 text-[10px] font-medium tracking-wide text-[#8F817B]">Item Code: {p.sku}</p>
-            )}
-            <h1 className="mb-3 font-serif text-[28px] leading-tight text-[#3A2428] md:text-[34px]">{p.name}</h1>
-            
-            <div className="mb-5 flex items-baseline gap-2.5">
-              {isSale ? (
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#B8955E]">{(p.categorySlug || p.category || "").replace("-", " ")}</p>
+              {p.sku && (
                 <>
-                  <span className="text-2xl font-bold text-[#3A2428] md:text-3xl">₹{p.salePrice}</span>
-                  <span className="text-sm font-medium text-[#8F817B] line-through md:text-base">₹{p.regularPrice}</span>
-                  <span className="rounded-full bg-emerald-50 border border-emerald-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-600">
-                    {Math.round(((p.regularPrice! - p.salePrice) / p.regularPrice!) * 100)}% off
+                  <span className="text-[#E8D7C8]">•</span>
+                  <p className="text-[10px] font-mono tracking-wider text-[#8F817B]">Item Code: {p.sku}</p>
+                </>
+              )}
+            </div>
+            <h1 className="mb-4 font-serif text-[28px] leading-tight text-[#3A2428] md:text-[34px]">{p.name}</h1>
+            
+            <div className="mb-6 flex items-end gap-3">
+              <span className="text-3xl font-serif font-medium text-[#3A2428] md:text-4xl">₹{p.salePrice}</span>
+              {isSale && (
+                <>
+                  <span className="text-base font-medium text-[#8F817B] line-through mb-1">₹{p.regularPrice}</span>
+                  <span className="mb-1.5 rounded-md bg-[#B8955E]/10 border border-[#B8955E]/20 px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#B8955E]">
+                    {Math.round(((p.regularPrice! - p.salePrice) / p.regularPrice!) * 100)}% OFF
                   </span>
                 </>
-              ) : (
-                <span className="text-2xl font-bold text-[#3A2428] md:text-3xl">₹{p.salePrice}</span>
               )}
             </div>
             
@@ -126,19 +135,19 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
             </p>
 
             {p.colorOptions && p.colorOptions.length > 0 && (
-              <div className="mb-5">
-                <p className="mb-2.5 text-xs font-bold uppercase tracking-widest text-[#3A2428]">
-                  Color {p.selectedColorRequired && <span className="text-red-500 ml-0.5">*</span>}
+              <div className="mb-6">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#8F817B]">
+                  Color {p.selectedColorRequired && <span className="text-red-500">*</span>}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {p.colorOptions.map((color) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
-                      className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-all border ${
+                      className={`min-w-[3.5rem] rounded-full px-4 py-2 text-[11px] font-bold tracking-wide transition-all border shadow-sm ${
                         selectedColor === color
-                          ? "bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white border-transparent shadow-sm"
-                          : "bg-[#FFF9FB] text-[#3A2428] border-[#E8D7C8] hover:border-[#B8955E] hover:bg-[#FFF0F5]"
+                          ? "bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white border-transparent"
+                          : "bg-[#FFF9FB] text-[#3A2428] border-[#E8D7C8] hover:border-[#B8955E]"
                       }`}
                     >
                       {color}
@@ -149,19 +158,19 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
             )}
 
             {p.sizeOptions && p.sizeOptions.length > 0 && (
-              <div className="mb-5">
-                <p className="mb-2.5 text-xs font-bold uppercase tracking-widest text-[#3A2428]">
-                  Size {p.selectedSizeRequired && <span className="text-red-500 ml-0.5">*</span>}
+              <div className="mb-6">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#8F817B]">
+                  Size {p.selectedSizeRequired && <span className="text-red-500">*</span>}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {p.sizeOptions.map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-all border ${
+                      className={`min-w-[3.5rem] rounded-full px-4 py-2 text-[11px] font-bold tracking-wide transition-all border shadow-sm ${
                         selectedSize === size
-                          ? "bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white border-transparent shadow-sm"
-                          : "bg-[#FFF9FB] text-[#3A2428] border-[#E8D7C8] hover:border-[#B8955E] hover:bg-[#FFF0F5]"
+                          ? "bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white border-transparent"
+                          : "bg-[#FFF9FB] text-[#3A2428] border-[#E8D7C8] hover:border-[#B8955E]"
                       }`}
                     >
                       {size}
@@ -171,33 +180,33 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
               </div>
             )}
 
-            <div className="mb-5 flex items-center gap-4">
-              <div className="flex items-center gap-1 rounded-xl p-1 bg-[#FFF9FB] border border-[#E8D7C8]">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#3A2428] hover:bg-[#FFF0F5]" aria-label="Decrease">
+            <div className="mb-6 flex items-center gap-4">
+              <div className="flex items-center gap-1 rounded-2xl p-1 bg-[#FFF9FB] border border-[#E8D7C8] shadow-sm">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-10 w-10 items-center justify-center rounded-xl text-[#3A2428] hover:bg-[#FFF0F5]" aria-label="Decrease">
                   <Minus className="h-4 w-4" />
                 </button>
-                <span className="w-8 text-center text-sm font-semibold text-[#3A2428]">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(p.stock || 10, q + 1))} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#3A2428] hover:bg-[#FFF0F5]" aria-label="Increase">
+                <span className="w-10 text-center text-[13px] font-bold text-[#3A2428]">{qty}</span>
+                <button onClick={() => setQty((q) => Math.min(p.stock || 10, q + 1))} className="flex h-10 w-10 items-center justify-center rounded-xl text-[#3A2428] hover:bg-[#FFF0F5]" aria-label="Increase">
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
-              <span className="text-xs font-medium text-[#8F817B]">{p.stock || "In"} stock</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#8F817B]">{p.stock || "In"} stock</span>
             </div>
 
-            <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mb-10 flex flex-col gap-3 sm:flex-row pb-4">
               <button 
                 onClick={handleAddToCart}
-                className="w-full flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
+                className="w-full flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] px-6 py-4 text-[13px] font-bold tracking-wide uppercase text-white shadow-md shadow-[#B8955E]/20 transition-all hover:opacity-90 active:scale-[0.98]"
               >
                 <ShoppingBag className="h-5 w-5" />
-                <span className="whitespace-nowrap">Add to Cart</span>
+                <span>Add to Cart</span>
               </button>
               <button 
                 onClick={toggleWishlist}
-                className={`w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-[#E8D7C8] bg-[#FFF9FB] px-5 py-3.5 text-sm font-semibold transition-all hover:border-[#B8955E] active:scale-[0.98] ${isWishlisted ? "text-red-500" : "text-[#3A2428]"}`}
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-[#E8D7C8] bg-[#FFF9FB] px-6 py-4 text-[13px] font-bold tracking-wide uppercase shadow-sm transition-all hover:border-[#B8955E] active:scale-[0.98] ${isWishlisted ? "text-red-500 border-red-200" : "text-[#3A2428]"}`}
+                aria-label="Wishlist"
               >
                 <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
-                <span>Wishlist</span>
               </button>
             </div>
 
@@ -249,9 +258,9 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
 
 function MiniTrust({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-3 shadow-sm text-center">
-      <div className="mb-1.5 flex justify-center text-[#B8955E]">{icon}</div>
-      <p className="text-[11px] font-bold uppercase tracking-wide text-[#3A2428]">{label}</p>
+    <div className="flex flex-col items-center justify-center rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm text-center">
+      <div className="mb-2 flex justify-center text-[#B8955E]">{icon}</div>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[#3A2428]">{label}</p>
     </div>
   );
 }
@@ -400,29 +409,29 @@ function ProductReviews({ productId }: { productId: string }) {
           
           <div className="md:col-span-2 space-y-4">
             {reviews.length === 0 ? (
-              <div className="text-center py-12 text-[#8F817B] border border-dashed border-[#E8D7C8] rounded-2xl bg-[#FFF9FB]/50">
+              <div className="text-center py-12 text-[#8F817B] border border-dashed border-[#E8D7C8] rounded-[24px] bg-[#FFF9FB]/50">
                 No reviews yet. Be the first to share your thoughts!
               </div>
             ) : (
               reviews.map(review => (
-                <div key={review.id} className="bg-[#FFF9FB] border border-[#E8D7C8]/50 rounded-2xl p-5 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-9 w-9 rounded-full bg-[#E8D7C8]/30 flex items-center justify-center text-[#B8955E]">
+                <div key={review.id} className="bg-[#FFF9FB] border border-[#E8D7C8]/50 rounded-[24px] p-6 shadow-sm">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="h-10 w-10 rounded-full bg-[#E8D7C8]/40 flex items-center justify-center text-[#B8955E]">
                       <UserCircle className="h-6 w-6" />
                     </div>
                     <div>
-                      <div className="font-medium text-sm text-[#3A2428]">{review.customerName}</div>
-                      <div className="text-xs text-[#8F817B]">
+                      <div className="font-bold text-sm text-[#3A2428]">{review.customerName}</div>
+                      <div className="text-[11px] text-[#8F817B] tracking-wide mt-0.5">
                         {new Date(review.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                       </div>
                     </div>
                   </div>
                   <div className="flex gap-0.5 mb-3">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className={`h-3 w-3 ${star <= review.rating ? 'fill-[#B8955E] text-[#B8955E]' : 'text-[#E8D7C8]'}`} />
+                      <Star key={star} className={`h-4 w-4 ${star <= review.rating ? 'fill-[#B8955E] text-[#B8955E]' : 'text-[#E8D7C8]'}`} />
                     ))}
                   </div>
-                  <p className="text-sm text-[#3A2428]/90 leading-relaxed">{review.comment}</p>
+                  <p className="text-[13px] text-[#3A2428]/90 leading-relaxed">{review.comment}</p>
                 </div>
               ))
             )}

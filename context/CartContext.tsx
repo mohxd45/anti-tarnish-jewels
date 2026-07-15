@@ -19,6 +19,14 @@ type CartContextType = {
   coupon: string;
   couponId: string;
   applyCoupon: (code: string) => Promise<{ success: boolean; error?: string }>;
+  removeCoupon: () => void;
+  productSavings: number;
+  totalSavings: number;
+  isGiftWrap: boolean;
+  giftMessage: string;
+  giftWrapPrice: number;
+  toggleGiftWrap: () => void;
+  setGiftMessage: (msg: string) => void;
   freeShippingThreshold: number | null;
   isDrawerOpen: boolean;
   openDrawer: () => void;
@@ -33,6 +41,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isGiftWrap, setIsGiftWrap] = useState(false);
+  const [giftMessage, setGiftMessage] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -45,8 +55,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           setItems(parsed);
         }
       }
+      const savedGiftWrap = localStorage.getItem("atj-giftwrap");
+      if (savedGiftWrap === "true") setIsGiftWrap(true);
+      const savedGiftMsg = localStorage.getItem("atj-giftmsg");
+      if (savedGiftMsg) setGiftMessage(savedGiftMsg);
     } catch {
-      try { localStorage.removeItem("atj-cart"); } catch {}
+      try { 
+        localStorage.removeItem("atj-cart");
+        localStorage.removeItem("atj-giftwrap");
+        localStorage.removeItem("atj-giftmsg");
+      } catch {}
     }
     setMounted(true);
   }, []);
@@ -99,6 +117,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return;
     try {
       localStorage.setItem("atj-cart", JSON.stringify(items));
+      localStorage.setItem("atj-giftwrap", isGiftWrap ? "true" : "false");
+      if (giftMessage) {
+        localStorage.setItem("atj-giftmsg", giftMessage);
+      } else {
+        localStorage.removeItem("atj-giftmsg");
+      }
     } catch {
       // ignore
     }
@@ -108,7 +132,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to save cart to cloud:", err);
       });
     }
-  }, [items, mounted, user]);
+  }, [items, mounted, user, isGiftWrap, giftMessage]);
 
   const [shippingFee, setShippingFee] = useState(79); // safe temporary default
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(999); // default threshold
@@ -188,7 +212,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return val;
   }, [activeCoupon, subtotal]);
 
-  const total = Math.max(subtotal + shipping - discount, 0);
+  const giftWrapPrice = 99;
+  const total = Math.max(subtotal + shipping - discount, 0) + (isGiftWrap ? giftWrapPrice : 0);
+
+  const productSavings = useMemo(() => {
+    return items.reduce((sum, item) => {
+      const reg = item.product.regularPrice || 0;
+      const sale = item.product.salePrice || 0;
+      const saving = Math.max(0, reg - sale);
+      return sum + (saving * item.quantity);
+    }, 0);
+  }, [items]);
+
+  const totalSavings = productSavings + discount;
 
   const value = useMemo<CartContextType>(() => ({
     items,
@@ -212,13 +248,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     clearCart: () => {
       setItems([]);
       setActiveCoupon(null);
+      setIsGiftWrap(false);
+      setGiftMessage("");
     },
     subtotal,
     shipping,
     discount,
     total,
+    productSavings,
+    totalSavings,
     coupon: activeCoupon ? activeCoupon.code : "",
     couponId: activeCoupon ? activeCoupon.id : "",
+    removeCoupon: () => setActiveCoupon(null),
     applyCoupon: async (code) => {
       const clean = code.trim().toUpperCase();
       if (!clean) {
@@ -246,12 +287,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: "Failed to apply coupon." };
       }
     },
+    isGiftWrap,
+    giftMessage,
+    giftWrapPrice,
+    toggleGiftWrap: () => setIsGiftWrap(prev => !prev),
+    setGiftMessage: (msg) => setGiftMessage(msg),
     freeShippingThreshold,
     isDrawerOpen,
     openDrawer: () => setIsDrawerOpen(true),
     closeDrawer: () => setIsDrawerOpen(false),
     isLoaded: mounted,
-  }), [items, subtotal, shipping, discount, total, activeCoupon, freeShippingThreshold, isDrawerOpen, mounted]);
+  }), [items, subtotal, shipping, discount, total, productSavings, totalSavings, activeCoupon, isGiftWrap, giftMessage, freeShippingThreshold, isDrawerOpen, mounted]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

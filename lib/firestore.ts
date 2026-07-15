@@ -382,6 +382,9 @@ export async function createOrder(orderData: {
   paymentMethod: string;
   couponCode?: string;
   couponId?: string;
+  giftWrapSelected?: boolean;
+  giftWrapPrice?: number;
+  giftMessage?: string;
   notes?: string;
 }) {
   clearAllCaches(); // Invalidate cache
@@ -400,10 +403,30 @@ export async function createOrder(orderData: {
 
   let initialStatus: OrderStatus = "Pending";
   let initialDesc = "Your order has been placed successfully.";
+  
+  // Advance Payment Tracking Variables
+  let advanceRequired = false;
+  let advanceAmount = 0;
+  let amountPaid = 0;
+  let payOnDeliveryAmount = orderData.total;
+  let codAdvanceStatus: "not_required" | "pending" | "paid" = "not_required";
+  let initialPaymentStatus: Order["paymentStatus"] = "Pending";
 
   if (displayPaymentMethod === "Cash on Delivery") {
-    initialStatus = "Pending Verification";
-    initialDesc = "Your Cash on Delivery order has been received and is pending phone or WhatsApp verification.";
+    if (orderData.total > 300) {
+      initialStatus = "Pending Advance";
+      initialDesc = "Your order requires a ₹100 advance payment to be confirmed.";
+      advanceRequired = true;
+      advanceAmount = 100;
+      payOnDeliveryAmount = orderData.total; // Balance is total before advance is actually paid
+      codAdvanceStatus = "pending";
+      initialPaymentStatus = "pending_advance";
+      displayPaymentMethod = "cod_with_advance";
+    } else {
+      initialStatus = "Pending";
+      initialDesc = "Your Cash on Delivery order has been received and is pending phone or WhatsApp verification.";
+      initialPaymentStatus = "cod_pending";
+    }
   }
 
   const initialTimeline = [
@@ -441,7 +464,13 @@ export async function createOrder(orderData: {
       quantity: item.quantity,
       selectedSize: item.selectedSize || "",
       selectedColor: item.selectedColor || "",
-      image: item.product.images?.[0] || ""
+      image: item.product.images?.[0] || "",
+      type: item.product.isBundle ? "bundle" : "product",
+      bundleId: item.product.isBundle ? item.product.id : undefined,
+      bundleName: item.product.isBundle ? item.product.name : undefined,
+      bundleSku: item.product.isBundle ? (item.product.sku || "") : undefined,
+      bundlePrice: item.product.isBundle ? item.product.salePrice : undefined,
+      includedItems: item.product.isBundle ? item.product.includedItems : undefined
     })),
     subtotal: orderData.subtotal,
     shippingFee: orderData.shipping,
@@ -451,9 +480,17 @@ export async function createOrder(orderData: {
     couponId: orderData.couponId || "",
     total: orderData.total,
     paymentMethod: displayPaymentMethod,
-    paymentStatus: "Pending",
+    advanceRequired,
+    advanceAmount,
+    amountPaid,
+    payOnDeliveryAmount,
+    codAdvanceStatus,
+    paymentStatus: initialPaymentStatus,
     orderStatus: initialStatus,
     status: initialStatus, // fallback
+    giftWrapSelected: orderData.giftWrapSelected || false,
+    giftWrapPrice: orderData.giftWrapPrice || 0,
+    giftMessage: orderData.giftMessage || "",
     trackingNumber: "",
     courierName: "",
     trackingUrl: "",
@@ -474,7 +511,7 @@ export async function createOrder(orderData: {
     orderStatus: initialStatus,
     status: initialStatus, // fallback
     paymentMethod: displayPaymentMethod,
-    paymentStatus: "Pending",
+    paymentStatus: initialPaymentStatus,
     courierName: "",
     trackingNumber: "",
     trackingUrl: "",
@@ -2029,4 +2066,28 @@ export async function submitReturnRequest(data: {
     status: "pending",
     createdAt: new Date().toISOString()
   });
+}
+
+export async function markAdvancePaid(orderId: string, total: number) {
+  clearAllCaches();
+  const updateData: any = {
+    amountPaid: 100,
+    payOnDeliveryAmount: total - 100,
+    paymentStatus: 'advance_paid',
+    codAdvanceStatus: 'paid',
+    orderStatus: 'Confirmed',
+    status: 'Confirmed'
+  };
+  await updateOrder(orderId, updateData);
+}
+
+export async function getOrderById(id: string): Promise<Order | null> {
+  if (!hasFirebaseConfig || !db) return null;
+  try {
+    const d = await withTimeout(getDoc(doc(db, 'orders', id)));
+    if (d.exists()) {
+      return { id: d.id, ...d.data() } as Order;
+    }
+  } catch (err) {}
+  return null;
 }

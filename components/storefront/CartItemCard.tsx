@@ -50,6 +50,16 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
             {(item.sku || product.sku) && (
               <p className="text-[10px] text-[#8F817B] mt-0.5">Item Code: {item.sku || product.sku}</p>
             )}
+            {product.isBundle && product.includedItems && product.includedItems.length > 0 && (
+              <div className="mt-1.5 flex flex-col gap-0.5 border-t border-[#E8D7C8]/40 pt-1.5">
+                <span className="text-[9px] uppercase tracking-wider text-[#B8955E] font-bold">Included:</span>
+                {product.includedItems.map((inc, i) => (
+                  <p key={i} className="text-[10px] text-stone-500 truncate">
+                    • {inc.quantity}x {inc.name}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
           <button
             onClick={() => removeFromCart(item.cartItemId || product.id)}

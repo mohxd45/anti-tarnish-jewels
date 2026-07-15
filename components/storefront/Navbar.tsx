@@ -52,6 +52,7 @@ export function Navbar({ settings }: { settings?: any }) {
             <NavItem href="/shop?category=earrings">Earrings</NavItem>
             <NavItem href="/shop?category=necklaces">Necklaces</NavItem>
             <NavItem href="/shop?category=bracelets">Bracelets</NavItem>
+            <NavItem href="/bundles">Bundles</NavItem>
             <Link
               href="/shop?category=sale"
               className="text-sm font-semibold text-stoneGray transition hover:text-[#3A2428]"

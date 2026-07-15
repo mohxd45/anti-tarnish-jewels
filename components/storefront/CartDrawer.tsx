@@ -1,7 +1,10 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, Tag } from "lucide-react";
+import { X, ShoppingBag } from "lucide-react";
+import { SavingsBanner } from "./SavingsBanner";
+import { CouponSection } from "./CouponSection";
+import { GiftAddon } from "./GiftAddon";
 import { useCart } from "@/context/CartContext";
 import { useState, useEffect } from "react";
 import { CartItemCard } from "./CartItemCard";
@@ -15,18 +18,11 @@ export function CartDrawer() {
     isDrawerOpen, 
     closeDrawer, 
     subtotal, 
-    applyCoupon,
-    coupon,
     increase,
     decrease,
     removeFromCart
   } = useCart();
   
-  const [couponCode, setCouponCode] = useState("");
-  const [couponError, setCouponError] = useState("");
-  const [couponSuccess, setCouponSuccess] = useState("");
-  const [isApplying, setIsApplying] = useState(false);
-
   // Hide WhatsApp button when drawer is open
   useEffect(() => {
     if (isDrawerOpen) {
@@ -36,23 +32,6 @@ export function CartDrawer() {
     }
     return () => document.body.classList.remove('cart-drawer-open');
   }, [isDrawerOpen]);
-
-  const handleApplyCoupon = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCouponError("");
-    setCouponSuccess("");
-    if (!couponCode.trim()) return;
-    
-    setIsApplying(true);
-    const res = await applyCoupon(couponCode);
-    if (res.success) {
-      setCouponSuccess("Coupon applied successfully!");
-      setCouponCode("");
-    } else {
-      setCouponError(res.error || "Invalid coupon.");
-    }
-    setIsApplying(false);
-  };
 
   return (
     <AnimatePresence>
@@ -132,39 +111,10 @@ export function CartDrawer() {
                   </div>
 
                   {/* Coupon Section inside scrollable area to save sticky space */}
-                  <div className="px-4 pb-4">
-                    <div className="bg-brandCardBg rounded-2xl p-3 shadow-sm border border-brandBorder/30">
-                      <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                        <div className="relative flex-1">
-                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                          <input
-                            type="text"
-                            value={couponCode}
-                            onChange={(e) => setCouponCode(e.target.value)}
-                            placeholder="Discount code"
-                            className="w-full pl-9 pr-3 py-2 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold transition-shadow"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={isApplying || !couponCode.trim()}
-                          className="px-4 py-2 bg-brandGold text-white text-sm font-semibold rounded-lg hover:bg-brandGoldDeep transition-colors disabled:opacity-50"
-                        >
-                          {isApplying ? "..." : "Apply"}
-                        </button>
-                      </form>
-                      
-                      {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
-                      {couponSuccess && <p className="text-green-600 text-xs mt-2">{couponSuccess}</p>}
-                      {coupon && !couponSuccess && (
-                        <div className="mt-2 flex items-center justify-between text-[11px] bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-100/50">
-                          <span className="font-semibold flex items-center gap-1.5">
-                            <Tag className="h-3 w-3" />
-                            {coupon} applied
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                  <div className="px-4 pb-4 flex flex-col gap-3">
+                    <SavingsBanner />
+                    <CouponSection compact />
+                    <GiftAddon compact />
                   </div>
 
                   <div className="mt-auto">

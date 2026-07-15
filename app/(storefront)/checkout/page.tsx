@@ -8,6 +8,9 @@ import { useState, useEffect } from "react";
 import { ShieldCheck, ArrowLeft, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { SavingsBanner } from "@/components/storefront/SavingsBanner";
+import { CouponSection } from "@/components/storefront/CouponSection";
+import { GiftAddon } from "@/components/storefront/GiftAddon";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -53,7 +56,10 @@ export default function CheckoutPage() {
         total: cart.total,
         discount: cart.discount,
         shipping: cart.shipping || 0,
-        paymentMethod: "cod"
+        paymentMethod: "cod",
+        giftWrapSelected: cart.isGiftWrap,
+        giftWrapPrice: cart.isGiftWrap ? cart.giftWrapPrice : 0,
+        giftMessage: cart.isGiftWrap ? cart.giftMessage : ""
       });
       cart.clearCart();
       router.push(`/order-success?id=${orderId}`);
@@ -167,16 +173,47 @@ export default function CheckoutPage() {
           <Section title="Payment method">
             <label className={`flex items-start gap-3 p-4 border border-[#E8D7C8] rounded-2xl bg-white cursor-pointer transition-colors ${settings?.codEnabled !== false ? 'hover:border-[#B8955E]' : 'opacity-60 cursor-not-allowed'}`}>
               <input type="radio" name="pm" defaultChecked className="mt-1 accent-[#B8955E] h-4 w-4" disabled={settings?.codEnabled === false} /> 
-              <div className="flex flex-col">
+              <div className="flex flex-col w-full">
                 <span className={`text-base font-medium ${settings?.codEnabled === false ? 'text-stone-400' : 'text-[#3A2428]'}`}>
                   Cash on Delivery
                   {settings?.codEnabled === false && " (Disabled)"}
                 </span>
-                {settings?.codEnabled !== false && (
-                  <span className="text-sm text-[#8F817B] mt-0.5">{settings?.codText || "Pay remaining amount on delivery"}</span>
+                
+                {settings?.codEnabled !== false && cart.total <= 300 && (
+                  <span className="text-sm text-[#8F817B] mt-0.5">Cash on Delivery available. Pay full amount when delivered.</span>
                 )}
               </div>
             </label>
+
+            {/* Advance Required Card rendering right beneath the COD label */}
+            {settings?.codEnabled !== false && cart.total > 300 && (
+              <div className="bg-[#FFF9FB] p-5 rounded-2xl border border-[#B8955E]/40 shadow-sm mt-3 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#B8955E]" />
+                <h4 className="font-serif text-[18px] text-[#3A2428] mb-2 font-medium flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#B8955E]" /> ₹100 Advance Required
+                </h4>
+                <p className="text-[13px] text-[#8F817B] mb-4 leading-relaxed">
+                  To confirm your COD order, ₹100 advance is required. After advance confirmation, the remaining amount will be collected when your jewellery is delivered.
+                </p>
+                <div className="bg-white border border-[#E8D7C8]/50 rounded-xl p-3 text-sm space-y-1.5">
+                  <div className="flex justify-between text-[#8F817B]">
+                    <span>Order Total</span>
+                    <span>₹{cart.total}</span>
+                  </div>
+                  <div className="flex justify-between text-[#B8955E] font-medium border-b border-[#E8D7C8]/30 pb-1.5">
+                    <span>Advance Required</span>
+                    <span>₹100</span>
+                  </div>
+                  <div className="flex justify-between text-[#3A2428] font-medium pt-1">
+                    <span>Balance After Advance</span>
+                    <span>₹{cart.total - 100}</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-[#8F817B] mt-3 font-medium bg-[#B8955E]/5 inline-block px-2 py-1 rounded">
+                  * ₹100 advance is part of your total, not an extra charge.
+                </p>
+              </div>
+            )}
             
             <label className="flex items-start gap-3 p-4 border border-[#E8D7C8] rounded-2xl bg-stone-50 cursor-not-allowed opacity-70">
               <input type="radio" name="pm" disabled className="mt-1 h-4 w-4" /> 
@@ -204,8 +241,9 @@ export default function CheckoutPage() {
 
         {/* Right Column (Summary & Sticky Bar container on mobile) */}
         <div className="flex flex-col lg:sticky lg:top-32 gap-0">
-          <aside className="bg-[#FFF9FB] border border-[#E8D7C8] rounded-[24px] shadow-sm px-4 py-5 md:p-6 mb-6">
+          <aside className="bg-[#FFF9FB] border border-[#E8D7C8] rounded-[24px] shadow-sm px-4 py-5 md:p-6 mb-6 flex flex-col gap-0">
             <h3 className="mb-4 font-serif text-[26px] text-[#3A2428]">Order summary</h3>
+            <SavingsBanner />
             
             <div className="space-y-4 max-h-[40vh] overflow-y-auto no-scrollbar pr-1 mb-5">
               {cart.items.map((it) => (
@@ -242,6 +280,16 @@ export default function CheckoutPage() {
                       {(it.sku || it.product.sku) && (
                         <p className="text-[10px] text-[#8F817B] mt-0.5">Item Code: {it.sku || it.product.sku}</p>
                       )}
+                      {it.product.isBundle && it.product.includedItems && it.product.includedItems.length > 0 && (
+                        <div className="mt-1 flex flex-col gap-0.5 border-t border-[#E8D7C8]/40 pt-1">
+                          <span className="text-[8px] uppercase tracking-wider text-[#B8955E] font-bold">Included:</span>
+                          {it.product.includedItems.map((inc, i) => (
+                            <p key={i} className="text-[9px] text-[#8F817B] truncate leading-tight">
+                              • {inc.quantity}x {inc.name}
+                            </p>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col items-end justify-center shrink-0">
@@ -264,10 +312,21 @@ export default function CheckoutPage() {
                 <span>Shipping</span><span className="font-medium">{cart.shipping === 0 ? <span className="text-emerald-600">Free</span> : `₹${cart.shipping}`}</span>
               </div>
               
-              <div className="mt-4 pt-4 border-t border-[#E8D7C8] flex justify-between items-center">
+              {cart.isGiftWrap && (
+                <div className="flex justify-between text-[#B8955E]">
+                  <span>Gift Wrap</span><span className="font-medium">+₹{cart.giftWrapPrice}</span>
+                </div>
+              )}
+              
+              <div className="border-t border-[#E8D7C8]/60 mt-3 pt-3 flex justify-between items-center mb-1">
                 <span className="font-serif text-xl font-bold text-[#3A2428]">Total</span>
                 <span className="text-[22px] font-bold text-[#B8955E]">₹{cart.total}</span>
               </div>
+            </div>
+            
+            <div className="mt-5 flex flex-col gap-4">
+              <CouponSection />
+              <GiftAddon />
             </div>
             
             <div className="mt-6 flex items-center justify-center gap-2 text-[#8F817B] text-[11px] uppercase tracking-wide font-medium">
@@ -288,7 +347,7 @@ export default function CheckoutPage() {
                 disabled={loading || settings?.codEnabled === false} 
                 className="w-[60%] lg:w-full bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] hover:from-[#A08050] hover:to-[#C6AE8B] text-white font-semibold py-3.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {loading ? "Processing..." : "Place Order"}
+                {loading ? "Processing..." : (cart.total > 300 ? "Place Order — Pending Advance" : "Place COD Order")}
               </button>
             </div>
           </div>

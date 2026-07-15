@@ -20,6 +20,7 @@ export function MobileNav({ open, onClose, openDrawer }: { open: boolean; onClos
     { href: "/shop?category=bangles", label: "Bangles" },
     { href: "/shop?category=hair-accessories", label: "Hair Accessories" },
     { href: "/shop?category=gift-sets", label: "Gift Sets" },
+    { href: "/bundles", label: "Bundles & Combos" },
     { href: "/shop?category=sale", label: "Sale", highlight: true },
   ];
 

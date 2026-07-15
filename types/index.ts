@@ -57,6 +57,19 @@ export type Product = {
   faqs?: { question: string; answer: string; }[];
   createdAt?: string;
   updatedAt?: string;
+  isBundle?: boolean;
+  includedItems?: BundleItemSnapshot[];
+};
+
+export type BundleItemSnapshot = {
+  productId: string;
+  name: string;
+  sku: string;
+  quantity: number;
+  price: number;
+  image?: string;
+  selectedSize?: string;
+  selectedColor?: string;
 };
 
 export type CartItem = {
@@ -69,10 +82,17 @@ export type CartItem = {
   name?: string;
   price?: number;
   productId?: string;
+  type?: "product" | "bundle";
+  bundleId?: string;
+  bundleName?: string;
+  bundleSku?: string;
+  bundlePrice?: number;
+  includedItems?: BundleItemSnapshot[];
 };
 
 export type OrderStatus =
   | "Pending Verification"
+  | "Pending Advance"
   | "Pending"
   | "Confirmed"
   | "Packed"
@@ -119,9 +139,17 @@ export type Order = {
   couponId?: string;
   total: number;
   paymentMethod: string;
-  paymentStatus: "Pending" | "Paid" | "Refunded" | "Failed";
+  advanceRequired?: boolean;
+  advanceAmount?: number;
+  amountPaid?: number;
+  payOnDeliveryAmount?: number;
+  codAdvanceStatus?: "not_required" | "pending" | "paid";
+  paymentStatus: "Pending" | "Paid" | "Refunded" | "Failed" | "cod_pending" | "pending_advance" | "advance_paid";
   orderStatus: OrderStatus;
   status: OrderStatus; // Backwards compatibility fallback
+  giftWrapSelected?: boolean;
+  giftWrapPrice?: number;
+  giftMessage?: string;
   trackingNumber?: string;
   courierName?: string;
   trackingUrl?: string;

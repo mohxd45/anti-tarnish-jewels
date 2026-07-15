@@ -9,6 +9,8 @@ import { getProducts, getSimilarProducts } from "@/lib/firestore";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 
+import { useRouter } from "next/navigation";
+
 interface RecommendedProductSliderProps {
   closeDrawer?: () => void;
 }
@@ -17,6 +19,7 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { items, addToCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchRecommendations() {
@@ -110,12 +113,28 @@ export function RecommendedProductSlider({ closeDrawer }: RecommendedProductSlid
                 </div>
               </div>
               
-              <button
-                onClick={() => addToCart(product, 1)}
-                className="mt-2 w-full flex items-center justify-center gap-1 bg-white border border-brandBorder/50 hover:bg-brandGold hover:border-brandGold hover:text-white text-brandEspresso text-[11px] font-semibold py-1.5 rounded-lg shadow-sm transition-all"
-              >
-                <Plus className="h-3 w-3" /> Add
-              </button>
+              {(() => {
+                const requiresOptions = product.selectedSizeRequired || product.selectedColorRequired || (product.variants && product.variants.length > 0);
+                
+                return requiresOptions ? (
+                  <button
+                    onClick={() => {
+                      if (closeDrawer) closeDrawer();
+                      router.push(`/product/${product.slug}`);
+                    }}
+                    className="mt-2 w-full flex items-center justify-center gap-1 bg-white border border-[#E8D7C8] hover:bg-[#FFF9FB] text-[#3A2428] text-[11px] font-semibold py-1.5 rounded-lg shadow-sm transition-all"
+                  >
+                    Select Options
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => addToCart(product, 1)}
+                    className="mt-2 w-full flex items-center justify-center gap-1 bg-[#B8955E] hover:bg-[#a3824f] text-white text-[11px] font-semibold py-1.5 rounded-lg shadow-sm transition-all"
+                  >
+                    <Plus className="h-3 w-3" /> Add
+                  </button>
+                );
+              })()}
             </div>
           </div>
         ))}

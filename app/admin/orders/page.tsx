@@ -2,8 +2,8 @@
 import { useAuth } from "@/context/AuthContext";
 
 
-import { useEffect, useMemo, useState } from "react";
-import { listenToAllOrders, updateOrderStatus, updateOrderTracking , logActivity } from "@/lib/firestore";
+import { useEffect, useMemo, useState, Fragment } from "react";
+import { listenToAllOrders, updateOrderStatus, updateOrderTracking , logActivity, markAdvancePaid } from "@/lib/firestore";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -34,11 +34,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, Printer, RefreshCw, Filter, Search, Pencil } from "lucide-react";
+import { Eye, Printer, RefreshCw, Filter, Search, Pencil, Gift } from "lucide-react";
 import { toast } from "sonner";
 
 const FILTERS: ("All" | OrderStatus)[] = [
   "All",
+  "Pending Advance",
+  "Pending Verification",
   "Pending",
   "Confirmed",
   "Packed",
@@ -146,6 +148,17 @@ export default function ManageOrdersPage() {
     } catch (err) {
       console.error(err);
       toast.error("Failed to update order");
+    }
+  };
+
+  const handleAdvancePaid = async (orderId: string, total: number) => {
+    try {
+      await markAdvancePaid(orderId, total);
+      toast.success("Advance marked as paid. Order is now Confirmed.");
+      // It will auto-update since we are listening to firestore
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to mark advance as paid");
     }
   };
 
@@ -296,6 +309,7 @@ export default function ManageOrdersPage() {
           setEditing(o);
         }}
         onPrint={printOrder}
+        onMarkAdvancePaid={handleAdvancePaid}
       />
       <EditOrderDialog
         order={editing}
@@ -320,11 +334,13 @@ function ViewOrderDialog({
   onClose,
   onEdit,
   onPrint,
+  onMarkAdvancePaid,
 }: {
   order: Order | null;
   onClose: () => void;
   onEdit: (o: Order) => void;
   onPrint: (o: Order) => void;
+  onMarkAdvancePaid: (id: string, total: number) => void;
 }) {
   if (!order) return null;
   const addr = order.shippingAddress || order.address;
@@ -391,19 +407,41 @@ function ViewOrderDialog({
               </thead>
               <tbody className="divide-y divide-adminBorder">
                 {(order.items || []).map((it, i) => (
-                  <tr key={i} className="text-adminSidebar">
-                    <td className="px-4 py-3 font-medium">{it.product?.name || it.name || "Unknown Item"}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-adminMuted">{it.sku || it.product?.sku || "N/A"}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">
-                      {it.quantity}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
-                      {formatPrice(it.product?.salePrice || 0)}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums font-medium">
-                      {formatPrice((it.product?.salePrice || 0) * (it.quantity || 1))}
-                    </td>
-                  </tr>
+                  <Fragment key={i}>
+                    <tr className="text-adminSidebar">
+                      <td className="px-4 py-3 font-medium">
+                        {it.product?.name || it.name || "Unknown Item"}
+                        {it.product?.isBundle && (
+                          <span className="ml-2 inline-block px-1.5 py-0.5 bg-adminGold/10 text-adminGold text-[9px] font-bold uppercase rounded-sm">Bundle</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-adminMuted">{it.sku || it.product?.sku || "N/A"}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {it.quantity}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {formatPrice(it.product?.salePrice || 0)}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums font-medium">
+                        {formatPrice((it.product?.salePrice || 0) * (it.quantity || 1))}
+                      </td>
+                    </tr>
+                    {it.product?.isBundle && it.product?.includedItems && it.product.includedItems.length > 0 && (
+                      <tr className="bg-adminBg/50">
+                        <td colSpan={5} className="px-4 py-2 pb-3">
+                          <div className="pl-2 border-l-2 border-adminGold/30 ml-2 space-y-1">
+                            <div className="text-[10px] uppercase tracking-wider text-adminMuted font-semibold mb-1">Included in bundle:</div>
+                            {it.product.includedItems.map((inc, idx) => (
+                              <div key={idx} className="flex justify-between text-[11px] text-adminSidebar">
+                                <span>• {inc.quantity}x {inc.name} {inc.selectedSize || inc.selectedColor ? `(${[inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - ")})` : ""}</span>
+                                <span className="font-mono text-adminMuted">{inc.sku}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -413,29 +451,72 @@ function ViewOrderDialog({
               <Row label="Subtotal" value={formatPrice(order.subtotal || 0)} />
               {order.discount > 0 && <Row label={`Discount ${order.couponCode ? `(${order.couponCode})` : ""}`} value={`-${formatPrice(order.discount)}`} />}
               <Row label="Shipping" value={(order.shippingFee ?? order.shipping ?? 0) === 0 ? "Free" : formatPrice(order.shippingFee ?? order.shipping ?? 0)} />
+              {order.giftWrapSelected && <Row label="Gift Packaging" value={formatPrice(order.giftWrapPrice || 99)} />}
               <div className="flex items-center justify-between pt-2 border-t border-adminBorder font-semibold text-base text-adminGold">
                 <span>Total</span>
                 <span>{formatPrice(order.total || 0)}</span>
               </div>
+              
+              {/* COD Advance Breakdown */}
+              {order.advanceRequired && (
+                <div className="pt-3 mt-3 border-t border-adminBorder text-xs space-y-1">
+                  <div className="flex justify-between text-adminMuted">
+                    <span>Advance Required</span>
+                    <span>{formatPrice(order.advanceAmount || 100)}</span>
+                  </div>
+                  <div className="flex justify-between text-adminMuted">
+                    <span>Advance Paid</span>
+                    <span className={order.amountPaid ? "text-emerald-600 font-medium" : "text-adminRose font-medium"}>
+                      {formatPrice(order.amountPaid || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-medium text-adminSidebar">
+                    <span>Pay on Delivery</span>
+                    <span>{formatPrice(order.payOnDeliveryAmount || order.total)}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
         
-        {order.notes && (
+        {(order.notes || order.giftMessage) && (
           <div className="bg-adminBg p-4 rounded-xl border border-adminBorder">
-            <h4 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-2">
-              Admin Notes
-            </h4>
-            <p className="text-sm italic text-adminSidebar">{order.notes}</p>
+            {order.notes && (
+              <>
+                <h4 className="text-[10px] uppercase tracking-widest font-semibold text-adminMuted mb-2">
+                  Admin Notes
+                </h4>
+                <p className="text-sm italic text-adminSidebar mb-4">{order.notes}</p>
+              </>
+            )}
+            {order.giftMessage && (
+              <>
+                <h4 className="text-[10px] uppercase tracking-widest font-semibold text-adminGold mb-2 flex items-center gap-1.5">
+                  <Gift className="h-3.5 w-3.5" /> Gift Message
+                </h4>
+                <p className="text-sm italic text-adminSidebar bg-white p-3 rounded-lg border border-adminBorder/50">{order.giftMessage}</p>
+              </>
+            )}
           </div>
         )}
-        <DialogFooter className="gap-2 mt-4">
-          <Button variant="outline" onClick={() => onPrint(order)} className="rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg">
-            <Printer className="h-4 w-4 mr-2 text-adminMuted" /> Print
-          </Button>
-          <Button onClick={() => onEdit(order)} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md">
-            <Pencil className="h-4 w-4 mr-2" /> Edit Order
-          </Button>
+        <DialogFooter className="gap-2 mt-4 flex flex-wrap sm:flex-nowrap">
+          {order.advanceRequired && order.codAdvanceStatus === "pending" && (
+            <Button 
+              onClick={() => onMarkAdvancePaid(order.id, order.total)} 
+              className="rounded-full bg-emerald-600 text-white hover:bg-emerald-700 border-none shadow-md"
+            >
+              Mark Advance Paid
+            </Button>
+          )}
+          <div className="flex gap-2 ml-auto">
+            <Button variant="outline" onClick={() => onPrint(order)} className="rounded-full border-adminBorder text-adminSidebar hover:bg-adminBg">
+              <Printer className="h-4 w-4 mr-2 text-adminMuted" /> Print
+            </Button>
+            <Button onClick={() => onEdit(order)} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md">
+              <Pencil className="h-4 w-4 mr-2" /> Edit Order
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -589,14 +670,38 @@ function printInvoice(o: Order) {
   }
   const itemsHtml = (o.items || [])
     .map(
-      (it) => `
-      <tr>
-        <td>${escapeHtml(it.sku || it.product?.sku || "N/A")}</td>
-        <td>${escapeHtml(it.product?.name || it.name || "Unknown Item")}</td>
-        <td style="text-align:right">${it.quantity}</td>
-        <td style="text-align:right">${formatPrice(it.product?.salePrice || it.price || 0)}</td>
-        <td style="text-align:right">${formatPrice((it.product?.salePrice || it.price || 0) * (it.quantity || 1))}</td>
-      </tr>`
+      (it) => {
+        const isBundle = it.product?.isBundle;
+        const mainRow = `
+          <tr>
+            <td>${escapeHtml(it.sku || it.product?.sku || "N/A")}</td>
+            <td>
+              ${escapeHtml(it.product?.name || it.name || "Unknown Item")}
+              ${isBundle ? '<span style="font-size:10px;color:#D4AF37;background:#faf5ef;padding:2px 4px;border-radius:4px;margin-left:4px;text-transform:uppercase;font-weight:bold;">Bundle</span>' : ''}
+            </td>
+            <td style="text-align:right">${it.quantity}</td>
+            <td style="text-align:right">${formatPrice(it.product?.salePrice || it.price || 0)}</td>
+            <td style="text-align:right">${formatPrice((it.product?.salePrice || it.price || 0) * (it.quantity || 1))}</td>
+          </tr>`;
+          
+        let bundleRows = "";
+        if (isBundle && it.product?.includedItems && it.product.includedItems.length > 0) {
+          bundleRows = `
+            <tr>
+              <td colspan="5" style="padding:4px 10px 12px; background:#faf5ef; color:#7a6f68; font-size:11px; border-bottom:1px solid #ece4dc;">
+                <div style="font-weight:600; text-transform:uppercase; margin-bottom:4px; font-size:9px; letter-spacing:0.05em;">Included in bundle:</div>
+                ${it.product.includedItems.map(inc => `
+                  <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                    <span>• ${inc.quantity}x ${escapeHtml(inc.name)} ${inc.selectedSize || inc.selectedColor ? `(${escapeHtml([inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - "))})` : ""}</span>
+                    <span style="font-family:monospace">${escapeHtml(inc.sku)}</span>
+                  </div>
+                `).join("")}
+              </td>
+            </tr>
+          `;
+        }
+        return mainRow + bundleRows;
+      }
     )
     .join("");
 
@@ -647,8 +752,21 @@ function printInvoice(o: Order) {
       <thead><tr><th>Item Code</th><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th><th style="text-align:right">Subtotal</th></tr></thead>
       <tbody>${itemsHtml}</tbody>
     </table>
+    <div style="text-align:right; margin-top:20px; font-size:14px;">
+      <div>Subtotal: ${formatPrice(o.subtotal || 0)}</div>
+      ${o.discount ? `<div style="color:#059669">Discount: -${formatPrice(o.discount)}</div>` : ''}
+      <div>Shipping: ${o.shipping ? formatPrice(o.shipping) : 'Free'}</div>
+      ${o.giftWrapSelected ? `<div>Gift Packaging: ${formatPrice(o.giftWrapPrice || 99)}</div>` : ''}
+    </div>
     <div class="total">Total: ${formatPrice(o.total || 0)}</div>
-    <div class="muted" style="margin-top:6px;text-align:right">Payment: ${escapeHtml((o.paymentMethod || "COD").toUpperCase())}</div>
+    ${o.advanceRequired ? `
+      <div style="text-align:right; margin-top:10px; font-size:13px; color:#7a6f68;">
+        <div>Advance Required: ${formatPrice(o.advanceAmount || 100)}</div>
+        <div>Advance Paid: <span style="color:${o.amountPaid ? '#059669' : '#dc2626'}">${formatPrice(o.amountPaid || 0)}</span></div>
+        <div style="font-weight:600; color:#1f1a17; margin-top:4px;">Pay on Delivery: ${formatPrice(o.payOnDeliveryAmount || o.total)}</div>
+      </div>
+    ` : ''}
+    <div class="muted" style="margin-top:12px;text-align:right">Payment: ${escapeHtml((o.paymentMethod || "COD").toUpperCase())}</div>
     ${o.notes ? `<div class="notes"><strong>Admin notes:</strong> ${escapeHtml(o.notes)}</div>` : ""}
     <script>window.onload = () => { window.print(); }</script>
   </body></html>`);

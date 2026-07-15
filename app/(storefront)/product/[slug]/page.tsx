@@ -1,5 +1,6 @@
 import { getProductBySlug, getSimilarProducts } from "@/lib/firestore";
 import { ProductDetailsClient } from "@/components/ProductDetailsClient";
+import { BundleDetailsClient } from "@/components/storefront/BundleDetailsClient";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -38,7 +39,11 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
         .whatsapp-button { display: none !important; }
       `}</style>
       <div className="bg-[#FFF0F5] min-h-[100dvh] pb-40 md:pb-24">
-        <ProductDetailsClient product={product} initialSimilar={similarProducts} />
+        {product.isBundle ? (
+          <BundleDetailsClient product={product} />
+        ) : (
+          <ProductDetailsClient product={product} initialSimilar={similarProducts} />
+        )}
       </div>
     </>
   );

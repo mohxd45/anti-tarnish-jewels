@@ -12,35 +12,13 @@ import { CartItemCard } from "@/components/storefront/CartItemCard";
 import { RecommendedProductSlider } from "@/components/storefront/RecommendedProductSlider";
 import { StickyCartSummaryBar } from "@/components/storefront/StickyCartSummaryBar";
 import { useRouter } from "next/navigation";
+import { SavingsBanner } from "@/components/storefront/SavingsBanner";
+import { CouponSection } from "@/components/storefront/CouponSection";
+import { GiftAddon } from "@/components/storefront/GiftAddon";
 
 export default function CartPage() {
-  const cart = useCart();
-  const { items, subtotal, total, discount, coupon, applyCoupon, increase, decrease, removeFromCart, shipping } = cart;
-
-  const [code, setCode] = useState("");
-  const [couponMsg, setCouponMsg] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
+  const { items, subtotal, total, discount, coupon, increase, decrease, removeFromCart, shipping, isGiftWrap, giftWrapPrice } = useCart();
   const router = useRouter();
-
-  async function handleApplyCoupon() {
-    if (!code.trim()) return;
-    setCouponLoading(true);
-    setCouponMsg("");
-    try {
-      const res = await applyCoupon(code);
-      setCouponMsg(res.success ? "✨ Coupon applied!" : `❌ ${res.error || "Invalid coupon"}`);
-      if (res.success) setCode("");
-    } catch {
-      setCouponMsg("❌ Failed to apply coupon");
-    } finally {
-      setCouponLoading(false);
-    }
-  }
-
-  function removeCouponLocal() {
-    applyCoupon("");
-  }
-
   return (
     <>
       <style>{`
@@ -113,47 +91,27 @@ export default function CartPage() {
                     value={shipping === 0 ? <span className="text-[#B8955E] font-medium">Free</span> : (formatPrice ? formatPrice(shipping) : `₹${shipping.toLocaleString()}`)} 
                   />
                   
+                  {isGiftWrap && (
+                    <Row 
+                      label={<span className="text-[#B8955E] flex items-center gap-1.5"><Tag className="h-3 w-3" /> Gift Wrap</span>} 
+                      value={<span className="text-[#B8955E]">+{formatPrice ? formatPrice(giftWrapPrice) : `₹${giftWrapPrice}`}</span>} 
+                    />
+                  )}
+                  
                   <div className="my-4 border-t border-[#E8D7C8]/50" />
                   <Row 
                     label={<span className="font-serif text-xl font-bold text-[#3A2428]">Total</span>} 
                     value={<span className="font-serif text-xl font-bold text-[#B8955E]">{formatPrice ? formatPrice(total) : `₹${total.toLocaleString()}`}</span>} 
                   />
                 </div>
-                
-                <div className="mt-8">
-                  <div className="mb-6">
-                    {!coupon ? (
-                      <div className="flex gap-2">
-                        <div className="relative flex-1">
-                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                          <input 
-                            type="text" 
-                            placeholder="Discount code" 
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            className="w-full pl-9 pr-3 py-3 text-sm border border-[#E8D7C8]/80 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#B8955E] focus:border-[#B8955E] bg-white transition-shadow"
-                          />
-                        </div>
-                        <button 
-                          onClick={handleApplyCoupon}
-                          disabled={couponLoading || !code.trim()}
-                          className="bg-[#B8955E] hover:bg-[#a3824f] text-white px-5 py-3 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors shadow-sm"
-                        >
-                          {couponLoading ? "..." : "Apply"}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-100/50">
-                        <span className="text-sm font-medium text-emerald-700">✨ {coupon} Applied!</span>
-                        <button onClick={removeCouponLocal} className="text-xs text-[#3A2428]/60 hover:text-red-600 font-semibold transition-colors">Remove</button>
-                      </div>
-                    )}
-                    {couponMsg && !coupon && <p className="text-xs text-red-500 mt-2 font-medium px-1">{couponMsg}</p>}
-                  </div>
-                  <button onClick={() => router.push("/checkout")} className="w-full py-3.5 bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white rounded-xl font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
-                    Proceed to Checkout
-                  </button>
+                <div className="mt-8 mb-6 flex flex-col gap-3">
+                  <SavingsBanner />
+                  <CouponSection />
+                  <GiftAddon />
                 </div>
+                <button onClick={() => router.push("/checkout")} className="w-full py-3.5 bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white rounded-xl font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
+                  Proceed to Checkout
+                </button>
                 
                 <div className="mt-6 flex items-center justify-center gap-2 text-stone-400 text-xs">
                   <ShieldCheck className="h-4 w-4 text-[#B8955E]/70" /> Secure encrypted checkout
