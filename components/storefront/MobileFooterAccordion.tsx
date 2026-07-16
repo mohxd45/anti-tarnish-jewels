@@ -82,40 +82,18 @@ export function MobileFooterAccordion({
               Connect
             </AccordionTrigger>
             <AccordionContent className="text-brandMutedText pb-4 space-y-4 pl-2">
-              {settings?.email && (
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-brandGold" />
-                  <span className="text-sm">{settings.email}</span>
-                </div>
-              )}
-              {settings?.whatsAppNumber && (
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-brandGold" />
-                  <span className="text-sm">{settings.whatsAppNumber}</span>
-                </div>
-              )}
-              {settings?.businessAddress && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-brandGold mt-0.5 shrink-0" />
-                  <span className="text-sm leading-relaxed">{settings.businessAddress}</span>
-                </div>
-              )}
-              {(!settings?.email && !settings?.whatsAppNumber && !settings?.businessAddress) && (
-                <>
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-brandGold" />
-                    <span className="text-sm">hello@antitarnishjewels.com</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-brandGold" />
-                    <span className="text-sm">+91 98765 43210</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-4 w-4 text-brandGold mt-0.5 shrink-0" />
-                    <span className="text-sm leading-relaxed">Mumbai, India</span>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-brandGold shrink-0" />
+                <span className="text-sm">support@lonajewels.in</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-brandGold shrink-0" />
+                <span className="text-sm">+91 99335 12345</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 text-brandGold mt-0.5 shrink-0" />
+                <span className="text-sm leading-relaxed">BMST Enterprise, 96/H/7 Cossipore Road, Kolkata, West Bengal - 700002</span>
+              </div>
             </AccordionContent>
           </AccordionItem>
 

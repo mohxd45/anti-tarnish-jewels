@@ -13,22 +13,22 @@ const faqs: FAQItemProps[] = [
   {
     category: "Shopping",
     question: "Why should I buy from LONA JEWELS?",
-    answer: "LONA JEWELS offers premium, long-lasting jewellery designed for everyday luxury. Our pieces are crafted with skin-friendly materials, ensuring durability without compromising on elegance."
+    answer: "LONA JEWELS offers trendy, high-quality, and budget-friendly fashion jewellery designed for everyday style. Our pieces are crafted with skin-friendly alloys, giving you a gorgeous look without breaking the bank."
   },
   {
     category: "Shopping",
     question: "What type of jewellery do you sell?",
-    answer: "We specialize in premium rings, earrings, necklaces, and bracelets. Our collections feature luxurious designs in rose gold, champagne gold, and pearl."
+    answer: "We specialize in trendy imitation jewellery, including earrings, rings, necklaces, bracelets, and a wide variety of stylish hair accessories. Our collection features the latest Korean designs and daily-wear fashion pieces."
   },
   {
     category: "Shopping",
     question: "Are your products suitable for daily wear?",
-    answer: "Absolutely. Our pieces are designed to be water-resistant and durable, making them perfect for everyday wear without losing their shine."
+    answer: "Yes, our jewellery is perfect for daily wear! Since these are fashion accessories (not real gold/silver), their shine will last a very long time if kept away from direct water, perfume, sweat, and harsh chemicals. Store them in a dry pouch after use to enjoy their beauty for years."
   },
   {
     category: "Payments",
-    question: "Do you offer Cash on Delivery?",
-    answer: "Yes, Cash on Delivery (COD) is available for most locations. You can select this option during checkout."
+    question: "How does Cash on Delivery (COD) work?",
+    answer: "Yes, we offer Partial COD! To confirm your Cash on Delivery order, a minor advance payment of ₹100 is required online, and you can pay the remaining balance at the time of delivery. This helps us filter genuine buyers and avoid courier rejection."
   },
   {
     category: "Payments",

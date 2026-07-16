@@ -7,9 +7,9 @@ export async function Footer() {
   const settings = await getSiteSettings();
   const content = await getSiteContent("home");
 
-  const brandName = settings?.brandName || "LONA JEWELS";
-  const logoText = settings?.logoText || brandName.charAt(0);
-  const footerText = content?.footerText || "Premium anti-tarnish jewellery crafted for everyday elegance. Stay radiant, always.";
+  const brandName = "LONA JEWELS";
+  const logoText = settings?.logoText || "L";
+  const footerText = "Trendy, budget-friendly fashion jewellery and hair accessories crafted for everyday style.";
 
   return (
     <footer className="bg-[#FFF0F5] px-4 pb-28 md:pb-8 pt-12 md:pt-16 border-t border-[#E8D7C8]/50">
@@ -53,27 +53,21 @@ export async function Footer() {
           ]}/>
           <div>
             <h4 className="mb-4 font-semibold text-brandEspresso">Connect</h4>
-            <ul className="space-y-2 text-sm text-brandMutedText">
-              {settings?.email && <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brandGold" />{settings.email}</li>}
-              {settings?.whatsAppNumber && <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-brandGold" />{settings.whatsAppNumber}</li>}
-              {settings?.businessAddress && <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-brandGold shrink-0" />{settings.businessAddress}</li>}
-              {(!settings?.email && !settings?.whatsAppNumber && !settings?.businessAddress) && (
-                <>
-                  <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brandGold" />hello@antitarnishjewels.com</li>
-                  <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-brandGold" />+91 98765 43210</li>
-                  <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-brandGold shrink-0" />Mumbai, India</li>
-                </>
-              )}
+            <ul className="space-y-3 text-sm text-brandMutedText">
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brandGold shrink-0" />support@lonajewels.in</li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-brandGold shrink-0" />+91 99335 12345</li>
+              <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brandGold mt-0.5 shrink-0" /><span className="leading-relaxed">BMST Enterprise, 96/H/7 Cossipore Road, Kolkata, West Bengal - 700002</span></li>
             </ul>
           </div>
         </div>
 
         {/* Copyright & Links - Shared across mobile and desktop */}
-        <div className="mt-8 md:mt-0 flex flex-col items-center justify-between gap-4 border-t border-[#E8D7C8]/50 pt-6 md:flex-row">
-          <p className="text-sm text-brandMutedText text-center md:text-left">
-            © {new Date().getFullYear()} {brandName.toUpperCase()}. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-sm text-brandMutedText">
+        <div className="mt-8 md:mt-0 flex flex-col items-center justify-between gap-4 border-t border-[#E8D7C8]/50 pt-6 md:flex-row pb-6">
+          <div className="flex flex-col gap-1 text-sm text-brandMutedText text-center md:text-left">
+            <p>© 2026 LONA JEWELS. All rights reserved.</p>
+            <p>LONA JEWELS is owned and operated by BMST Enterprise.</p>
+          </div>
+          <div className="flex gap-4 text-sm text-brandMutedText mb-4 md:mb-0">
             {settings?.deliveryText && <span className="mr-2 border-r border-[#E8D7C8] pr-4 hidden md:inline">{settings.deliveryText}</span>}
             <Link href="/privacy-policy" className="hover:text-brandGoldDeep transition-colors">Privacy</Link>
             <Link href="/return-policy" className="hover:text-brandGoldDeep transition-colors">Returns</Link>

@@ -75,7 +75,7 @@ export default function ReturnPolicyPage() {
           <PolicyAccordionItem title="Return Eligibility">
             <ul className="list-disc list-inside space-y-2">
               <li>Items must be returned in their original, unopened, and unused condition.</li>
-              <li>All original brand packaging, price tags, manuals, and accessories must be intact.</li>
+              <li>The product must be returned in its original packaging.</li>
               <li>We offer a strict 7-day window from the date of delivery to initiate a request.</li>
               <li>A valid proof of purchase (invoice copy or order confirmation) must accompany the return.</li>
             </ul>

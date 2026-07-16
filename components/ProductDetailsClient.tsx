@@ -130,9 +130,12 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
               )}
             </div>
             
-            <p className="mb-6 text-sm leading-relaxed text-[#3A2428]/80">
-              {p.description || "Discover waterproof, sweatproof, and life-proof luxury pieces designed for your everyday elegance."}
-            </p>
+            <div className="mb-6 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-5 shadow-sm">
+              <h4 className="mb-3 font-serif text-lg text-[#3A2428]">Description</h4>
+              <p className="text-sm leading-relaxed text-[#3A2428]/80 whitespace-pre-wrap">
+                {p.description || "Discover waterproof, sweatproof, and life-proof luxury pieces designed for your everyday elegance."}
+              </p>
+            </div>
 
             {p.colorOptions && p.colorOptions.length > 0 && (
               <div className="mb-6">
@@ -193,7 +196,7 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#8F817B]">{p.stock || "In"} stock</span>
             </div>
 
-            <div className="mb-10 flex flex-col gap-3 sm:flex-row pb-4">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row">
               <button 
                 onClick={handleAddToCart}
                 className="w-full flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] px-6 py-4 text-[13px] font-bold tracking-wide uppercase text-white shadow-md shadow-[#B8955E]/20 transition-all hover:opacity-90 active:scale-[0.98]"
@@ -210,21 +213,38 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
               </button>
             </div>
 
-            <div className="rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-5 shadow-sm">
-              <h4 className="mb-3 font-serif text-lg text-[#3A2428]">Care instructions</h4>
-              <ul className="space-y-1.5 text-sm text-[#3A2428]/80">
-                <li className="flex gap-2"><Sparkles className="h-4 w-4 shrink-0 text-[#B8955E] mt-0.5" /> Wipe with a soft dry cloth after use.</li>
-                <li className="flex gap-2"><Sparkles className="h-4 w-4 shrink-0 text-[#B8955E] mt-0.5" /> Avoid direct contact with perfume or lotion.</li>
-                <li className="flex gap-2"><Sparkles className="h-4 w-4 shrink-0 text-[#B8955E] mt-0.5" /> Store in the provided pouch to preserve shine.</li>
-              </ul>
+            <div className="mb-10 flex flex-col gap-3">
+              <div className="flex gap-4 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm items-start">
+                <div className="mt-0.5 rounded-full bg-[#FFF0F5] p-2 text-[#B8955E]">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="mb-1 font-serif text-sm font-semibold text-[#3A2428]">Why LONA JEWELS?</h4>
+                  <p className="text-xs leading-relaxed text-[#3A2428]/80">Get trendy, budget-friendly Korean design jewellery and stylish hair accessories crafted with skin-friendly materials.</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm items-start">
+                <div className="mt-0.5 rounded-full bg-[#FFF0F5] p-2 text-[#B8955E]">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="mb-1 font-serif text-sm font-semibold text-[#3A2428]">COD with ₹100 Refundable Advance</h4>
+                  <p className="text-xs leading-relaxed text-[#3A2428]/80">Cash on Delivery is available! Just pay ₹100 advance online to confirm, and pay the rest at delivery. If you cancel before dispatch, your ₹100 is 100% refunded.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm items-start">
+                <div className="mt-0.5 rounded-full bg-[#FFF0F5] p-2 text-[#B8955E]">
+                  <RotateCcw className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="mb-1 font-serif text-sm font-semibold text-[#3A2428]">7-Day Easy Replacement</h4>
+                  <p className="text-xs leading-relaxed text-[#3A2428]/80">Received something damaged? Don’t worry! Report within 24 hours with a quick, uncut unboxing video for a hassle-free replacement.</p>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-              <MiniTrust icon={<ShieldCheck className="h-5 w-5" />} label="Anti-Tarnish" />
-              <MiniTrust icon={<Truck className="h-5 w-5" />} label="Free ₹999+" />
-              <MiniTrust icon={<RotateCcw className="h-5 w-5" />} label="7-Day Returns" />
-              <MiniTrust icon={<Sparkles className="h-5 w-5" />} label="Hypoallergenic" />
-            </div>
             
             <FAQAccordion product={p} />
           </div>

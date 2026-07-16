@@ -19,8 +19,8 @@ export function Navbar({ settings }: { settings?: any }) {
   
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   
-  const brandName = settings?.brandName || "LONA JEWELS";
-  const logoText = settings?.logoText || brandName.charAt(0);
+  const brandName = "LONA JEWELS";
+  const logoText = settings?.logoText || "L";
   const subtitle = settings?.subtitle || "Jewels";
 
   return (
@@ -40,9 +40,9 @@ export function Navbar({ settings }: { settings?: any }) {
           </div>
 
           {/* Centered Mobile Wordmark */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 sm:hidden">
-             <Link href="/" className="pointer-events-auto flex flex-col items-center justify-center mt-0.5">
-                <h1 className="font-serif text-[15px] leading-tight text-[#3A2428] tracking-[0.08em] font-bold">{brandName}</h1>
+          <div className="absolute left-16 right-16 top-0 bottom-0 flex items-center justify-center pointer-events-none z-0 sm:hidden">
+             <Link href="/" className="pointer-events-auto flex flex-col items-center justify-center mt-0.5 max-w-full px-1">
+                <h1 className="font-serif text-[14px] xs:text-[15px] leading-tight text-[#3A2428] tracking-[0.05em] font-bold truncate">{brandName}</h1>
              </Link>
           </div>
 

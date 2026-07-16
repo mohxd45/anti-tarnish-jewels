@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
-import { Package, ShieldCheck, Truck, ArrowLeft, Plus } from "lucide-react";
+import { Package, ShieldCheck, Truck, ArrowLeft, Plus, Sparkles, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -103,8 +103,11 @@ export function BundleDetailsClient({ product: bundle }: { product: Product }) {
           </div>
 
           {bundle.description && (
-            <div className="mb-8 text-[#3A2428]/80 text-sm leading-relaxed whitespace-pre-wrap">
-              {bundle.description}
+            <div className="mb-8 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-5 shadow-sm">
+              <h4 className="mb-3 font-serif text-lg text-[#3A2428]">Description</h4>
+              <p className="text-sm leading-relaxed text-[#3A2428]/80 whitespace-pre-wrap">
+                {bundle.description}
+              </p>
             </div>
           )}
 
@@ -151,14 +154,35 @@ export function BundleDetailsClient({ product: bundle }: { product: Product }) {
           </button>
 
           {/* Trust badges */}
-          <div className="grid grid-cols-2 gap-3 mt-4 pt-6 border-t border-[#E8D7C8]/50 md:grid-cols-2">
-            <div className="flex flex-col items-center justify-center rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm text-center">
-              <div className="mb-2 flex justify-center text-[#B8955E]"><ShieldCheck className="h-5 w-5" /></div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#3A2428]">100% Authentic</p>
+          <div className="mt-4 pt-6 border-t border-[#E8D7C8]/50 flex flex-col gap-3">
+            <div className="flex gap-4 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm items-start">
+              <div className="mt-0.5 rounded-full bg-[#FFF0F5] p-2 text-[#B8955E]">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="mb-1 font-serif text-sm font-semibold text-[#3A2428]">Why LONA JEWELS?</h4>
+                <p className="text-xs leading-relaxed text-[#3A2428]/80">Get trendy, budget-friendly Korean design jewellery and stylish hair accessories crafted with skin-friendly materials.</p>
+              </div>
             </div>
-            <div className="flex flex-col items-center justify-center rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm text-center">
-              <div className="mb-2 flex justify-center text-[#B8955E]"><Truck className="h-5 w-5" /></div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#3A2428]">Fast Delivery</p>
+            
+            <div className="flex gap-4 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm items-start">
+              <div className="mt-0.5 rounded-full bg-[#FFF0F5] p-2 text-[#B8955E]">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="mb-1 font-serif text-sm font-semibold text-[#3A2428]">COD with ₹100 Refundable Advance</h4>
+                <p className="text-xs leading-relaxed text-[#3A2428]/80">Cash on Delivery is available! Just pay ₹100 advance online to confirm, and pay the rest at delivery. If you cancel before dispatch, your ₹100 is 100% refunded.</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 rounded-2xl bg-[#FFF9FB] border border-[#E8D7C8]/60 p-4 shadow-sm items-start">
+              <div className="mt-0.5 rounded-full bg-[#FFF0F5] p-2 text-[#B8955E]">
+                <RotateCcw className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="mb-1 font-serif text-sm font-semibold text-[#3A2428]">7-Day Easy Replacement</h4>
+                <p className="text-xs leading-relaxed text-[#3A2428]/80">Received something damaged? Don’t worry! Report within 24 hours with a quick, uncut unboxing video for a hassle-free replacement.</p>
+              </div>
             </div>
           </div>
         </div>
