@@ -132,7 +132,7 @@ export default function SettingsPage() {
                       value={settings.subtitle || ""}
                       onChange={(e) => setSettings({ ...settings, subtitle: e.target.value })}
                       className="bg-white border-adminBorder text-adminSidebar focus:ring-1 focus:ring-adminGold rounded-md"
-                      placeholder="e.g. Elegant Anti-Tarnish Jewelry"
+                      placeholder="e.g. Elegant Fashion Jewelry"
                     />
                   </Field>
 

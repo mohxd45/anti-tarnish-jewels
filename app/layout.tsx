@@ -6,12 +6,12 @@ import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://anti-tarnish-jewels-livid.vercel.app/"),
-  title: "LONA JEWELS | Premium Anti-Tarnish Jewellery",
-  description: "Shop premium anti-tarnish jewellery with long-lasting shine, water-resistant finish, and skin-friendly designs.",
+  title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
+  description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "LONA JEWELS | Premium Anti-Tarnish Jewellery",
-    description: "Shop premium anti-tarnish jewellery with long-lasting shine, water-resistant finish, and skin-friendly designs.",
+    title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
+    description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
     url: "https://anti-tarnish-jewels-livid.vercel.app/",
     siteName: "LONA JEWELS",
     images: [

@@ -5,22 +5,7 @@ import { getAnnouncements } from "./firestore";
  * Sanitizes it by keeping only digits and removing spaces, +, -, brackets, etc.
  */
 export async function getWhatsAppNumber(): Promise<string> {
-  let rawNumber = "";
-  try {
-    const announcements = await getAnnouncements();
-    if (announcements && announcements.whatsAppSupport) {
-      rawNumber = announcements.whatsAppSupport;
-    }
-  } catch (err) {
-    console.warn("Failed to fetch WhatsApp number from announcements:", err);
-  }
-  
-  if (!rawNumber || !rawNumber.trim()) {
-    rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918100558024";
-  }
-  
-  // Sanitize: remove spaces, +, -, brackets, keep only digits
-  return rawNumber.replace(/[^0-9]/g, "");
+  return "918100558024";
 }
 
 /**

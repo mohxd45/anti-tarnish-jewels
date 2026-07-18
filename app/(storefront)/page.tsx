@@ -7,8 +7,8 @@ import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 import { CategoryBar } from "@/components/storefront/CategoryBar";
 
 export const metadata = {
-  title: "LONA JEWELS | Premium Anti-Tarnish Jewellery",
-  description: "Shop premium anti-tarnish jewellery with long-lasting shine, water-resistant finish, and skin-friendly designs.",
+  title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
+  description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
 };
 
 export default async function HomePage() {

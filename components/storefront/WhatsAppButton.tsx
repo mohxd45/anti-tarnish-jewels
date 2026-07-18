@@ -8,7 +8,7 @@ export async function WhatsAppButton() {
 
   if (announcements?.showWhatsAppButton === false) return null;
 
-  const phone = announcements?.whatsAppSupport || settings?.whatsAppNumber || "919876543210";
+  const phone = "918100558024";
   const message = announcements?.whatsAppMessage || "";
   
   const href = `https://wa.me/${phone}${message ? `?text=${encodeURIComponent(message)}` : ""}`;

@@ -30,7 +30,7 @@ export function MobileFooterAccordion({
       {/* Top Brand Row */}
       <div className="bg-[#FFF9FB] rounded-2xl border border-brandBorder/30 p-5 shadow-sm text-center">
         <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-transparent shadow-sm overflow-hidden">
-          <img src="/lona-logo.jpg" alt="LONA JEWELS" className="w-full h-full object-contain" />
+          <img src="/lona-monogram.jpg" alt="LONA JEWELS" className="w-full h-full object-contain" />
         </div>
         <h3 className="font-serif text-xl text-brandEspresso mb-1">{brandName}</h3>
         <p className="text-sm text-brandMutedText max-w-[280px] mx-auto">

@@ -15,7 +15,7 @@ export default function WishlistPage() {
         <EmptyStateCard 
           icon={Heart} 
           text="Your Wishlist is Empty" 
-          subtext="Save your favorite anti-tarnish pieces here for later."
+          subtext="Save your favorite pieces here for later."
         >
           <Link href="/shop" className="mt-4 inline-flex items-center justify-center rounded-full bg-[#B8955E] px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-[#A38250] shadow-sm tracking-wide">
             Explore Collection
