@@ -29,8 +29,8 @@ export function MobileFooterAccordion({
     <div className="md:hidden space-y-6">
       {/* Top Brand Row */}
       <div className="bg-[#FFF9FB] rounded-2xl border border-brandBorder/30 p-5 shadow-sm text-center">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brandGoldDeep shadow-md">
-          <span className="font-serif text-xl font-bold text-white">{logoText}</span>
+        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-transparent shadow-sm overflow-hidden">
+          <img src="/lona-logo.jpg" alt="LONA JEWELS" className="w-full h-full object-contain" />
         </div>
         <h3 className="font-serif text-xl text-brandEspresso mb-1">{brandName}</h3>
         <p className="text-sm text-brandMutedText max-w-[280px] mx-auto">
@@ -84,11 +84,11 @@ export function MobileFooterAccordion({
             <AccordionContent className="text-brandMutedText pb-4 space-y-4 pl-2">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-brandGold shrink-0" />
-                <span className="text-sm">support@lonajewels.in</span>
+                <span className="text-sm">Support@lonajewels.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-brandGold shrink-0" />
-                <span className="text-sm">+91 99335 12345</span>
+                <span className="text-sm">+91 8100558024</span>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-brandGold mt-0.5 shrink-0" />

@@ -25,15 +25,11 @@ export async function Footer() {
 
         {/* Desktop Layout */}
         <div className="hidden md:grid mb-12 grid-cols-4 gap-8">
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <div className="gold-trim flex h-10 w-10 items-center justify-center rounded-full">
-                <span className="font-serif text-lg font-bold text-white">{logoText}</span>
-              </div>
-              <div>
-                <h3 className="font-serif text-lg text-brandEspresso">{brandName}</h3>
-                {settings?.subtitle && <p className="-mt-1 text-xs text-brandMutedText">{settings.subtitle}</p>}
-              </div>
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <div className="mb-4">
+              <Link href="/" className="inline-block relative w-32 h-32 md:w-40 md:h-40">
+                <img src="/lona-logo.jpg" alt="LONA JEWELS" className="w-full h-full object-contain" />
+              </Link>
             </div>
             <p className="text-sm text-brandMutedText whitespace-pre-wrap">
               {footerText}
@@ -54,8 +50,8 @@ export async function Footer() {
           <div>
             <h4 className="mb-4 font-semibold text-brandEspresso">Connect</h4>
             <ul className="space-y-3 text-sm text-brandMutedText">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brandGold shrink-0" />support@lonajewels.in</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-brandGold shrink-0" />+91 99335 12345</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brandGold shrink-0" />Support@lonajewels.com</li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-brandGold shrink-0" />+91 8100558024</li>
               <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brandGold mt-0.5 shrink-0" /><span className="leading-relaxed">BMST Enterprise, 96/H/7 Cossipore Road, Kolkata, West Bengal - 700002</span></li>
             </ul>
           </div>

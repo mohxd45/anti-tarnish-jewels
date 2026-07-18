@@ -29,8 +29,8 @@ export function Navbar({ settings }: { settings?: any }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 relative">
           <div className="flex min-w-0 items-center gap-3 relative z-10">
             <Link href="/" className="flex min-w-0 items-center gap-2">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm" style={{ background: "var(--gradient-gold, linear-gradient(135deg, #D4AF37, #B8860B))" }}>
-                <span className="font-serif text-lg font-bold text-white">{logoText}</span>
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-transparent overflow-hidden">
+                <img src="/lona-logo.jpg" alt="LONA JEWELS" className="h-full w-full object-contain" />
               </div>
               <div className="hidden min-w-0 sm:block">
                 <h1 className="truncate font-serif text-lg leading-tight text-stone-900 md:text-xl">{brandName}</h1>
