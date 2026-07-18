@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
   
   const isRestrictedForStaff = staffRestrictedPaths.some(p => pathname.startsWith(p));
-  const roles = isRestrictedForStaff ? ["owner_admin", "partner_admin", "developer_admin"] : undefined;
+  const roles = isRestrictedForStaff ? ["owner", "admin", "owner_admin", "partner_admin", "developer_admin"] : undefined;
 
   return (
     <Protected allowedRoles={roles as any} adminOnly={!roles}>

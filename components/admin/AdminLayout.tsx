@@ -26,7 +26,6 @@ const nav: NavItem[] = [
   { to: "/admin/categories", label: "Categories", icon: FolderTree, adminOnly: true },
   { to: "/admin/orders", label: "Orders Tracking", icon: ShoppingBag },
   { to: "/admin/users", label: "Users & Customers", icon: Users, adminOnly: true },
-  { to: "/admin/staff", label: "Staff Management", icon: Users, adminOnly: true },
   { to: "/admin/coupons", label: "Coupons", icon: Ticket, adminOnly: true },
   { to: "/admin/reviews", label: "Reviews", icon: Star },
   { to: "/admin/messages", label: "Messages", icon: MessageSquare },
