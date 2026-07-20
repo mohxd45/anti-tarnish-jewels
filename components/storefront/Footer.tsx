@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { getSiteSettings, getSiteContent } from "@/lib/firestore";
 import { MobileFooterAccordion } from "./MobileFooterAccordion";
@@ -28,7 +29,7 @@ export async function Footer() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="mb-4">
               <Link href="/" className="inline-block relative w-32 h-32 md:w-40 md:h-40">
-                <img src="/lona-logo.jpg" alt="LONA JEWELS" className="w-full h-full object-contain" />
+                <Image src="/lona-logo.jpg" alt="LONA JEWELS" fill sizes="160px" className="object-contain" />
               </Link>
             </div>
             <p className="text-sm text-brandMutedText whitespace-pre-wrap">

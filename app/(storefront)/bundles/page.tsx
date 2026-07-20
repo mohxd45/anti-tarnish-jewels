@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
+import Image from "next/image";
 
 export default function BundlesPage() {
   const [bundles, setBundles] = useState<Product[]>([]);
@@ -78,10 +79,17 @@ export default function BundlesPage() {
                       </div>
                     )}
                     {bundle.images?.[0] ? (
-                      <img 
+                      <Image 
                         src={bundle.images[0]} 
                         alt={bundle.name} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.srcset = "";
+                          target.src = "/product-stack.jpg";
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

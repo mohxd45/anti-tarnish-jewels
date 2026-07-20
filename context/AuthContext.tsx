@@ -11,6 +11,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
+  getRedirectResult,
   signOut
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -49,17 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const isAdminEmail = !!user?.email && (
-    user.email === ADMIN_EMAIL ||
-    user.email === ADMIN_ENV_EMAIL ||
-    user.email === ADDITIONAL_ADMIN
-  );
-
-  // If user has an admin email but no admin role, override to owner_admin safely in memory
   let userRole = profile?.role || null;
-  if (isAdminEmail && (!userRole || userRole === "customer")) {
-    userRole = "owner_admin";
-  }
 
   const userStatus = profile?.status || "active";
   const isAdmin = !!(userRole && ["admin", "owner", "owner_admin", "partner_admin", "developer_admin", "staff"].includes(userRole));
@@ -84,6 +75,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // REAL FIREBASE MODE
+    // Capture redirect result to ensure OAuth flow completes and errors are caught
+    getRedirectResult(auth).then(async (result) => {
+      if (result?.user) {
+        setUser(result.user);
+        // Profile saving will be handled by onAuthStateChanged
+      }
+    }).catch((err) => {
+      console.error("Firebase getRedirectResult error:", err);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("google_auth_error", err.message || err.code);
+      }
+    });
 
     let unsubscribed = false;
     const unsubscribe = onAuthStateChanged(auth, async (current) => {
@@ -245,7 +248,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await signInWithPopup(auth, googleProvider);
         }
       } catch (err: any) {
+        if (err.code === "auth/popup-closed-by-user") {
+          throw err;
+        }
         console.warn("Google signInWithPopup failed, attempting redirect fallback:", err);
+        // Before redirecting, save a flag so we know we attempted it
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("google_redirect_started", "true");
+        }
         await signInWithRedirect(auth, googleProvider);
       }
     },

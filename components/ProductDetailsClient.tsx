@@ -8,6 +8,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import { getProductReviews, submitProductReview } from "@/lib/firestore";
 import { ProductCard } from "@/components/ProductCard";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Heart, Minus, Plus, ShoppingBag, ShieldCheck, Truck, RotateCcw, Sparkles, Star, UserCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -72,11 +73,13 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
           {/* Gallery */}
           <div className="flex flex-col gap-3">
             <div className="bg-[#FFF9FB] border border-[#E8D7C8]/50 shadow-sm overflow-hidden rounded-[24px] flex items-center justify-center relative aspect-square sm:aspect-[4/5] md:aspect-auto md:h-[480px]">
-              <img
-                src={images[activeImg] || "/product-stack.jpg"}
-                onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }}
+              <OptimizedImage
+                src={images[activeImg]}
                 alt={p.name}
-                className="w-full h-full object-contain mix-blend-multiply p-4"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain mix-blend-multiply p-4"
               />
             </div>
             {images.length > 1 && (
@@ -90,9 +93,9 @@ export function ProductDetailsClient({ product: p, initialSimilar }: { product: 
                   <button
                     key={i}
                     onClick={() => setActiveImg(i)}
-                    className={`h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-2xl bg-[#FFF9FB] transition-all ${i === activeImg ? "ring-2 ring-offset-2 ring-[#B8955E] border-transparent" : "border border-[#E8D7C8] opacity-70 hover:opacity-100"}`}
+                    className={`relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-2xl bg-[#FFF9FB] transition-all ${i === activeImg ? "ring-2 ring-offset-2 ring-[#B8955E] border-transparent" : "border border-[#E8D7C8] opacity-70 hover:opacity-100"}`}
                   >
-                    <img src={src || "/product-stack.jpg"} onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} alt="" className="h-full w-full object-cover mix-blend-multiply p-1" />
+                    <OptimizedImage src={src} fill sizes="80px" alt="" className="object-cover mix-blend-multiply p-1" />
                   </button>
                 ))}
               </div>

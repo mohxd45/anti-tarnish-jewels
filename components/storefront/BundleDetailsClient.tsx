@@ -5,9 +5,11 @@ import { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import { Package, ShieldCheck, Truck, ArrowLeft, Plus, Sparkles, RotateCcw } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
 
 export function BundleDetailsClient({ product: bundle }: { product: Product }) {
   const router = useRouter();
@@ -48,17 +50,21 @@ export function BundleDetailsClient({ product: bundle }: { product: Product }) {
               </div>
             )}
             {bundle.images?.[0] ? (
-              <img 
+              <OptimizedImage 
                 src={bundle.images[0]} 
-                onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }}
                 alt={bundle.name} 
-                className="w-full h-full object-contain mix-blend-multiply" 
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain mix-blend-multiply" 
               />
             ) : (
-              <img 
+              <Image 
                 src="/product-stack.jpg" 
                 alt="Fallback bundle" 
-                className="w-full h-full object-contain mix-blend-multiply" 
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain mix-blend-multiply" 
               />
             )}
           </div>
@@ -119,9 +125,9 @@ export function BundleDetailsClient({ product: bundle }: { product: Product }) {
             <div className="space-y-3 bg-[#FFF9FB] p-4 rounded-2xl border border-[#E8D7C8]/50 shadow-sm">
               {bundle.includedItems?.map((item, idx) => (
                 <div key={`${item.productId}-${idx}`} className="flex items-center gap-4 py-2 border-b border-[#E8D7C8]/40 last:border-0 last:pb-0">
-                  <div className="w-14 h-14 shrink-0 rounded-[12px] overflow-hidden bg-white border border-[#E8D7C8]/50 p-1">
+                  <div className="relative w-14 h-14 shrink-0 rounded-[12px] overflow-hidden bg-white border border-[#E8D7C8]/50 p-1">
                     {item.image ? (
-                      <img src={item.image} onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
+                      <OptimizedImage src={item.image} fill sizes="60px" alt={item.name} className="object-contain mix-blend-multiply" />
                     ) : (
                       <Package className="w-6 h-6 m-auto mt-3 text-[#E8D7C8]" />
                     )}

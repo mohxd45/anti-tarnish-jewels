@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { CartItem } from "@/types";
 import { formatPrice } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 interface CartItemCardProps {
   item: CartItem;
@@ -22,14 +23,12 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
         className="relative h-[76px] w-[76px] flex-shrink-0 overflow-hidden rounded-xl bg-white border border-[#E8D7C8]/50 block"
         onClick={closeDrawer}
       >
-        <img
-          src={product.images[0] || "/product-stack.jpg"}
+        <OptimizedImage
+          src={product.images[0]}
           alt={product.name || "Product image"}
-          className="h-full w-full object-cover"
-          onError={(e) => {
-            (e.target as HTMLImageElement).onerror = null;
-            (e.target as HTMLImageElement).src = "/product-stack.jpg";
-          }}
+          fill
+          sizes="76px"
+          className="object-cover"
         />
       </Link>
       

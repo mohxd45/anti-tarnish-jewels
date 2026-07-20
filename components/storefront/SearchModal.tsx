@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Search, X, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProducts } from "@/lib/firestore";
 import { Product } from "@/types";
+import { HeartLoader } from "@/components/ui/HeartLoader";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -145,11 +148,13 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       onClick={onClose}
                       className="group flex items-center gap-4 rounded-2xl border border-transparent p-2 transition hover:bg-white hover:border-stone-200 hover:shadow-sm"
                     >
-                      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-stone-100">
-                        <img 
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-stone-100">
+                        <OptimizedImage 
                           src={img} 
                           alt={product.name} 
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-110" 
+                          fill
+                          sizes="64px"
+                          className="object-cover transition duration-300 group-hover:scale-110" 
                         />
                       </div>
                       <div className="min-w-0 flex-1">

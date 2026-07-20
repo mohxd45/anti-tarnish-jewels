@@ -1,9 +1,12 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
-import { createOrder, getOptimizedImageUrl } from "@/lib/firestore";
+import { getOptimizedImageUrl } from "@/lib/firestore";
 import { Address } from "@/types";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { formatPrice } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { ShieldCheck, ArrowLeft, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +14,7 @@ import { toast } from "sonner";
 import { SavingsBanner } from "@/components/storefront/SavingsBanner";
 import { CouponSection } from "@/components/storefront/CouponSection";
 import { GiftAddon } from "@/components/storefront/GiftAddon";
+import { auth } from "@/lib/firebase";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -47,22 +51,42 @@ export default function CheckoutPage() {
     
     try {
       setLoading(true);
-      const orderId = await createOrder({
-        userId: user?.uid || "guest",
-        customerEmail: user?.email || "guest@example.com",
-        items: cart.items,
-        address,
-        subtotal: cart.subtotal,
-        total: cart.total,
-        discount: cart.discount,
-        shipping: cart.shipping || 0,
-        paymentMethod: "cod",
-        giftWrapSelected: cart.isGiftWrap,
-        giftWrapPrice: cart.isGiftWrap ? cart.giftWrapPrice : 0,
-        giftMessage: cart.isGiftWrap ? cart.giftMessage : ""
+      
+      let token = "";
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+      }
+
+      const res = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          items: cart.items.map(i => ({
+            productId: i.productId,
+            bundleId: i.bundleId,
+            quantity: i.quantity,
+            selectedSize: i.selectedSize,
+            selectedColor: i.selectedColor,
+            cartItemId: i.cartItemId
+          })),
+          address,
+          giftWrapSelected: cart.isGiftWrap,
+          giftMessage: cart.isGiftWrap ? cart.giftMessage : "",
+          paymentMethod: "cod",
+          couponCode: cart.coupon || ""
+        })
       });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to place order.");
+      }
+
       cart.clearCart();
-      router.push(`/order-success?id=${orderId}`);
+      router.push(`/order-success?id=${data.orderId}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to place order.");
       setLoading(false);
@@ -250,17 +274,15 @@ export default function CheckoutPage() {
                 <div key={it.product.id} className="flex gap-4">
                   <div className="h-[64px] w-[64px] rounded-xl border border-[#E8D7C8] bg-white overflow-hidden shrink-0 flex items-center justify-center">
                     {it.product.images?.[0] ? (
-                      <img 
+                      <OptimizedImage 
                         src={getOptimizedImageUrl(it.product.images[0], 150)} 
                         alt="" 
-                        className="h-full w-full object-cover" 
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).onerror = null;
-                          (e.target as HTMLImageElement).src = "/product-stack.jpg";
-                        }}
+                        fill
+                        sizes="64px"
+                        className="object-cover" 
                       />
                     ) : (
-                      <img src="/product-stack.jpg" alt="Product" className="h-full w-full object-cover opacity-80" />
+                      <OptimizedImage src="/product-stack.jpg" alt="Product" fill sizes="64px" className="object-cover opacity-80" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1 flex flex-col justify-center">

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -14,8 +14,28 @@ export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, signup, loginWithGoogle, user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      if (isAdmin) {
+        router.push("/admin/orders");
+      } else {
+        router.push("/account");
+      }
+    }
+  }, [user, authLoading, isAdmin, router]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const authError = sessionStorage.getItem("google_auth_error");
+      if (authError) {
+        toast.error(`Google Sign-In failed: ${authError}`);
+        sessionStorage.removeItem("google_auth_error");
+      }
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

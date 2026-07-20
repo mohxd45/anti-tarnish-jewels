@@ -1,6 +1,7 @@
 import { getBannerBySlug } from "@/lib/firestore";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Tag } from "lucide-react";
+import Image from "next/image";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -67,10 +68,13 @@ export default async function OfferPage({ params }: { params: Promise<{ slug: st
         {/* Hero Image Section */}
         <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-[2rem] overflow-hidden mb-12 shadow-[var(--shadow-soft)] group">
           <div className="absolute inset-0 bg-[var(--gradient-gold)] p-px rounded-[2rem] z-10 opacity-50" />
-          <img 
+          <Image 
             src={banner.imageUrl} 
             alt={banner.title} 
-            className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover transition-transform duration-[2s] group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
           

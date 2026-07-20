@@ -34,10 +34,8 @@ export default async function HomePage() {
   let heroMainHeading = (content?.heroMainHeading || content?.heroTitle) || "SUMMER SALE";
   let heroSubtitle = content?.heroSubtitle || "Verified quality jewellery for every occasion.";
   let heroCtaText = content?.heroCtaText || "Shop The Collection";
-  let heroCtaLink = content?.heroCtaLink || "/collections";
-  if (heroCtaLink === "/shop" || heroCtaLink === "/collection") {
-    heroCtaLink = "/collections";
-  }
+  // Always point to Collections (Categories) as requested
+  let heroCtaLink = "/collections";
 
   // Force fix spelling error
   heroSmallTitle = heroSmallTitle.replace(/SUMMER SELL/gi, "SUMMER SALE");
@@ -61,7 +59,7 @@ export default async function HomePage() {
           <HomepageFlashSaleBanner settings={announcements} />
         </div>
 
-        <div className="relative z-30 w-full">
+        <div id="categories" className="relative z-30 w-full">
           <CategoryBar />
         </div>
       </div>

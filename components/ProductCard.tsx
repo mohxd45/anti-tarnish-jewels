@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Heart, ShoppingBag } from "lucide-react";
 import { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { toast } from "sonner";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 export function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
@@ -50,15 +52,12 @@ export function ProductCard({ product }: { product: Product }) {
         href={`/product/${product.slug || product.id}`}
         className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-[#FFF0F5]/50 mb-3 block"
       >
-        <img
-          src={product.images?.[0] || (product as any).image || (product as any).imageUrl || "/product-stack.jpg"}
+        <OptimizedImage
+          src={product.images?.[0] || (product as any).image || (product as any).imageUrl}
           alt={product.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-          onError={(e) => {
-            (e.target as HTMLImageElement).onerror = null;
-            (e.target as HTMLImageElement).src = "/product-stack.jpg";
-          }}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover transition duration-700 group-hover:scale-105"
         />
         {badge && (
           <span className={`absolute left-2 top-2 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wide shadow-sm ${badge.cls}`}>
