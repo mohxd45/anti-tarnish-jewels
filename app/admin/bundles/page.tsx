@@ -183,18 +183,22 @@ export default function AdminBundlesPage() {
       updatedAt: new Date().toISOString()
     };
 
+    // Deep sanitize to prevent Firestore crashes from undefined values in nested arrays
+    const cleanPayload = JSON.parse(JSON.stringify(payload));
+
     try {
       if (editingBundle) {
-        await updateProduct(editingBundle.id, payload);
+        await updateProduct(editingBundle.id, cleanPayload);
         toast.success("Bundle updated");
       } else {
-        await addProduct(payload);
+        await addProduct(cleanPayload);
         toast.success("Bundle created");
       }
       setIsModalOpen(false);
       loadData();
-    } catch (err) {
-      toast.error("Failed to save bundle");
+    } catch (err: any) {
+      console.error("Bundle save error:", err);
+      toast.error(`Failed to save bundle: ${err.message || "Unknown error"}`);
     }
   }
 
