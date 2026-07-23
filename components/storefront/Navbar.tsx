@@ -94,16 +94,18 @@ export function Navbar({ settings }: { settings?: any }) {
           </div>
         </div>
 
-        {/* Desktop Category Nav (Pill Style) */}
-        <div className="hidden lg:flex max-w-5xl mx-auto px-8 pb-3 items-center justify-center gap-3 xl:gap-5 border-t border-stone-100 pt-3 overflow-x-auto scrollbar-hide">
-          <NavItemPill href="/shop" label="All Jewellery" />
-          <NavItemPill href="/shop?category=rings" label="Rings" />
-          <NavItemPill href="/shop?category=earrings" label="Earrings" />
-          <NavItemPill href="/shop?category=necklaces" label="Necklaces" />
-          <NavItemPill href="/shop?category=bracelets" label="Bracelets" />
-          <NavItemPill href="/bundles" label="Bundles" />
-          <NavItemPill href="/shop?category=sale" label="Sale" />
-          <NavItemPill href="/track-order" label="Track Order" />
+        {/* Desktop Category Nav (Premium Box Style) */}
+        <div className="hidden lg:flex w-full pb-3 px-8 justify-center">
+          <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 xl:gap-3 bg-gradient-to-r from-[#FFF5F8] to-[#FFF9E6] border border-[#E9C8A1]/40 rounded-xl shadow-[0_2px_12px_rgba(184,149,94,0.06)] px-3 py-2 overflow-x-auto scrollbar-hide">
+            <NavItemPill href="/shop" label="All Jewellery" />
+            <NavItemPill href="/shop?category=rings" label="Rings" />
+            <NavItemPill href="/shop?category=earrings" label="Earrings" />
+            <NavItemPill href="/shop?category=necklaces" label="Necklaces" />
+            <NavItemPill href="/shop?category=bracelets" label="Bracelets" />
+            <NavItemPill href="/bundles" label="Bundles" />
+            <NavItemPill href="/shop?category=sale" label="Sale" />
+            <NavItemPill href="/track-order" label="Track Order" />
+          </div>
         </div>
       </nav>
 
@@ -118,7 +120,7 @@ function NavItemPill({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="px-4 py-1.5 rounded-full text-[13px] font-medium tracking-wide border border-stone-200 text-stone-700 hover:border-[#B8955E] hover:text-[#B8955E] hover:bg-[#FFF9FB] transition-all whitespace-nowrap"
+      className="px-4 py-1.5 rounded-lg text-[13px] font-medium tracking-wide bg-white/80 border border-[#E9C8A1]/50 text-stone-700 hover:bg-white hover:border-[#B8955E] hover:text-[#B8955E] hover:shadow-sm transition-all whitespace-nowrap"
     >
       {label}
     </Link>

@@ -42,7 +42,7 @@ export function HomepageFlashSaleBanner({ settings }: { settings: AnnouncementSe
   }
 
   return (
-    <div className="bg-[#361A28] border-y border-[#E9C8A1]/20 py-2 px-4 md:px-6 shadow-md w-full">
+    <div className="bg-[#361A28] py-2 px-4 md:px-6 w-full relative z-10 border-b border-[#E9C8A1]/10">
       {/* Mobile Layout */}
       <div className="flex md:hidden flex-row items-center justify-center gap-2.5 sm:gap-4">
         {settings?.popupOfferTitle && (
@@ -84,14 +84,12 @@ export function HomepageFlashSaleBanner({ settings }: { settings: AnnouncementSe
               <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded px-1.5 py-0.5 min-w-[36px]"><span className="text-sm font-bold text-[#361A28] leading-tight">{timeLeft.s.toString().padStart(2, "0")}</span><span className="text-[9px] uppercase text-[#361A28] opacity-80 tracking-wider">Sec</span></div>
             </div>
           )}
-          {settings?.popupOfferLinkUrl && (
-            <Link 
-              href={settings.popupOfferLinkUrl} 
-              className="whitespace-nowrap bg-[#F5ECD5] text-[#361A28] px-4 py-1.5 text-xs rounded-full hover:bg-[#F5ECD5]/90 transition-colors font-semibold shadow-sm"
-            >
-              {settings.popupOfferLinkText || "Shop Now"}
-            </Link>
-          )}
+          <Link 
+            href="/collections" 
+            className="whitespace-nowrap bg-gradient-to-r from-[#B8955E] to-[#D4AF37] text-white px-5 py-1.5 text-xs rounded-full hover:shadow-[0_2px_10px_rgba(184,149,94,0.3)] transition-all font-semibold shadow-sm border border-[#D4AF37]/50"
+          >
+            Explore Collections
+          </Link>
         </div>
       </div>
     </div>

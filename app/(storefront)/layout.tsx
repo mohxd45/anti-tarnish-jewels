@@ -20,7 +20,7 @@ export default async function StorefrontLayout({
     <>
       <Navbar settings={settings || {}} />
       <PromoPopup settings={announcements} />
-      <div className="pt-[64px] lg:pt-[116px] flex flex-col w-full min-h-screen">
+      <div className="pt-[64px] lg:pt-[132px] flex flex-col w-full min-h-screen">
         <main className="flex-grow">{children}</main>
         <Footer />
         <WhatsAppButton />
