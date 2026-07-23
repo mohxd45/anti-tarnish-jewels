@@ -42,7 +42,7 @@ export function HomepageFlashSaleBanner({ settings }: { settings: AnnouncementSe
   }
 
   return (
-    <div className="bg-[#361A28] border-y border-[#E9C8A1]/20 py-2.5 md:py-8 px-4 md:px-6 shadow-md w-full">
+    <div className="bg-[#361A28] border-y border-[#E9C8A1]/20 py-2 px-4 md:px-6 shadow-md w-full">
       {/* Mobile Layout */}
       <div className="flex md:hidden flex-row items-center justify-center gap-2.5 sm:gap-4">
         {settings?.popupOfferTitle && (
@@ -62,27 +62,32 @@ export function HomepageFlashSaleBanner({ settings }: { settings: AnnouncementSe
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex max-w-4xl mx-auto flex-col md:flex-row items-center justify-between gap-6">
-        <div className="text-center md:text-left flex-1">
-          {settings?.popupOfferTitle && <h2 className="text-2xl sm:text-3xl font-serif text-[#F5ECD5] mb-2">{settings.popupOfferTitle}</h2>}
-          {settings?.popupOfferText && <p className="text-[#F5ECD5]/80">{settings.popupOfferText}</p>}
+      <div className="hidden md:flex max-w-7xl mx-auto flex-row items-center justify-center gap-6">
+        <div className="text-center md:text-left flex items-center justify-center gap-3">
+          {settings?.popupOfferTitle && <h2 className="text-sm tracking-widest font-semibold text-[#F5ECD5] uppercase">{settings.popupOfferTitle}</h2>}
+          {settings?.popupOfferText && (
+            <>
+              <span className="text-[#F5ECD5]/50">•</span>
+              <p className="text-sm text-[#F5ECD5]/90">{settings.popupOfferText}</p>
+            </>
+          )}
         </div>
         
-        <div className="flex flex-col sm:flex-row items-center gap-6">
+        <div className="flex flex-row items-center gap-4">
           {timeLeft && (
-            <div className="flex items-center gap-2 font-mono">
-              {timeLeft.d > 0 && <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded-lg px-3 py-2 min-w-[60px]"><span className="text-xl font-bold text-[#361A28]">{timeLeft.d}</span><span className="text-[10px] uppercase text-[#361A28] opacity-80 tracking-wider">Days</span></div>}
-              <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded-lg px-3 py-2 min-w-[60px]"><span className="text-xl font-bold text-[#361A28]">{timeLeft.h.toString().padStart(2, "0")}</span><span className="text-[10px] uppercase text-[#361A28] opacity-80 tracking-wider">Hrs</span></div>
-              <div className="text-xl font-bold text-[#F5ECD5] opacity-50">:</div>
-              <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded-lg px-3 py-2 min-w-[60px]"><span className="text-xl font-bold text-[#361A28]">{timeLeft.m.toString().padStart(2, "0")}</span><span className="text-[10px] uppercase text-[#361A28] opacity-80 tracking-wider">Min</span></div>
-              <div className="text-xl font-bold text-[#F5ECD5] opacity-50">:</div>
-              <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded-lg px-3 py-2 min-w-[60px]"><span className="text-xl font-bold text-[#361A28]">{timeLeft.s.toString().padStart(2, "0")}</span><span className="text-[10px] uppercase text-[#361A28] opacity-80 tracking-wider">Sec</span></div>
+            <div className="flex items-center gap-1.5 font-mono">
+              {timeLeft.d > 0 && <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded px-1.5 py-0.5 min-w-[36px]"><span className="text-sm font-bold text-[#361A28] leading-tight">{timeLeft.d}</span><span className="text-[9px] uppercase text-[#361A28] opacity-80 tracking-wider">Days</span></div>}
+              <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded px-1.5 py-0.5 min-w-[36px]"><span className="text-sm font-bold text-[#361A28] leading-tight">{timeLeft.h.toString().padStart(2, "0")}</span><span className="text-[9px] uppercase text-[#361A28] opacity-80 tracking-wider">Hrs</span></div>
+              <div className="text-sm font-bold text-[#F5ECD5] opacity-50">:</div>
+              <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded px-1.5 py-0.5 min-w-[36px]"><span className="text-sm font-bold text-[#361A28] leading-tight">{timeLeft.m.toString().padStart(2, "0")}</span><span className="text-[9px] uppercase text-[#361A28] opacity-80 tracking-wider">Min</span></div>
+              <div className="text-sm font-bold text-[#F5ECD5] opacity-50">:</div>
+              <div className="flex flex-col items-center bg-[#F5ECD5] shadow-sm rounded px-1.5 py-0.5 min-w-[36px]"><span className="text-sm font-bold text-[#361A28] leading-tight">{timeLeft.s.toString().padStart(2, "0")}</span><span className="text-[9px] uppercase text-[#361A28] opacity-80 tracking-wider">Sec</span></div>
             </div>
           )}
           {settings?.popupOfferLinkUrl && (
             <Link 
               href={settings.popupOfferLinkUrl} 
-              className="whitespace-nowrap bg-[#F5ECD5] text-[#361A28] px-8 py-3 rounded-full hover:bg-[#F5ECD5]/90 transition-colors font-medium shadow-md hover:shadow-lg"
+              className="whitespace-nowrap bg-[#F5ECD5] text-[#361A28] px-4 py-1.5 text-xs rounded-full hover:bg-[#F5ECD5]/90 transition-colors font-semibold shadow-sm"
             >
               {settings.popupOfferLinkText || "Shop Now"}
             </Link>

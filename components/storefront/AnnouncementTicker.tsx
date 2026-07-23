@@ -52,7 +52,7 @@ export async function AnnouncementTicker({ className = "" }: { className?: strin
 
   return (
     <div
-      className={`overflow-hidden py-1.5 w-full bg-[#4A3040] ${className}`}
+      className={`overflow-hidden py-1 w-full bg-[#4A3040] ${className}`}
     >
       <div className="ticker-animate flex whitespace-nowrap items-center w-max">
         {tickerItems}

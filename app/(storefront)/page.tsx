@@ -49,7 +49,7 @@ export default async function HomePage() {
         }
       `}</style>
       
-      <div className="-mt-[48px] lg:mt-0 flex flex-col w-full">
+      <div className="flex flex-col w-full">
         <div id="categories" className="block lg:hidden relative z-30 w-full">
           <CategoryBar />
         </div>
