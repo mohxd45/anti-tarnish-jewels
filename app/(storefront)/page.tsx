@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
 import { getProducts, getReviews, getSiteContent, getSiteSettings, getAnnouncements } from "@/lib/firestore";
-import { Truck, RotateCcw, ShieldCheck, Lock } from "lucide-react";
 import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSaleBanner";
 import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 import { CategoryBar } from "@/components/storefront/CategoryBar";
@@ -51,16 +50,16 @@ export default async function HomePage() {
       `}</style>
       
       <div className="-mt-[48px] lg:mt-0 flex flex-col w-full">
-        <div className="block md:hidden relative z-20 w-full overflow-hidden">
-          <AnnouncementTicker className="relative w-full h-[44px]" />
-        </div>
-
-        <div className="block md:hidden relative z-20 w-full">
-          <HomepageFlashSaleBanner settings={announcements} />
-        </div>
-
-        <div id="categories" className="relative z-30 w-full">
+        <div id="categories" className="block lg:hidden relative z-30 w-full">
           <CategoryBar />
+        </div>
+
+        <div className="relative z-20 w-full overflow-hidden">
+          <AnnouncementTicker className="text-xs tracking-wide" />
+        </div>
+
+        <div className="relative z-20 w-full">
+          <HomepageFlashSaleBanner settings={announcements} />
         </div>
       </div>
 
@@ -101,10 +100,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="hidden md:block">
-        <HomepageFlashSaleBanner settings={announcements} />
-      </div>
-
 
 
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full overflow-hidden">
@@ -130,21 +125,6 @@ export default async function HomePage() {
       </section>
 
 
-
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-        <div className="mb-6 md:mb-10 text-center">
-          <h2 className="mb-2 md:mb-3 font-serif text-2xl md:text-4xl text-charcoalBrown">Why Shop With Us?</h2>
-          <p className="mx-auto max-w-2xl text-sm md:text-base text-stoneGray">
-            Enjoy a seamless and secure shopping experience with every order.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-          <Trust icon={<Truck className="h-6 w-6 md:h-8 md:w-8" />} title="Free Delivery" sub="On orders above ₹999" />
-          <Trust icon={<RotateCcw className="h-6 w-6 md:h-8 md:w-8" />} title="7-Day Return" sub="Easy return & exchange" />
-          <Trust icon={<Lock className="h-6 w-6 md:h-8 md:w-8" />} title="Secure Payment" sub="Safe checkout experience" />
-          <Trust icon={<ShieldCheck className="h-6 w-6 md:h-8 md:w-8" />} title="Verified Quality" sub="Quality checked products" />
-        </div>
-      </section>
 
       <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full overflow-hidden">
         <div className="mb-6 md:mb-10 text-center">
@@ -209,13 +189,3 @@ function SectionHeader({ title, subtitle, ctaTo }: { title: string; subtitle: st
   );
 }
 
-
-function Trust({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
-  return (
-    <div className="glass-premium p-3 md:p-6 rounded-2xl flex flex-col items-center border border-white/80 justify-center text-center shadow-sm transition hover:bg-white hover:-translate-y-1 hover:shadow-md h-full bg-[#FAF9F6]">
-      <div className="mb-1 md:mb-4 flex justify-center text-[color:var(--color-gold)]">{icon}</div>
-      <h4 className="text-[12px] sm:text-base font-semibold text-[color:var(--color-espresso)] uppercase tracking-wider leading-tight">{title}</h4>
-      <p className="mt-0.5 md:mt-2 text-[10px] md:text-sm text-[color:var(--color-muted-text)] leading-tight">{sub}</p>
-    </div>
-  );
-}

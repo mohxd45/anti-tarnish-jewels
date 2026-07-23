@@ -3,7 +3,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function getRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : null;
     }
     
     function isAdmin() {
@@ -20,149 +22,166 @@ service cloud.firestore {
     }
 
     function isAnyAdminOrStaff() {
-      return isAdmin() || isStaff();
+      return request.auth != null && (isAdmin() || isStaff());
     }
 
-    function hasValidInvite() {
-      let email = request.auth.token.email.lower();
-      return exists(/databases/$(database)/documents/staffInvites/$(email));
-    }
-
-    function getInviteRole() {
-      let email = request.auth.token.email.lower();
-      return get(/databases/$(database)/documents/staffInvites/$(email)).data.role;
-    }
-
-    // Products — anyone can read, admin & staff can write
+    // Products
     match /products/{productId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAnyAdminOrStaff();
+      allow read: if true; 
+      allow create, update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
     }
 
-    // Orders — customers can read their own, admin & staff can read/write all
+    // Bundles
+    match /bundles/{bundleId} {
+      allow read: if true;
+      allow create, update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Orders
     match /orders/{orderId} {
-      allow create: if false; // Creation moved to server API
+      allow create: if false; 
       allow read: if request.auth != null && 
         (resource.data.userId == request.auth.uid || isAnyAdminOrStaff());
-      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+      allow update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+
+    match /returnRequests/{docId} {
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAnyAdminOrStaff());
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && !('approved' in request.resource.data)
+        && !('rejected' in request.resource.data)
+        && !('refunded' in request.resource.data)
+        && !('adminNotes' in request.resource.data)
+        && !('refundAmount' in request.resource.data);
+      allow update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
     }
 
     match /publicTrackingOrders/{docId} {
       allow get: if true;
       allow list: if false;
-      allow create: if false; // Creation moved to server API
-      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+      allow create: if false; 
+      allow update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
     }
 
     match /orderLookups/{docId} {
       allow get: if true;
       allow list: if false;
-      allow create: if false; // Creation moved to server API
-      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+      allow create: if false;
+      allow update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
     }
 
-    // Users — users can read their own, admin can read/write all. 
+    match /trackingMappings/{docId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if false;
+      allow update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Users
     match /users/{userId} {
-      allow read: if request.auth != null && (userId == request.auth.uid || isAdmin());
+      allow read: if request.auth != null && (request.auth.uid == userId || isAnyAdminOrStaff());
       
-      allow create: if request.auth != null && userId == request.auth.uid && (
-        !request.resource.data.keys().hasAny(['permissions', 'isAdmin', 'admin', 'claims']) &&
-        (
-          !request.resource.data.keys().hasAny(['role']) ||
-          request.resource.data.role == 'customer' ||
-          (hasValidInvite() && request.resource.data.role == getInviteRole())
-        ) &&
-        (
-          !request.resource.data.keys().hasAny(['status']) ||
-          request.resource.data.status == 'active'
-        )
-      );
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && (!("uid" in request.resource.data) || request.resource.data.uid == request.auth.uid)
+        && (!("email" in request.resource.data) || request.resource.data.email == request.auth.token.email)
+        && request.resource.data.keys().hasOnly([
+          "uid", "email", "name", "displayName", "role", "status", "dateJoined", "createdAt", 
+          "lastLoginAt", "updatedAt", "provider", "loginMethod", "photoURL", 
+          "phone", "phoneCountryCode", "phoneNumber", "phoneE164", "phoneClean", 
+          "address", "addresses", "city", "state", "pincode"
+        ])
+        && (!("role" in request.resource.data) || request.resource.data.role == "customer")
+        && (!("status" in request.resource.data) || request.resource.data.status == "active");
 
       allow update: if request.auth != null && (
-        isAdmin() || 
         (
-          userId == request.auth.uid && 
-          (
-            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['permissions', 'isAdmin', 'admin', 'claims', 'status']) &&
-            (
-              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) ||
-              (hasValidInvite() && request.resource.data.role == getInviteRole())
-            )
-          )
+          request.auth.uid == userId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            "name", "displayName", "phone", "phoneCountryCode", "phoneNumber", 
+            "phoneE164", "phoneClean", "photoURL", "address", "addresses", 
+            "city", "state", "pincode", "updatedAt", "lastLoginAt"
+          ])
         )
+        || isAdmin()
       );
-
-      allow delete: if request.auth != null && isAdmin();
-    }
-
-    // Staff Invites - only admins can write, user can read their own
-    match /staffInvites/{email} {
-      allow read: if request.auth != null && (isAdmin() || request.auth.token.email.lower() == email);
-      allow write: if request.auth != null && isAdmin();
-      // Allow users to delete their own invite once claimed
-      allow delete: if request.auth != null && (isAdmin() || request.auth.token.email.lower() == email);
-    }
-
-    // Audit Logs
-    match /auditLogs/{logId} {
-      allow read: if request.auth != null && isAdmin();
-      // Append only: user can only log for themselves, no updating/deleting except dev admin
-      allow create: if request.auth != null && isAnyAdminOrStaff() && request.resource.data.actorUid == request.auth.uid;
-      allow update: if false; // Strict append-only
-      allow delete: if request.auth != null && isDevAdmin();
-    }
-
-    // Settings — public read, admin write (NO STAFF)
-    match /siteSettings/{document} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /banners/{bannerId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /homepageSections/{sectionId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /siteContent/{contentId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /coupons/{couponId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /announcements/{announcementId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-    match /announcementsList/{announcementId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
-    }
-
-    // Messages - admin and staff
-    match /contactMessages/{messageId} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null && isAnyAdminOrStaff();
-    }
-
-    // Newsletters
-    match /newsletterSubscribers/{subId} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null && isAnyAdminOrStaff();
+      
+      allow delete: if isAdmin();
     }
     
-    // Reviews
-    match /reviews/{reviewId} {
+    // Categories
+    match /categories/{categoryId} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+      allow create, update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+    
+    // Banners
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow create, update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+    
+    // Coupons 
+    match /coupons/{couponId} {
+      allow read, create, update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+    
+    // Site configuration and UI settings (Public Read)
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isAnyAdminOrStaff();
+    }
+    match /siteContent/{docId} {
+      allow read: if true;
+      allow write: if isAnyAdminOrStaff();
+    }
+    match /homepageSections/{docId} {
+      allow read: if true;
+      allow write: if isAnyAdminOrStaff();
+    }
+    match /seoSettings/{docId} {
+      allow read: if true;
+      allow write: if isAnyAdminOrStaff();
+    }
+    match /announcements/{docId} {
+      allow read: if true;
+      allow write: if isAnyAdminOrStaff();
+    }
+    match /announcementsList/{docId} {
+      allow read: if true;
+      allow write: if isAnyAdminOrStaff();
+    }
+
+    match /reviews/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAnyAdminOrStaff();
+    }
+
+    match /contactMessages/{docId} {
+      allow create: if false; 
+      allow read, update, delete: if isAnyAdminOrStaff();
+    }
+
+    match /auditLogs/{docId} {
+      allow read: if isAdmin();
+      allow create: if isAnyAdminOrStaff();
+      allow update, delete: if isDevAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if request.auth != null && isDevAdmin();
     }
   }
 }

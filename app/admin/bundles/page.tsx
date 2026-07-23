@@ -143,6 +143,7 @@ export default function AdminBundlesPage() {
         selectedColor: p.colorOptions?.[0] || "",
       }
     ]);
+    setProdSearchTerm("");
   }
 
   function updateIncludedItem(idx: number, field: string, value: any) {
@@ -156,7 +157,7 @@ export default function AdminBundlesPage() {
   }
 
   async function handleSave() {
-    if (!name.trim() || !sku.trim() || !image.trim() || bundlePrice <= 0 || includedItems.length === 0) {
+    if (!name.trim() || !sku.trim() || !image.trim() || bundlePrice < 0 || includedItems.length === 0) {
       toast.error("Please fill all required fields and add at least one product.");
       return;
     }
@@ -288,17 +289,19 @@ export default function AdminBundlesPage() {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl text-adminGold font-serif">
-              {editingBundle ? "Edit Bundle" : "Create Bundle"}
-            </DialogTitle>
-            <DialogDescription>
-              Configure combo details and preselect required sizes/colors.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col p-0 bg-white text-adminSidebar shadow-xl rounded-2xl border border-adminBorder overflow-hidden">
+          <div className="p-6 pb-4 border-b border-adminBorder shrink-0 bg-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-adminGold font-serif">
+                {editingBundle ? "Edit Bundle" : "Create Bundle"}
+              </DialogTitle>
+              <DialogDescription>
+                Configure combo details and preselect required sizes/colors.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <div className="space-y-6 py-4">
+          <div className="space-y-6 p-6 overflow-y-auto flex-1 bg-white">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Bundle Name *</label>
@@ -340,7 +343,7 @@ export default function AdminBundlesPage() {
 
             <div className="space-y-4 border border-adminBorder p-5 rounded-2xl bg-stone-50/50">
               <h3 className="font-semibold text-adminGold text-sm">Included Products *</h3>
-              <div className="relative">
+              <div className="relative z-50">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-adminMuted" />
                 <Input 
                   placeholder="Search products to add..." 
@@ -349,17 +352,20 @@ export default function AdminBundlesPage() {
                   className="pl-9 bg-white rounded-xl"
                 />
                 {prodSearchTerm && searchedProducts.length > 0 && (
-                  <div className="absolute z-10 top-full mt-1 w-full bg-white border border-adminBorder rounded-xl shadow-lg p-2 space-y-1">
-                    {searchedProducts.map(p => (
-                      <div key={p.id} className="flex items-center justify-between p-2 hover:bg-adminBg rounded-lg cursor-pointer" onClick={() => handleAddProduct(p)}>
-                        <div className="flex items-center gap-3">
-                          {p.images?.[0] && <img src={p.images[0]} className="w-8 h-8 rounded object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />}
-                          <span className="text-sm font-medium">{p.name} <span className="text-xs text-adminMuted font-normal">({p.sku})</span></span>
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setProdSearchTerm("")} />
+                    <div className="absolute z-50 top-full mt-1 w-full bg-white border border-adminBorder rounded-xl shadow-lg p-2 space-y-1 max-h-[220px] overflow-y-auto">
+                      {searchedProducts.map(p => (
+                        <div key={p.id} className="flex items-center justify-between p-2 hover:bg-adminBg rounded-lg cursor-pointer transition-colors" onClick={() => handleAddProduct(p)}>
+                          <div className="flex items-center gap-3">
+                            {p.images?.[0] && <img src={p.images[0]} className="w-8 h-8 rounded object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />}
+                            <span className="text-sm font-medium">{p.name} <span className="text-xs text-adminMuted font-normal">({p.sku})</span></span>
+                          </div>
+                          <Plus className="w-4 h-4 text-adminGold" />
                         </div>
-                        <Plus className="w-4 h-4 text-adminGold" />
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -433,10 +439,10 @@ export default function AdminBundlesPage() {
             </div>
           </div>
           
-          <DialogFooter>
+          <div className="p-4 border-t border-adminBorder bg-stone-50 shrink-0 flex justify-end gap-3 rounded-b-2xl">
             <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
             <Button onClick={handleSave} className="bg-adminGold hover:bg-adminGold/90 text-white rounded-xl">Save Bundle</Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

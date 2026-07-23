@@ -47,21 +47,7 @@ export function Navbar({ settings }: { settings?: any }) {
              </Link>
           </div>
 
-          <div className="hidden items-center gap-6 lg:flex">
-            <NavItem href="/shop">All Jewellery</NavItem>
-            <NavItem href="/shop?category=rings">Rings</NavItem>
-            <NavItem href="/shop?category=earrings">Earrings</NavItem>
-            <NavItem href="/shop?category=necklaces">Necklaces</NavItem>
-            <NavItem href="/shop?category=bracelets">Bracelets</NavItem>
-            <NavItem href="/bundles">Bundles</NavItem>
-            <Link
-              href="/shop?category=sale"
-              className="text-sm font-semibold text-stoneGray transition hover:text-[#3A2428]"
-            >
-              Sale
-            </Link>
-            <NavItem href="/track-order">Track Order</NavItem>
-          </div>
+
 
           <div className="flex items-center gap-1">
             <button
@@ -107,6 +93,18 @@ export function Navbar({ settings }: { settings?: any }) {
             </button>
           </div>
         </div>
+
+        {/* Desktop Category Nav (Pill Style) */}
+        <div className="hidden lg:flex max-w-5xl mx-auto px-8 pb-3 items-center justify-center gap-3 xl:gap-5 border-t border-stone-100 pt-3 overflow-x-auto scrollbar-hide">
+          <NavItemPill href="/shop" label="All Jewellery" />
+          <NavItemPill href="/shop?category=rings" label="Rings" />
+          <NavItemPill href="/shop?category=earrings" label="Earrings" />
+          <NavItemPill href="/shop?category=necklaces" label="Necklaces" />
+          <NavItemPill href="/shop?category=bracelets" label="Bracelets" />
+          <NavItemPill href="/bundles" label="Bundles" />
+          <NavItemPill href="/shop?category=sale" label="Sale" />
+          <NavItemPill href="/track-order" label="Track Order" />
+        </div>
       </nav>
 
       <MobileNav open={open} onClose={() => setOpen(false)} openDrawer={openDrawer} />
@@ -116,13 +114,13 @@ export function Navbar({ settings }: { settings?: any }) {
   );
 }
 
-function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
+function NavItemPill({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-sm font-medium text-stone-900 transition hover:text-stoneGray"
+      className="px-4 py-1.5 rounded-full text-[13px] font-medium tracking-wide border border-stone-200 text-stone-700 hover:border-[#B8955E] hover:text-[#B8955E] hover:bg-[#FFF9FB] transition-all whitespace-nowrap"
     >
-      {children}
+      {label}
     </Link>
   );
 }

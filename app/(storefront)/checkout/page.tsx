@@ -99,6 +99,7 @@ export default function CheckoutPage() {
     <>
       <style>{`
         .whatsapp-button { display: none !important; }
+        .mobile-bottom-nav { display: none !important; }
       `}</style>
       
       <div className="mx-auto max-w-6xl xl:max-w-[1100px] px-4 pt-28 md:pt-32">
@@ -195,16 +196,16 @@ export default function CheckoutPage() {
           </Section>
 
           <Section title="Payment method">
-            <label className={`flex items-start gap-3 p-4 border border-[#E8D7C8] rounded-2xl bg-white cursor-pointer transition-colors ${settings?.codEnabled !== false ? 'hover:border-[#B8955E]' : 'opacity-60 cursor-not-allowed'}`}>
-              <input type="radio" name="pm" defaultChecked className="mt-1 accent-[#B8955E] h-4 w-4" disabled={settings?.codEnabled === false} /> 
+            <label className={`flex items-start gap-3 p-4 border border-[#E8D7C8] rounded-2xl transition-colors ${settings?.codEnabled !== false && cart.total > 300 ? 'bg-white cursor-pointer hover:border-[#B8955E]' : 'bg-stone-50 cursor-not-allowed opacity-60'}`}>
+              <input type="radio" name="pm" defaultChecked={cart.total > 300} disabled={settings?.codEnabled === false || cart.total <= 300} className="mt-1 accent-[#B8955E] h-4 w-4" /> 
               <div className="flex flex-col w-full">
-                <span className={`text-base font-medium ${settings?.codEnabled === false ? 'text-stone-400' : 'text-[#3A2428]'}`}>
+                <span className={`text-base font-medium ${(settings?.codEnabled === false || cart.total <= 300) ? 'text-stone-400' : 'text-[#3A2428]'}`}>
                   Cash on Delivery
                   {settings?.codEnabled === false && " (Disabled)"}
                 </span>
                 
                 {settings?.codEnabled !== false && cart.total <= 300 && (
-                  <span className="text-sm text-[#8F817B] mt-0.5">Cash on Delivery available. Pay full amount when delivered.</span>
+                  <span className="text-sm text-red-500 mt-0.5 font-medium">Minimum order value for COD is ₹301. Please add more items to your cart.</span>
                 )}
               </div>
             </label>
@@ -272,7 +273,7 @@ export default function CheckoutPage() {
             <div className="space-y-4 max-h-[40vh] overflow-y-auto no-scrollbar pr-1 mb-5">
               {cart.items.map((it) => (
                 <div key={it.product.id} className="flex gap-4">
-                  <div className="h-[64px] w-[64px] rounded-xl border border-[#E8D7C8] bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="relative h-[64px] w-[64px] rounded-xl border border-[#E8D7C8] bg-white overflow-hidden shrink-0 flex items-center justify-center">
                     {it.product.images?.[0] ? (
                       <OptimizedImage 
                         src={getOptimizedImageUrl(it.product.images[0], 150)} 
@@ -357,7 +358,7 @@ export default function CheckoutPage() {
           </aside>
 
           {/* Sticky Place Order Bar */}
-          <div className="fixed bottom-[60px] md:bottom-0 left-0 right-0 z-[100] bg-[#FFF9FB] border-t border-[#E8D7C8] px-4 py-3 shadow-[0_-6px_20px_rgba(58,36,40,0.06)] lg:static lg:bottom-auto lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:mt-0">
+          <div className="fixed bottom-0 left-0 right-0 z-[100] bg-[#FFF9FB] border-t border-[#E8D7C8] px-4 py-3 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(58,36,40,0.06)] lg:static lg:bottom-auto lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:pb-0 lg:mt-0">
             <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
               <div className="flex flex-col lg:hidden">
                 <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8F817B]">Total</span>
@@ -366,10 +367,10 @@ export default function CheckoutPage() {
               <button 
                 type="submit" 
                 form="checkout-form" 
-                disabled={loading || settings?.codEnabled === false} 
+                disabled={loading || settings?.codEnabled === false || cart.total <= 300} 
                 className="w-[60%] lg:w-full bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] hover:from-[#A08050] hover:to-[#C6AE8B] text-white font-semibold py-3.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {loading ? "Processing..." : (cart.total > 300 ? "Place Order — Pending Advance" : "Place COD Order")}
+                {loading ? "Processing..." : (cart.total > 300 ? "Place Order (₹100 Advance)" : "Minimum ₹301 Required")}
               </button>
             </div>
           </div>

@@ -1633,13 +1633,15 @@ export async function uploadImage(file: File, folderName: string = "product-imag
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-  // Validate file type and size before any upload attempt
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Invalid file type. Only images are allowed.");
+  // Validate file type strictly
+  const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!allowedMimeTypes.includes(file.type)) {
+    throw new Error("Please upload JPG, PNG, or WebP image under 10MB.");
   }
-  const MAX_SIZE_MB = 5;
+  
+  const MAX_SIZE_MB = 10;
   if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-    throw new Error(`File size exceeds ${MAX_SIZE_MB}MB limit.`);
+    throw new Error(`Please upload JPG, PNG, or WebP image under 10MB.`);
   }
 
   // Cloudinary fallback if configured
@@ -1673,7 +1675,8 @@ export async function uploadImage(file: File, folderName: string = "product-imag
 
   try {
     // Sanitize filename
-    const safeFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const originalName = file.name || "image.jpg";
+    const safeFileName = originalName.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const tempId = Date.now().toString();
     
     // Upload to specified folder

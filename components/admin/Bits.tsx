@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { AdminBadge } from "./AdminBadge";
 
 export function StatusBadge({ status }: { status: string }) {
-  const normalized = status.toLowerCase().replace(" ", "-");
+  const normalized = (status || "").toLowerCase().replace(" ", "-");
   
   // Try to map known statuses to our AdminBadge variants
   const validVariants = ["active", "inactive", "pending", "processing", "shipped", "delivered", "cancelled", "low-stock", "featured", "bestseller", "paid", "cod"];

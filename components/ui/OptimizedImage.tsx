@@ -14,10 +14,14 @@ export function OptimizedImage({
   alt = "Image",
   ...props 
 }: OptimizedImageProps) {
-  const [imgSrc, setImgSrc] = useState<string>(src || fallbackSrc);
+  const getValidSrc = (val: string | null | undefined) => {
+    return (val && val.trim() !== "") ? val : fallbackSrc;
+  };
+  
+  const [imgSrc, setImgSrc] = useState<string>(getValidSrc(src));
 
   useEffect(() => {
-    setImgSrc(src || fallbackSrc);
+    setImgSrc(getValidSrc(src));
   }, [src, fallbackSrc]);
 
   return (

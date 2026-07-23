@@ -23,7 +23,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#FFF9FB] border-t border-[#E8D7C8] shadow-[0_-6px_20px_rgba(58,36,40,0.08)] pb-[env(safe-area-inset-bottom)] md:hidden">
+    <nav className="mobile-bottom-nav fixed bottom-0 left-0 right-0 z-50 bg-[#FFF9FB] border-t border-[#E8D7C8] shadow-[0_-6px_20px_rgba(58,36,40,0.08)] pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="flex items-center justify-around h-[72px] px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));

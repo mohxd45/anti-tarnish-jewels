@@ -2,64 +2,41 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     function getRole() {
-      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+      return request.auth != null && firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
+        ? firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role
+        : null;
     }
-
     function isAdmin() {
-      return request.auth != null && 
-        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
-        getRole() in ['owner', 'admin', 'owner_admin', 'partner_admin', 'developer_admin'];
+      let role = getRole();
+      return role in ['owner', 'admin', 'owner_admin', 'partner_admin', 'developer_admin'];
     }
-
     function isStaff() {
-      return request.auth != null && 
-        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
-        getRole() == 'staff';
+      return getRole() == 'staff';
     }
-
     function isAnyAdminOrStaff() {
-      return isAdmin() || isStaff();
+      return request.auth != null && (isAdmin() || isStaff());
     }
 
-    // Helper to check if file is a valid image under 5MB
-    function isValidImage() {
-      return request.resource.size < 5 * 1024 * 1024 && request.resource.contentType.matches('image/.*');
+    // Secure Uploads for Images
+    match /{folder}/{allPaths=**} {
+      // Allow exact GET for public images. BLOCK public LIST.
+      allow get: if folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories'];
+      allow list: if isAnyAdminOrStaff();
+      
+      // Update/Create strictly validates MIME type and file size
+      allow create, update: if isAnyAdminOrStaff()
+        && folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories']
+        && request.resource.contentType.matches('^image/(jpeg|png|webp)$')
+        && request.resource.size < 10 * 1024 * 1024;
+        
+      // Delete does not have a request.resource payload, so we only check the folder access
+      allow delete: if isAnyAdminOrStaff()
+        && folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories'];
     }
-
-    // Public reads allowed for all files by default
+    
+    // Block all other root level or random folder access
     match /{allPaths=**} {
-      allow read: if true;
-      allow write: if false; // explicit fallback deny
-    }
-
-    // Product Images upload rule
-    match /product-images/{allPaths=**} {
-      allow write: if isAnyAdminOrStaff() && isValidImage();
-    }
-
-    // Bundle Images upload rule
-    match /bundles/{allPaths=**} {
-      allow write: if isAnyAdminOrStaff() && isValidImage();
-    }
-
-    // Banner Images upload rule
-    match /banner-images/{allPaths=**} {
-      allow write: if isAdmin() && isValidImage();
-    }
-
-    // Images upload rule (fallback for legacy or other uses)
-    match /images/{imageName} {
-      allow write: if isAdmin() && isValidImage();
-    }
-
-    // Admin assets folder
-    match /admin/{allPaths=**} {
-      allow write: if isAdmin();
-    }
-
-    // Users personal uploads (e.g. reviews or profiles)
-    match /users/{userId}/{allPaths=**} {
-      allow write: if request.auth != null && request.auth.uid == userId && isValidImage();
+      allow read, write: if false;
     }
   }
 }

@@ -1,9 +1,21 @@
 import { NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { createOrderSchema } from "@/lib/validation/order";
+import { orderRateLimit, checkRateLimit } from "@/lib/rateLimit";
+import { z } from "zod";
 
 export async function POST(req: Request) {
   try {
+    // 1. Rate Limiting
+    // Use IP as identifier
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown-ip";
+    const rateLimitResult = await checkRateLimit(orderRateLimit, `order_${ip}`);
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
     if (!adminAuth || !adminDb) {
       return NextResponse.json({ error: "Server misconfiguration. Admin SDK not initialized." }, { status: 500 });
     }
@@ -33,16 +45,11 @@ export async function POST(req: Request) {
       }
     }
 
-    const body = await req.json();
+    const rawBody = await req.json();
+    
+    // Validate with Zod
+    const body = createOrderSchema.parse(rawBody);
     const { items, address, giftWrapSelected, giftMessage, couponCode, paymentMethod, notes } = body;
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
-    }
-
-    if (!address || !address.fullName || !address.phone || !address.line1 || !address.city || !address.pincode) {
-      return NextResponse.json({ error: "Incomplete shipping address" }, { status: 400 });
-    }
 
     let subtotal = 0;
     const finalItems = [];
@@ -193,6 +200,10 @@ export async function POST(req: Request) {
       displayPaymentMethod = "Cash on Delivery";
     }
 
+    if (displayPaymentMethod === "Cash on Delivery" && total <= 300) {
+      return NextResponse.json({ error: "Minimum order value for Cash on Delivery is ₹301." }, { status: 400 });
+    }
+
     let initialStatus = "Pending";
     let initialDesc = "Your order has been placed successfully.";
     let advanceRequired = false;
@@ -337,6 +348,9 @@ export async function POST(req: Request) {
 
   } catch (err: any) {
     console.error("Order creation API error:", err);
-    return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: "Invalid request. Please check your details.", issues: err.errors }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Unable to place order right now. Please contact support." }, { status: 500 });
   }
 }

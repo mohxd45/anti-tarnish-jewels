@@ -2,7 +2,7 @@ import { getAnnouncementsList, getAnnouncements } from "@/lib/firestore";
 import Link from "next/link";
 import { FlashSaleCountdown } from "./FlashSaleCountdown";
 
-export async function AnnouncementTicker({ className = "fixed left-0 right-0 top-16 z-40 global-announcement-ticker" }: { className?: string }) {
+export async function AnnouncementTicker({ className = "" }: { className?: string }) {
   const globalSettings = await getAnnouncements();
   
   if (!globalSettings || !globalSettings.showAnnouncement) {
@@ -52,13 +52,9 @@ export async function AnnouncementTicker({ className = "fixed left-0 right-0 top
 
   return (
     <div
-      className={`overflow-hidden py-2 ${className} ${
-    globalSettings.cardStyle === 'rounded' ? 'm-2 rounded-full shadow-md' : 
-    globalSettings.cardStyle === 'glass' ? 'bg-opacity-70 backdrop-blur-md' : ''
-  }`}
-      style={{ background: "linear-gradient(90deg, #4A3040, #6B4060, #4A3040)" }}
+      className={`overflow-hidden py-1.5 w-full bg-[#4A3040] ${className}`}
     >
-      <div className="ticker-animate flex whitespace-nowrap">
+      <div className="ticker-animate flex whitespace-nowrap items-center w-max">
         {tickerItems}
       </div>
     </div>

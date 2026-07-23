@@ -19,11 +19,12 @@ export default async function StorefrontLayout({
   return (
     <>
       <Navbar settings={settings || {}} />
-      <AnnouncementTicker />
       <PromoPopup settings={announcements} />
-      <main className="pb-24 pt-28">{children}</main>
-      <Footer />
-      <WhatsAppButton />
+      <div className="pt-[64px] lg:pt-[116px] flex flex-col w-full min-h-screen">
+        <main className="flex-grow">{children}</main>
+        <Footer />
+        <WhatsAppButton />
+      </div>
       <MobileBottomNav />
     </>
   );

@@ -196,7 +196,7 @@ export default function AccountOrdersPage() {
                           {order.items.map((item) => (
                             <div key={item.product.id} className="pt-2 first:pt-0 flex items-center justify-between text-sm">
                               <div className="flex items-center gap-3">
-                                {item.product.images?.[0] && (
+                                {item.product.images?.[0]?.trim() && (
                                   <div className="relative w-10 h-10 rounded overflow-hidden border border-stone-200/30">
                                     <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                                   </div>

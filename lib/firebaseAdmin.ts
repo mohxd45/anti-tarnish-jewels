@@ -1,13 +1,15 @@
 import "server-only";
-import * as admin from "firebase-admin";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
-if (!admin.apps.length) {
+if (!getApps().length) {
   try {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
       // EASIEST METHOD: Parse the entire JSON string if provided
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+      initializeApp({
+        credential: cert(serviceAccount),
       });
       console.log("Firebase Admin SDK initialized successfully via JSON.");
     } else {
@@ -22,8 +24,8 @@ if (!admin.apps.length) {
       }
 
       if (projectId && clientEmail && privateKey) {
-        admin.initializeApp({
-          credential: admin.credential.cert({
+        initializeApp({
+          credential: cert({
             projectId,
             clientEmail,
             privateKey,
@@ -39,5 +41,5 @@ if (!admin.apps.length) {
   }
 }
 
-export const adminAuth = admin.apps.length ? admin.auth() : null;
-export const adminDb = admin.apps.length ? admin.firestore() : null;
+export const adminAuth = getApps().length ? getAuth() : null;
+export const adminDb = getApps().length ? getFirestore() : null;

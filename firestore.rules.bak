@@ -1,0 +1,168 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      let role = getRole();
+      return role in ['owner', 'admin', 'owner_admin', 'partner_admin', 'developer_admin'];
+    }
+
+    function isDevAdmin() {
+      return getRole() == 'developer_admin';
+    }
+
+    function isStaff() {
+      return getRole() == 'staff';
+    }
+
+    function isAnyAdminOrStaff() {
+      return isAdmin() || isStaff();
+    }
+
+    function hasValidInvite() {
+      let email = request.auth.token.email.lower();
+      return exists(/databases/$(database)/documents/staffInvites/$(email));
+    }
+
+    function getInviteRole() {
+      let email = request.auth.token.email.lower();
+      return get(/databases/$(database)/documents/staffInvites/$(email)).data.role;
+    }
+
+    // Products — anyone can read, admin & staff can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAnyAdminOrStaff();
+    }
+
+    // Orders — customers can read their own, admin & staff can read/write all
+    match /orders/{orderId} {
+      allow create: if false; // Creation moved to server API
+      allow read: if request.auth != null && 
+        (resource.data.userId == request.auth.uid || isAnyAdminOrStaff());
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+
+    match /publicTrackingOrders/{docId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if false; // Creation moved to server API
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+
+    match /orderLookups/{docId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if false; // Creation moved to server API
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+
+    // Users — users can read their own, admin can read/write all. 
+    match /users/{userId} {
+      allow read: if request.auth != null && (userId == request.auth.uid || isAdmin());
+      
+      allow create: if request.auth != null && userId == request.auth.uid && (
+        !request.resource.data.keys().hasAny(['permissions', 'isAdmin', 'admin', 'claims']) &&
+        (
+          !request.resource.data.keys().hasAny(['role']) ||
+          request.resource.data.role == 'customer' ||
+          (hasValidInvite() && request.resource.data.role == getInviteRole())
+        ) &&
+        (
+          !request.resource.data.keys().hasAny(['status']) ||
+          request.resource.data.status == 'active'
+        )
+      );
+
+      allow update: if request.auth != null && (
+        isAdmin() || 
+        (
+          userId == request.auth.uid && 
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['permissions', 'isAdmin', 'admin', 'claims', 'status']) &&
+            (
+              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) ||
+              (hasValidInvite() && request.resource.data.role == getInviteRole())
+            )
+          )
+        )
+      );
+
+      allow delete: if request.auth != null && isAdmin();
+    }
+
+    // Staff Invites - only admins can write, user can read their own
+    match /staffInvites/{email} {
+      allow read: if request.auth != null && (isAdmin() || request.auth.token.email.lower() == email);
+      allow write: if request.auth != null && isAdmin();
+      // Allow users to delete their own invite once claimed
+      allow delete: if request.auth != null && (isAdmin() || request.auth.token.email.lower() == email);
+    }
+
+    // Audit Logs
+    match /auditLogs/{logId} {
+      allow read: if request.auth != null && isAdmin();
+      // Append only: user can only log for themselves, no updating/deleting except dev admin
+      allow create: if request.auth != null && isAnyAdminOrStaff() && request.resource.data.actorUid == request.auth.uid;
+      allow update: if false; // Strict append-only
+      allow delete: if request.auth != null && isDevAdmin();
+    }
+
+    // Settings — public read, admin write (NO STAFF)
+    match /siteSettings/{document} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /homepageSections/{sectionId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /siteContent/{contentId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    match /announcementsList/{announcementId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+
+    // Messages - admin and staff
+    match /contactMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+
+    // Newsletters
+    match /newsletterSubscribers/{subId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+    
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && isAnyAdminOrStaff();
+    }
+  }
+}

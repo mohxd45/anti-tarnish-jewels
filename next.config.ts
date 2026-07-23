@@ -9,7 +9,7 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value:
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://*.firebaseapp.com; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://*.firebaseapp.com blob:; " +
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "img-src 'self' data: blob: https:; " +
       "font-src 'self' data: https://fonts.gstatic.com; " +
@@ -18,6 +18,7 @@ const securityHeaders = [
       "frame-ancestors 'self'; " +
       "base-uri 'self'; " +
       "form-action 'self'; " +
+      "worker-src 'self' blob:; " +
       "object-src 'none';",
   },
   {

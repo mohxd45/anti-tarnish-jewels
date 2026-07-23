@@ -244,7 +244,7 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
               {order.items.map((item) => (
                 <div key={item.product.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    {item.product.images?.[0] && (
+                    {item.product.images?.[0]?.trim() && (
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-stone-200/30 shrink-0">
                         <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                       </div>

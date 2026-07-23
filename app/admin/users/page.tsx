@@ -168,7 +168,7 @@ export default function ManageUsersPage() {
 
   const totalRegistered = users.filter(u => !u.isGuest).length;
   const totalGuests = users.filter(u => u.isGuest).length;
-  const totalAdmins = users.filter(u => u.role !== "customer").length;
+  const totalAdmins = users.filter(u => u.role === "admin" || u.role === "owner" || u.role === "owner_admin" || u.role === "partner_admin" || u.role === "developer_admin" || u.role === "staff").length;
 
   return (
     <Protected adminOnly>
@@ -234,7 +234,7 @@ export default function ManageUsersPage() {
                   </thead>
                   <tbody className="divide-y divide-adminBorder">
                     {paginatedUsers.map((user) => {
-                      const isStaffOrAdmin = user.role !== "customer";
+                      const isStaffOrAdmin = user.role === "admin" || user.role === "owner" || user.role === "owner_admin" || user.role === "partner_admin" || user.role === "developer_admin" || user.role === "staff";
                       return (
                         <tr key={user.uid} className="hover:bg-adminBg/50 transition-colors">
                           <td className="px-4 py-4">
@@ -262,7 +262,7 @@ export default function ManageUsersPage() {
                                 : "bg-adminBg text-adminSidebar border border-adminBorder"
                             }`}>
                               {isStaffOrAdmin ? <Shield size={12} /> : null}
-                              <span>{isStaffOrAdmin ? user.role.replace("_", " ") : (user.isGuest ? "Guest" : "Registered")}</span>
+                              <span>{isStaffOrAdmin ? (user.role || "unknown").replace("_", " ") : (user.isGuest ? "Guest" : "Registered")}</span>
                             </span>
                           </td>
                           <td className="px-4 py-4 text-xs text-adminMuted">
