@@ -179,6 +179,8 @@ export default function AdminBundlesPage() {
       includedItems,
       reviewCount: editingBundle ? editingBundle.reviewCount : 0,
       rating: editingBundle ? editingBundle.rating : 5,
+      createdAt: editingBundle?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     try {
