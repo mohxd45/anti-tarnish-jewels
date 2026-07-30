@@ -426,14 +426,29 @@ function ViewOrderDialog({
                         {formatPrice((it.product?.salePrice || 0) * (it.quantity || 1))}
                       </td>
                     </tr>
-                    {it.product?.isBundle && it.product?.includedItems && it.product.includedItems.length > 0 && (
+                    {it.product?.isBundle && it.product?.bundleType !== "mix_and_match" && it.product?.includedItems && it.product.includedItems.length > 0 && (
                       <tr className="bg-adminBg/50">
                         <td colSpan={5} className="px-4 py-2 pb-3">
                           <div className="pl-2 border-l-2 border-adminGold/30 ml-2 space-y-1">
                             <div className="text-[10px] uppercase tracking-wider text-adminMuted font-semibold mb-1">Included in bundle:</div>
-                            {it.product.includedItems.map((inc, idx) => (
+                            {it.product.includedItems.map((inc: any, idx: number) => (
                               <div key={idx} className="flex justify-between text-[11px] text-adminSidebar">
                                 <span>• {inc.quantity}x {inc.name} {inc.selectedSize || inc.selectedColor ? `(${[inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - ")})` : ""}</span>
+                                <span className="font-mono text-adminMuted">{inc.sku}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {it.type === "mix_and_match_bundle" && it.selectedProducts && it.selectedProducts.length > 0 && (
+                      <tr className="bg-adminBg/50">
+                        <td colSpan={5} className="px-4 py-2 pb-3">
+                          <div className="pl-2 border-l-2 border-adminGold/30 ml-2 space-y-1">
+                            <div className="text-[10px] uppercase tracking-wider text-adminMuted font-semibold mb-1">Selected items ({it.selectedProducts.length}):</div>
+                            {it.selectedProducts.map((inc: any, idx: number) => (
+                              <div key={idx} className="flex justify-between text-[11px] text-adminSidebar">
+                                <span>• {inc.name}</span>
                                 <span className="font-mono text-adminMuted">{inc.sku}</span>
                               </div>
                             ))}
@@ -685,14 +700,28 @@ function printInvoice(o: Order) {
           </tr>`;
           
         let bundleRows = "";
-        if (isBundle && it.product?.includedItems && it.product.includedItems.length > 0) {
+        if (isBundle && it.product?.bundleType !== "mix_and_match" && it.product?.includedItems && it.product.includedItems.length > 0) {
           bundleRows = `
             <tr>
               <td colspan="5" style="padding:4px 10px 12px; background:#faf5ef; color:#7a6f68; font-size:11px; border-bottom:1px solid #ece4dc;">
                 <div style="font-weight:600; text-transform:uppercase; margin-bottom:4px; font-size:9px; letter-spacing:0.05em;">Included in bundle:</div>
-                ${it.product.includedItems.map(inc => `
+                ${it.product.includedItems.map((inc: any) => `
                   <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
                     <span>• ${inc.quantity}x ${escapeHtml(inc.name)} ${inc.selectedSize || inc.selectedColor ? `(${escapeHtml([inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - "))})` : ""}</span>
+                    <span style="font-family:monospace">${escapeHtml(inc.sku)}</span>
+                  </div>
+                `).join("")}
+              </td>
+            </tr>
+          `;
+        } else if (it.type === "mix_and_match_bundle" && it.selectedProducts && it.selectedProducts.length > 0) {
+          bundleRows = `
+            <tr>
+              <td colspan="5" style="padding:4px 10px 12px; background:#faf5ef; color:#7a6f68; font-size:11px; border-bottom:1px solid #ece4dc;">
+                <div style="font-weight:600; text-transform:uppercase; margin-bottom:4px; font-size:9px; letter-spacing:0.05em;">Selected items (${it.selectedProducts.length}):</div>
+                ${it.selectedProducts.map((inc: any) => `
+                  <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                    <span>• ${escapeHtml(inc.name)}</span>
                     <span style="font-family:monospace">${escapeHtml(inc.sku)}</span>
                   </div>
                 `).join("")}

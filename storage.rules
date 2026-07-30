@@ -20,18 +20,18 @@ service firebase.storage {
     // Secure Uploads for Images
     match /{folder}/{allPaths=**} {
       // Allow exact GET for public images. BLOCK public LIST.
-      allow get: if folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories'];
+      allow get: if folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories', 'bundle-item-images'];
       allow list: if isAnyAdminOrStaff();
       
       // Update/Create strictly validates MIME type and file size
       allow create, update: if isAnyAdminOrStaff()
-        && folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories']
+        && folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories', 'bundle-item-images']
         && request.resource.contentType.matches('^image/(jpeg|png|webp)$')
         && request.resource.size < 10 * 1024 * 1024;
         
       // Delete does not have a request.resource payload, so we only check the folder access
       allow delete: if isAnyAdminOrStaff()
-        && folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories'];
+        && folder in ['product-images', 'bundle-images', 'bundles', 'banner-images', 'category-images', 'categories', 'bundle-item-images'];
     }
     
     // Block all other root level or random folder access

@@ -39,6 +39,13 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Bundle Items
+    match /bundleItems/{itemId} {
+      allow read: if true;
+      allow create, update: if isAnyAdminOrStaff();
+      allow delete: if isAdmin();
+    }
+
     // Orders
     match /orders/{orderId} {
       allow create: if false; 

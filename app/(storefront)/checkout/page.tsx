@@ -70,7 +70,9 @@ export default function CheckoutPage() {
             quantity: i.quantity,
             selectedSize: i.selectedSize,
             selectedColor: i.selectedColor,
-            cartItemId: i.cartItemId
+            cartItemId: i.cartItemId,
+            selectedProductIds: i.selectedProductIds,
+            selectedBundleItemIds: i.selectedBundleItemIds
           })),
           address,
           giftWrapSelected: cart.isGiftWrap,
@@ -303,12 +305,22 @@ export default function CheckoutPage() {
                       {(it.sku || it.product.sku) && (
                         <p className="text-[10px] text-[#8F817B] mt-0.5">Item Code: {it.sku || it.product.sku}</p>
                       )}
-                      {it.product.isBundle && it.product.includedItems && it.product.includedItems.length > 0 && (
+                      {it.product.isBundle && it.product.bundleType !== "mix_and_match" && it.product.includedItems && it.product.includedItems.length > 0 && (
                         <div className="mt-1 flex flex-col gap-0.5 border-t border-[#E8D7C8]/40 pt-1">
                           <span className="text-[8px] uppercase tracking-wider text-[#B8955E] font-bold">Included:</span>
                           {it.product.includedItems.map((inc, i) => (
                             <p key={i} className="text-[9px] text-[#8F817B] truncate leading-tight">
                               • {inc.quantity}x {inc.name}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                      {it.type === "mix_and_match_bundle" && it.selectedProducts && it.selectedProducts.length > 0 && (
+                        <div className="mt-1 flex flex-col gap-0.5 border-t border-[#E8D7C8]/40 pt-1">
+                          <span className="text-[8px] uppercase tracking-wider text-[#B8955E] font-bold">Selected ({it.selectedProducts.length}):</span>
+                          {it.selectedProducts.map((inc, i) => (
+                            <p key={i} className="text-[9px] text-[#8F817B] truncate leading-tight">
+                              • {inc.name}
                             </p>
                           ))}
                         </div>

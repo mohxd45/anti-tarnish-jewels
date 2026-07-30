@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { getProducts, addProduct, updateProduct, deleteProduct, uploadImage, getCategories, logActivity } from "@/lib/firestore";
-import { Product, Category, BundleItemSnapshot } from "@/types";
+import { Product, Category, BundleItemSnapshot, IndependentBundleItem } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 export default function AdminBundlesPage() {
   const { user } = useAuth();
@@ -45,6 +46,10 @@ export default function AdminBundlesPage() {
   const [isActive, setIsActive] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [includedItems, setIncludedItems] = useState<BundleItemSnapshot[]>([]);
+  const [bundleType, setBundleType] = useState<"fixed" | "mix_and_match">("fixed");
+  const [selectionLimit, setSelectionLimit] = useState(5);
+  const [sourceType, setSourceType] = useState<"existing_products" | "bundle_items">("existing_products");
+  const [independentItems, setIndependentItems] = useState<IndependentBundleItem[]>([]);
 
   // Product Selection UI
   const [prodSearchTerm, setProdSearchTerm] = useState("");
@@ -80,6 +85,10 @@ export default function AdminBundlesPage() {
     setIsActive(true);
     setIsFeatured(false);
     setIncludedItems([]);
+    setBundleType("fixed");
+    setSelectionLimit(5);
+    setSourceType("existing_products");
+    setIndependentItems([]);
     setIsModalOpen(true);
   }
 
@@ -95,7 +104,18 @@ export default function AdminBundlesPage() {
     setStock(bundle.stock || 0);
     setIsActive(bundle.isActive ?? true);
     setIsFeatured(bundle.isFeatured ?? false);
-    setIncludedItems(bundle.includedItems || []);
+    
+    setBundleType(bundle.bundleType || "fixed");
+    setSelectionLimit(bundle.selectionLimit || 5);
+    setSourceType(bundle.sourceType || "existing_products");
+    setIndependentItems(bundle.independentBundleItems || []);
+    
+    if (bundle.bundleType === "mix_and_match" && bundle.eligibleProductsSnapshot) {
+      setIncludedItems(bundle.eligibleProductsSnapshot);
+    } else {
+      setIncludedItems(bundle.includedItems || []);
+    }
+    
     setIsModalOpen(true);
   }
 
@@ -156,10 +176,57 @@ export default function AdminBundlesPage() {
     setIncludedItems(includedItems.filter((_, i) => i !== idx));
   }
 
+
+  function handleAddIndependentItem() {
+    setIndependentItems([
+      ...independentItems,
+      { id: Date.now().toString(), name: "", sku: "", stock: 10, active: true, image: "", sortOrder: independentItems.length }
+    ]);
+  }
+
+  function updateIndependentItem(idx: number, field: string, value: any) {
+    const newItems = [...independentItems];
+    newItems[idx] = { ...newItems[idx], [field]: value };
+    setIndependentItems(newItems);
+  }
+
+  function removeIndependentItem(idx: number) {
+    setIndependentItems(independentItems.filter((_, i) => i !== idx));
+  }
+
+  async function handleIndependentItemImage(idx: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      toast.loading("Uploading item image...");
+      // Using existing bundles folder, optionally generating a path if bundleId not present yet
+      const url = await uploadImage(file, `bundles/${editingBundle?.id || "temp-" + Date.now()}/items`);
+      updateIndependentItem(idx, "image", url);
+      toast.dismiss();
+      toast.success("Item image uploaded!");
+    } catch (err) {
+      toast.dismiss();
+      toast.error("Failed to upload item image");
+    }
+  }
+
   async function handleSave() {
-    if (!name.trim() || !sku.trim() || !image.trim() || bundlePrice < 0 || includedItems.length === 0) {
-      toast.error("Please fill all required fields and add at least one product.");
+
+    const isBundleItems = bundleType === "mix_and_match" && sourceType === "bundle_items";
+    if (!name.trim() || !sku.trim() || !image.trim() || bundlePrice < 0 || (!isBundleItems && includedItems.length === 0)) {
+      toast.error(isBundleItems ? "Please fill all required fields." : "Please fill all required fields and add at least one product.");
       return;
+    }
+    
+    if (bundleType === "mix_and_match") {
+      if (sourceType === "existing_products" && includedItems.length < selectionLimit) {
+        toast.error(`Please add at least ${selectionLimit} eligible products for this mix & match bundle.`);
+        return;
+      }
+      if (selectionLimit < 1) {
+        toast.error("Selection limit must be at least 1.");
+        return;
+      }
     }
 
     const payload: Omit<Product, "id"> = {
@@ -176,9 +243,15 @@ export default function AdminBundlesPage() {
       isActive,
       isFeatured,
       images: [image],
-      includedItems,
       reviewCount: editingBundle ? editingBundle.reviewCount : 0,
       rating: editingBundle ? editingBundle.rating : 5,
+      bundleType,
+      selectionLimit: bundleType === "mix_and_match" ? selectionLimit : undefined,
+      sourceType: bundleType === "mix_and_match" ? sourceType : undefined,
+      eligibleProductIds: bundleType === "mix_and_match" && sourceType === "existing_products" ? includedItems.map(i => i.productId) : undefined,
+      eligibleProductsSnapshot: bundleType === "mix_and_match" && sourceType === "existing_products" ? includedItems : undefined,
+      includedItems: bundleType === "fixed" ? includedItems : undefined,
+      independentBundleItems: isBundleItems ? independentItems : undefined,
       createdAt: editingBundle?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -262,10 +335,19 @@ export default function AdminBundlesPage() {
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-adminBg border border-adminBorder shrink-0">
                         {bundle.images?.[0] ? <img src={bundle.images[0]} alt={bundle.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} /> : <ImageIcon className="w-5 h-5 m-auto mt-2.5 text-adminMuted" />}
                       </div>
-                      <span className="font-medium text-adminSidebar min-w-0 line-clamp-2 leading-tight">{bundle.name}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-adminSidebar min-w-0 line-clamp-2 leading-tight">{bundle.name}</span>
+                        {bundle.bundleType === "mix_and_match" && (
+                          <span className="text-[10px] uppercase font-bold text-adminGold tracking-wider mt-0.5">Mix & Match ({bundle.selectionLimit})</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-adminMuted">{bundle.sku || "-"}</td>
-                    <td className="px-6 py-4 text-adminMuted">{bundle.includedItems?.length || 0}</td>
+                    <td className="px-6 py-4 text-adminMuted">
+                      {bundle.bundleType === "mix_and_match" ? (
+                        bundle.sourceType === "bundle_items" ? "Bundle Items" : bundle.eligibleProductsSnapshot?.length || 0
+                      ) : bundle.includedItems?.length || 0}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="font-semibold text-adminGold">{formatPrice(bundle.salePrice || 0)}</div>
                       {bundle.regularPrice > bundle.salePrice && (
@@ -278,6 +360,13 @@ export default function AdminBundlesPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
+                        {bundle.bundleType === "mix_and_match" && bundle.sourceType === "bundle_items" && (
+                          <Link href={`/admin/bundles/${bundle.id}/items`}>
+                            <Button variant="ghost" size="sm" className="text-adminGold hover:bg-adminGold hover:text-white border border-adminGold rounded-xl h-8 text-xs px-3">
+                              Manage Items
+                            </Button>
+                          </Link>
+                        )}
                         <Button variant="ghost" size="icon" onClick={() => openEditModal(bundle)} className="h-8 w-8 text-adminSidebar hover:text-adminGold">
                           <Edit2 className="w-4 h-4" />
                         </Button>
@@ -319,6 +408,40 @@ export default function AdminBundlesPage() {
               </div>
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Bundle Type</label>
+                <select 
+                  value={bundleType} 
+                  onChange={e => setBundleType(e.target.value as any)}
+                  className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
+                >
+                  <option value="fixed">Fixed Bundle</option>
+                  <option value="mix_and_match">Mix & Match</option>
+                </select>
+              </div>
+              {bundleType === "mix_and_match" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Selection Limit</label>
+                  <Input type="number" value={selectionLimit} onChange={e => setSelectionLimit(Number(e.target.value))} min="1" />
+                  <p className="text-[10px] text-adminMuted">Number of items customer can pick.</p>
+                </div>
+              )}
+              {bundleType === "mix_and_match" && (
+                <div className="space-y-2 col-span-2">
+                  <label className="text-sm font-medium">Item Source</label>
+                  <select 
+                    value={sourceType} 
+                    onChange={e => setSourceType(e.target.value as any)}
+                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
+                  >
+                    <option value="existing_products">Existing Catalog Products</option>
+                    <option value="bundle_items">Bundle-Only Items (Independent Stock)</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Description</label>
               <Textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} />
@@ -347,93 +470,152 @@ export default function AdminBundlesPage() {
               </div>
             </div>
 
-            <div className="space-y-4 border border-adminBorder p-5 rounded-2xl bg-stone-50/50">
-              <h3 className="font-semibold text-adminGold text-sm">Included Products *</h3>
-              <div className="relative z-50">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-adminMuted" />
-                <Input 
-                  placeholder="Search products to add..." 
-                  value={prodSearchTerm}
-                  onChange={e => setProdSearchTerm(e.target.value)}
-                  className="pl-9 bg-white rounded-xl"
-                />
-                {prodSearchTerm && searchedProducts.length > 0 && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setProdSearchTerm("")} />
-                    <div className="absolute z-50 top-full mt-1 w-full bg-white border border-adminBorder rounded-xl shadow-lg p-2 space-y-1 max-h-[220px] overflow-y-auto">
-                      {searchedProducts.map(p => (
-                        <div key={p.id} className="flex items-center justify-between p-2 hover:bg-adminBg rounded-lg cursor-pointer transition-colors" onClick={() => handleAddProduct(p)}>
-                          <div className="flex items-center gap-3">
-                            {p.images?.[0] && <img src={p.images[0]} className="w-8 h-8 rounded object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />}
-                            <span className="text-sm font-medium">{p.name} <span className="text-xs text-adminMuted font-normal">({p.sku})</span></span>
-                          </div>
-                          <Plus className="w-4 h-4 text-adminGold" />
+            {bundleType === "mix_and_match" && sourceType === "bundle_items" && (
+               <div className="space-y-4 border border-adminBorder p-5 rounded-2xl bg-stone-50/50">
+                 <div className="flex items-center justify-between">
+                   <h3 className="font-semibold text-adminGold text-sm">Bundle-Only Items *</h3>
+                   <Button onClick={handleAddIndependentItem} size="sm" className="bg-adminGold text-white h-8 text-xs"><Plus className="w-4 h-4 mr-1"/> Add Item</Button>
+                 </div>
+                 {independentItems.length > 0 ? (
+                   <div className="space-y-3 mt-4">
+                     {independentItems.map((item, idx) => (
+                        <div key={item.id} className="flex flex-col gap-3 p-4 bg-white border border-adminBorder rounded-xl shadow-sm relative">
+                           <Button variant="ghost" size="icon" onClick={() => removeIndependentItem(idx)} className="absolute top-2 right-2 h-6 w-6 text-red-500 rounded-full hover:bg-red-50 shrink-0"><X className="w-3.5 h-3.5" /></Button>
+                           <div className="grid grid-cols-[80px_1fr] gap-4">
+                              <div className="space-y-2 flex flex-col items-center">
+                                 {item.image ? <img src={item.image} className="w-16 h-16 object-cover rounded-lg border border-adminBorder" /> : <div className="w-16 h-16 bg-stone-100 border border-dashed border-adminBorder rounded-lg flex items-center justify-center text-xs text-adminMuted">No Img</div>}
+                                 <label className="text-[10px] text-adminGold cursor-pointer hover:underline text-center font-semibold">
+                                    Upload
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleIndependentItemImage(idx, e)} />
+                                 </label>
+                              </div>
+                              <div className="space-y-3">
+                                 <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] uppercase font-bold text-adminMuted">Item Name</label>
+                                      <Input value={item.name} onChange={e => updateIndependentItem(idx, "name", e.target.value)} className="h-8 text-xs" />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] uppercase font-bold text-adminMuted">SKU</label>
+                                      <Input value={item.sku} onChange={e => updateIndependentItem(idx, "sku", e.target.value)} className="h-8 text-xs" />
+                                    </div>
+                                 </div>
+                                 <div className="grid grid-cols-3 gap-3">
+                                    <div className="space-y-1">
+                                      <label className="text-[10px] uppercase font-bold text-adminMuted">Stock</label>
+                                      <Input type="number" value={item.stock} onChange={e => updateIndependentItem(idx, "stock", Number(e.target.value))} className="h-8 text-xs" />
+                                    </div>
+                                    <div className="space-y-1 col-span-2 flex items-center pt-5 gap-2">
+                                      <input type="checkbox" checked={item.active} onChange={e => updateIndependentItem(idx, "active", e.target.checked)} className="accent-adminGold w-4 h-4" /> 
+                                      <span className="text-xs font-semibold text-adminSidebar">Active / In-Stock</span>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </>
+                     ))}
+                   </div>
+                 ) : (
+                   <p className="text-xs text-adminMuted mt-2">No items added yet.</p>
+                 )}
+               </div>
+            )}
+            
+            {!(bundleType === "mix_and_match" && sourceType === "bundle_items") && (
+              <div className="space-y-4 border border-adminBorder p-5 rounded-2xl bg-stone-50/50">
+                <h3 className="font-semibold text-adminGold text-sm">{bundleType === "mix_and_match" ? "Eligible Products *" : "Included Products *"}</h3>
+                {bundleType === "mix_and_match" && (
+                  <p className="text-xs text-adminMuted -mt-2 mb-2">Select the products customers can choose from.</p>
+                )}
+                <div className="relative z-50">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-adminMuted" />
+                  <Input 
+                    placeholder="Search products to add..." 
+                    value={prodSearchTerm}
+                    onChange={e => setProdSearchTerm(e.target.value)}
+                    className="pl-9 bg-white rounded-xl"
+                  />
+                  {prodSearchTerm && searchedProducts.length > 0 && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setProdSearchTerm("")} />
+                      <div className="absolute z-50 top-full mt-1 w-full bg-white border border-adminBorder rounded-xl shadow-lg p-2 space-y-1 max-h-[220px] overflow-y-auto">
+                        {searchedProducts.map(p => (
+                          <div key={p.id} className="flex items-center justify-between p-2 hover:bg-adminBg rounded-lg cursor-pointer transition-colors" onClick={() => handleAddProduct(p)}>
+                            <div className="flex items-center gap-3">
+                              {p.images?.[0] && <img src={p.images[0]} className="w-8 h-8 rounded object-cover" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />}
+                              <span className="text-sm font-medium">{p.name} <span className="text-xs text-adminMuted font-normal">({p.sku})</span></span>
+                            </div>
+                            <Plus className="w-4 h-4 text-adminGold" />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {includedItems.length > 0 ? (
+                  <div className="space-y-3 mt-4">
+                    {includedItems.map((item, idx) => {
+                      const originalProd = products.find(p => p.id === item.productId);
+                      return (
+                        <div key={item.productId} className="flex flex-col gap-3 p-3.5 bg-white border border-adminBorder rounded-xl shadow-sm relative">
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="flex items-center gap-3">
+                              <img src={item.image} className="w-10 h-10 rounded-lg border border-adminBorder/50 object-cover shrink-0" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />
+                              <div>
+                                <div className="text-[13px] font-semibold leading-tight line-clamp-1">{item.name}</div>
+                                <div className="text-[11px] text-adminMuted mt-0.5 font-mono">{item.sku}</div>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="icon" onClick={() => removeIncludedItem(idx)} className="h-6 w-6 text-red-500 rounded-full hover:bg-red-50 shrink-0">
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                          
+                          
+                          {bundleType === "fixed" && (
+                            <div className="grid grid-cols-3 gap-3">
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Qty</label>
+                                <Input type="number" min="1" value={item.quantity} onChange={e => updateIncludedItem(idx, "quantity", Number(e.target.value))} className="h-8 text-xs bg-stone-50/50" />
+                              </div>
+                              
+                              {(originalProd?.sizeOptions?.length || 0) > 0 && (
+                                <div className="space-y-1">
+                                  <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Fixed Size</label>
+                                  <select 
+                                    value={item.selectedSize || ""} 
+                                    onChange={e => updateIncludedItem(idx, "selectedSize", e.target.value)}
+                                    className="flex h-8 w-full rounded-md border border-input bg-stone-50/50 px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
+                                  >
+                                    {originalProd?.sizeOptions?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                  </select>
+                                </div>
+                              )}
+                              
+                              {(originalProd?.colorOptions?.length || 0) > 0 && (
+                                <div className="space-y-1">
+                                  <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Fixed Color</label>
+                                  <select 
+                                    value={item.selectedColor || ""} 
+                                    onChange={e => updateIncludedItem(idx, "selectedColor", e.target.value)}
+                                    className="flex h-8 w-full rounded-md border border-input bg-stone-50/50 px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
+                                  >
+                                    {originalProd?.colorOptions?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-adminMuted mt-2">No products added yet.</p>
                 )}
               </div>
-
-              {includedItems.length > 0 ? (
-                <div className="space-y-3 mt-4">
-                  {includedItems.map((item, idx) => {
-                    const originalProd = products.find(p => p.id === item.productId);
-                    return (
-                      <div key={item.productId} className="flex flex-col gap-3 p-3.5 bg-white border border-adminBorder rounded-xl shadow-sm relative">
-                        <div className="flex justify-between items-start gap-2">
-                          <div className="flex items-center gap-3">
-                            <img src={item.image} className="w-10 h-10 rounded-lg border border-adminBorder/50 object-cover shrink-0" onError={(e) => { e.currentTarget.src = "/product-stack.jpg"; }} />
-                            <div>
-                              <div className="text-[13px] font-semibold leading-tight line-clamp-1">{item.name}</div>
-                              <div className="text-[11px] text-adminMuted mt-0.5 font-mono">{item.sku}</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="icon" onClick={() => removeIncludedItem(idx)} className="h-6 w-6 text-red-500 rounded-full hover:bg-red-50 shrink-0">
-                            <X className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Qty</label>
-                            <Input type="number" min="1" value={item.quantity} onChange={e => updateIncludedItem(idx, "quantity", Number(e.target.value))} className="h-8 text-xs bg-stone-50/50" />
-                          </div>
-                          
-                          {(originalProd?.sizeOptions?.length || 0) > 0 && (
-                            <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Fixed Size</label>
-                              <select 
-                                value={item.selectedSize || ""} 
-                                onChange={e => updateIncludedItem(idx, "selectedSize", e.target.value)}
-                                className="flex h-8 w-full rounded-md border border-input bg-stone-50/50 px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
-                              >
-                                {originalProd?.sizeOptions?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                              </select>
-                            </div>
-                          )}
-                          
-                          {(originalProd?.colorOptions?.length || 0) > 0 && (
-                            <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-widest font-bold text-adminMuted">Fixed Color</label>
-                              <select 
-                                value={item.selectedColor || ""} 
-                                onChange={e => updateIncludedItem(idx, "selectedColor", e.target.value)}
-                                className="flex h-8 w-full rounded-md border border-input bg-stone-50/50 px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-adminGold"
-                              >
-                                {originalProd?.colorOptions?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                              </select>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-xs text-adminMuted mt-2">No products added yet.</p>
-              )}
-            </div>
+            )}
 
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-sm cursor-pointer">

@@ -51,12 +51,22 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
             {(item.sku || product.sku) && (
               <p className="text-[10px] text-[#8F817B] mt-0.5">Item Code: {item.sku || product.sku}</p>
             )}
-            {product.isBundle && product.includedItems && product.includedItems.length > 0 && (
+            {product.isBundle && product.bundleType !== "mix_and_match" && product.includedItems && product.includedItems.length > 0 && (
               <div className="mt-1.5 flex flex-col gap-0.5 border-t border-[#E8D7C8]/40 pt-1.5">
                 <span className="text-[9px] uppercase tracking-wider text-[#B8955E] font-bold">Included:</span>
                 {product.includedItems.map((inc, i) => (
                   <p key={i} className="text-[10px] text-stone-500 truncate">
                     • {inc.quantity}x {inc.name}
+                  </p>
+                ))}
+              </div>
+            )}
+            {item.type === "mix_and_match_bundle" && item.selectedProducts && item.selectedProducts.length > 0 && (
+              <div className="mt-1.5 flex flex-col gap-0.5 border-t border-[#E8D7C8]/40 pt-1.5">
+                <span className="text-[9px] uppercase tracking-wider text-[#B8955E] font-bold">Selected ({item.selectedProducts.length}):</span>
+                {item.selectedProducts.map((inc, i) => (
+                  <p key={i} className="text-[10px] text-stone-500 truncate">
+                    • {inc.name}
                   </p>
                 ))}
               </div>
@@ -84,22 +94,30 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
           </div>
 
           <div className="flex items-center rounded-lg border border-[#E8D7C8] bg-white overflow-hidden shadow-sm h-7">
-            <button
-              onClick={() => decrease(item.cartItemId || product.id)}
-              className="px-2 h-full flex items-center justify-center text-stone-400 hover:text-[#3A2428] hover:bg-stone-50 transition-colors disabled:opacity-50"
-              disabled={quantity <= 1}
-            >
-              <Minus className="h-[10px] w-[10px]" />
-            </button>
-            <span className="px-1 text-xs font-semibold text-[#3A2428] w-6 text-center select-none flex items-center justify-center h-full border-x border-[#E8D7C8]/30">
-              {quantity}
-            </span>
-            <button
-              onClick={() => increase(item.cartItemId || product.id)}
-              className="px-2 h-full flex items-center justify-center text-stone-400 hover:text-[#3A2428] hover:bg-stone-50 transition-colors"
-            >
-              <Plus className="h-[10px] w-[10px]" />
-            </button>
+            {item.type === "mix_and_match_bundle" ? (
+              <span className="px-3 text-xs font-semibold text-[#3A2428] text-center select-none flex items-center justify-center h-full opacity-50" title="Mix & Match bundle quantity is fixed at 1.">
+                Qty: {quantity}
+              </span>
+            ) : (
+              <>
+                <button
+                  onClick={() => decrease(item.cartItemId || product.id)}
+                  className="px-2 h-full flex items-center justify-center text-stone-400 hover:text-[#3A2428] hover:bg-stone-50 transition-colors disabled:opacity-50"
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-[10px] w-[10px]" />
+                </button>
+                <span className="px-1 text-xs font-semibold text-[#3A2428] w-6 text-center select-none flex items-center justify-center h-full border-x border-[#E8D7C8]/30">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => increase(item.cartItemId || product.id)}
+                  className="px-2 h-full flex items-center justify-center text-stone-400 hover:text-[#3A2428] hover:bg-stone-50 transition-colors"
+                >
+                  <Plus className="h-[10px] w-[10px]" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

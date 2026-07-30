@@ -19,7 +19,8 @@ import {
   UserRole,
   UserStatus,
   AuditLog,
-  Review
+  Review,
+  BundleItem
 } from "@/types";
 import {
   addDoc,
@@ -330,6 +331,58 @@ export async function deleteProduct(id: string) {
     await deleteDoc(doc(db, "products", id));
   } catch (err) {
     console.error("Firestore operation failed:", err);
+    throw err;
+  }
+}
+
+// BUNDLE ITEMS
+export async function getBundleItems(bundleId: string): Promise<any[]> {
+  if (!hasFirebaseConfig || !db) return [];
+  try {
+    const q = query(
+      collection(db, "bundleItems"),
+      where("bundleId", "==", bundleId),
+      orderBy("sortOrder", "asc")
+    );
+    const snap = await withTimeout(getDocs(q));
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.warn("Firestore getBundleItems failed:", err);
+    return [];
+  }
+}
+
+export async function addBundleItem(item: any) {
+  try {
+    const ref = await addDoc(collection(db, "bundleItems"), {
+      ...item,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    return { id: ref.id };
+  } catch (err) {
+    console.error("Firestore addBundleItem failed:", err);
+    throw err;
+  }
+}
+
+export async function updateBundleItem(id: string, item: any) {
+  try {
+    await updateDoc(doc(db, "bundleItems", id), {
+      ...item,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("Firestore updateBundleItem failed:", err);
+    throw err;
+  }
+}
+
+export async function deleteBundleItem(id: string) {
+  try {
+    await deleteDoc(doc(db, "bundleItems", id));
+  } catch (err) {
+    console.error("Firestore deleteBundleItem failed:", err);
     throw err;
   }
 }

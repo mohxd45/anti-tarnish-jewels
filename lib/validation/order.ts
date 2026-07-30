@@ -21,6 +21,10 @@ export const orderItemSchema = z.object({
   name: z.string().optional(),
   price: z.number().optional(),
   image: z.string().optional(),
+  type: z.string().optional(),
+  cartLineId: z.string().optional(),
+  selectedProductIds: z.array(z.string()).optional(),
+  selectedBundleItemIds: z.array(z.string()).optional(),
   // Ignore other fields that the frontend might be sending
 }).strip().refine(data => data.productId || data.bundleId, {
   message: "Either productId or bundleId is required"

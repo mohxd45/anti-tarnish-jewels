@@ -58,7 +58,38 @@ export type Product = {
   createdAt?: string;
   updatedAt?: string;
   isBundle?: boolean;
+  bundleType?: "fixed" | "mix_and_match";
+  selectionLimit?: number;
+  eligibleProductIds?: string[];
+  eligibleProductsSnapshot?: BundleItemSnapshot[];
   includedItems?: BundleItemSnapshot[];
+  sourceType?: "existing_products" | "bundle_items";
+  bundleItemIds?: string[];
+  independentBundleItems?: IndependentBundleItem[];
+};
+
+export type IndependentBundleItem = {
+  id: string;
+  name: string;
+  sku: string;
+  stock: number;
+  active: boolean;
+  image: string;
+  sortOrder?: number;
+};
+
+export type BundleItem = {
+  id: string;
+  bundleId: string;
+  name: string;
+  sku: string;
+  description: string;
+  images: string[];
+  stock: number;
+  active: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type BundleItemSnapshot = {
@@ -74,6 +105,7 @@ export type BundleItemSnapshot = {
 
 export type CartItem = {
   cartItemId?: string;
+  cartLineId?: string;
   product: Product;
   quantity: number;
   selectedSize?: string;
@@ -82,12 +114,16 @@ export type CartItem = {
   name?: string;
   price?: number;
   productId?: string;
-  type?: "product" | "bundle";
+  type?: "product" | "bundle" | "mix_and_match_bundle";
   bundleId?: string;
   bundleName?: string;
   bundleSku?: string;
   bundlePrice?: number;
+  selectionLimit?: number;
+  selectedProductIds?: string[];
+  selectedBundleItemIds?: string[];
   includedItems?: BundleItemSnapshot[];
+  selectedProducts?: BundleItemSnapshot[]; // used for snapshot in final order
 };
 
 export type OrderStatus =

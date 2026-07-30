@@ -252,6 +252,28 @@ function OrderDetailsInner({ orderNumber }: { orderNumber: string }) {
                     <div>
                       <h4 className="font-serif font-semibold text-charcoalBrown text-sm">{item.product.name}</h4>
                       <p className="text-xs text-stoneGray mt-1">Qty: {item.quantity} • {formatPrice(item.product.salePrice)}</p>
+                      
+                      {item.product?.isBundle && item.product?.bundleType !== "mix_and_match" && item.product?.includedItems && item.product.includedItems.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-champagne">Included:</p>
+                          {item.product.includedItems.map((inc: any, idx: number) => (
+                            <p key={idx} className="text-[11px] text-stoneGray leading-tight">
+                              • {inc.quantity}x {inc.name}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {item.type === "mix_and_match_bundle" && item.selectedProducts && item.selectedProducts.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-champagne">Selected ({item.selectedProducts.length}):</p>
+                          {item.selectedProducts.map((inc: any, idx: number) => (
+                            <p key={idx} className="text-[11px] text-stoneGray leading-tight">
+                              • {inc.name}
+                            </p>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <span className="font-semibold text-champagne text-sm">{formatPrice(item.product.salePrice * item.quantity)}</span>

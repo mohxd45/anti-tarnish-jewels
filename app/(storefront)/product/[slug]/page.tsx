@@ -1,6 +1,7 @@
-import { getProductBySlug, getSimilarProducts } from "@/lib/firestore";
+import { getProductBySlug, getSimilarProducts, getBundleItems } from "@/lib/firestore";
 import { ProductDetailsClient } from "@/components/ProductDetailsClient";
 import { BundleDetailsClient } from "@/components/storefront/BundleDetailsClient";
+import { MixMatchBundleClient } from "@/components/storefront/MixMatchBundleClient";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -33,6 +34,11 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
 
   const similarProducts = await getSimilarProducts(product.category, product.id, 4);
 
+  let fetchedBundleItems: any[] = [];
+  if (product.isBundle && product.bundleType === "mix_and_match" && product.sourceType === "bundle_items") {
+    fetchedBundleItems = await getBundleItems(product.id);
+  }
+
   return (
     <>
       <style>{`
@@ -40,7 +46,15 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
       `}</style>
       <div className="bg-[#FFF0F5] min-h-[100dvh] pb-40 md:pb-24">
         {product.isBundle ? (
-          <BundleDetailsClient product={product} />
+          product.bundleType === "mix_and_match" ? (
+            product.sourceType === "bundle_items" ? (
+              <MixMatchBundleClient product={product} initialBundleItems={fetchedBundleItems} />
+            ) : (
+              <MixMatchBundleClient product={product} />
+            )
+          ) : (
+            <BundleDetailsClient product={product} />
+          )
         ) : (
           <ProductDetailsClient product={product} initialSimilar={similarProducts} />
         )}

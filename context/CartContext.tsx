@@ -230,15 +230,43 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     items,
     addToCart: (product, quantity = 1, selectedSize, selectedColor) => {
       setItems((prev) => {
-        const cId = `${product.id}-${selectedSize || 'none'}-${selectedColor || 'none'}`;
-        const found = prev.find((item) => (item.cartItemId || `${item.product.id}-${item.selectedSize || 'none'}-${item.selectedColor || 'none'}`) === cId);
-        if (found) {
-          return prev.map((item) => {
-             const itemId = item.cartItemId || `${item.product.id}-${item.selectedSize || 'none'}-${item.selectedColor || 'none'}`;
-             return itemId === cId ? { ...item, quantity: item.quantity + quantity } : item;
-          });
+        // If it's a mix & match bundle, it comes with a unique cartLineId
+        const customCartLineId = (product as any).cartLineId;
+        const cId = customCartLineId || `${product.id}-${selectedSize || 'none'}-${selectedColor || 'none'}`;
+        
+        // For mix & match bundles, we don't merge them. We just add them as a new line.
+        if (!customCartLineId) {
+          const found = prev.find((item) => (item.cartItemId || `${item.product.id}-${item.selectedSize || 'none'}-${item.selectedColor || 'none'}`) === cId);
+          if (found) {
+            return prev.map((item) => {
+               const itemId = item.cartItemId || `${item.product.id}-${item.selectedSize || 'none'}-${item.selectedColor || 'none'}`;
+               return itemId === cId ? { ...item, quantity: item.quantity + quantity } : item;
+            });
+          }
         }
-        return [...prev, { cartItemId: cId, product, quantity, selectedSize, selectedColor, sku: product.sku }];
+        
+        const isMixMatch = product.bundleType === "mix_and_match";
+        const type = isMixMatch ? "mix_and_match_bundle" : (product.isBundle ? "bundle" : "product");
+        
+        return [...prev, { 
+          cartItemId: cId, 
+          cartLineId: customCartLineId,
+          product, 
+          quantity: isMixMatch ? 1 : quantity, 
+          selectedSize, 
+          selectedColor, 
+          sku: product.sku,
+          type,
+          bundleId: isMixMatch ? product.id : (product.isBundle ? product.id : undefined),
+          bundleName: isMixMatch ? product.name : (product.isBundle ? product.name : undefined),
+          bundleSku: isMixMatch ? product.sku : (product.isBundle ? product.sku : undefined),
+          bundlePrice: isMixMatch ? (product.salePrice || product.regularPrice) : undefined,
+          selectionLimit: isMixMatch ? product.selectionLimit : undefined,
+          selectedProductIds: isMixMatch ? (product as any).selectedProductIds : undefined,
+          selectedBundleItemIds: isMixMatch ? (product as any).selectedBundleItemIds : undefined,
+          selectedProducts: isMixMatch ? (product as any).selectedProducts : undefined,
+          includedItems: product.includedItems
+        }];
       });
       setIsDrawerOpen(true); // Auto-open drawer when adding to cart
     },

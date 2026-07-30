@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     const { items, address, giftWrapSelected, giftMessage, couponCode, paymentMethod, notes } = body;
 
     let subtotal = 0;
-    const finalItems = [];
+    const finalItems: any[] = [];
 
     // Process items
     for (const item of items) {
@@ -102,20 +102,78 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: `Bundle is not active: ${bundle.name}` }, { status: 400 });
         }
 
+        let selectedProductsData: any[] = [];
+        
+        if (bundle.bundleType === "mix_and_match") {
+          // Strictly validate mix and match selections
+          if (item.quantity !== 1) {
+            return NextResponse.json({ error: `Mix and Match bundles must have quantity 1. Received: ${item.quantity}` }, { status: 400 });
+          }
+          if (item.selectedProductIds) {
+            if (item.selectedProductIds.length !== bundle.selectionLimit) {
+               return NextResponse.json({ error: `Invalid selection count for ${bundle.name}. Expected ${bundle.selectionLimit}, got ${item.selectedProductIds.length}.` }, { status: 400 });
+            }
+            
+            const uniqueSelections = new Set(item.selectedProductIds);
+            if (uniqueSelections.size !== item.selectedProductIds.length) {
+               return NextResponse.json({ error: `Duplicate selections are not allowed in ${bundle.name}.` }, { status: 400 });
+            }
+            
+            const serverEligibleIds = bundle.eligibleProductIds || [];
+            const serverEligibleSnapshots = bundle.eligibleProductsSnapshot || [];
+            
+            for (const pid of item.selectedProductIds) {
+              if (!serverEligibleIds.includes(pid)) {
+                 return NextResponse.json({ error: `Invalid product selected in bundle ${bundle.name}: ${pid}` }, { status: 400 });
+              }
+              const snap = serverEligibleSnapshots.find((s: any) => s.productId === pid);
+              if (snap) {
+                selectedProductsData.push(snap);
+              }
+            }
+          } else if (item.selectedBundleItemIds) {
+            if (item.selectedBundleItemIds.length !== bundle.selectionLimit) {
+               return NextResponse.json({ error: `Invalid selection count for ${bundle.name}. Expected ${bundle.selectionLimit}, got ${item.selectedBundleItemIds.length}.` }, { status: 400 });
+            }
+            
+            const uniqueSelections = new Set(item.selectedBundleItemIds);
+            if (uniqueSelections.size !== item.selectedBundleItemIds.length) {
+               return NextResponse.json({ error: `Duplicate selections are not allowed in ${bundle.name}.` }, { status: 400 });
+            }
+
+            // We will resolve and validate bundle items inside the transaction later
+            // We just store the IDs for now
+            selectedProductsData = item.selectedBundleItemIds.map(id => ({ productId: id }));
+          } else {
+            return NextResponse.json({ error: `Missing selection for mix and match bundle: ${bundle.name}` }, { status: 400 });
+          }
+          
+          if (selectedProductsData.length !== bundle.selectionLimit) {
+            return NextResponse.json({ error: `Failed to resolve all selected products for bundle ${bundle.name}.` }, { status: 400 });
+          }
+          
+          if (selectedProductsData.length !== bundle.selectionLimit) {
+            return NextResponse.json({ error: `Failed to resolve all selected products for bundle ${bundle.name}.` }, { status: 400 });
+          }
+        }
+
         const priceToUse = typeof bundle.salePrice === "number" && bundle.salePrice >= 0 ? bundle.salePrice : (bundle.regularPrice || 0);
         
         subtotal += priceToUse * item.quantity;
         
         finalItems.push({
           cartItemId: item.cartItemId || `item-${Date.now()}-${Math.random()}`,
+          cartLineId: item.cartLineId || undefined,
           bundleId: item.bundleId,
-          type: "bundle",
+          type: bundle.bundleType === "mix_and_match" ? "mix_and_match_bundle" : "bundle",
+          bundleType: bundle.bundleType,
           bundleName: bundle.name,
           bundleSku: bundle.sku || "",
           bundlePrice: priceToUse,
           price: priceToUse,
           quantity: item.quantity,
           includedItems: bundle.includedItems || [],
+          selectedProducts: selectedProductsData,
           image: bundle.images?.[0] || bundle.thumbnail || "",
           product: { id: item.bundleId, ...bundle } // Store snapshot
         });
@@ -126,8 +184,9 @@ export async function POST(req: Request) {
 
     // Process Coupon
     let discount = 0;
-    let appliedCouponId = null;
-    let appliedCouponCode = null;
+    let appliedCouponId: string | null = null;
+    let appliedCouponCode: string | null = null;
+    let couponRef: FirebaseFirestore.DocumentReference | null = null;
 
     if (couponCode) {
       const couponsSnap = await adminDb.collection("coupons").where("code", "==", couponCode.toUpperCase()).get();
@@ -160,11 +219,7 @@ export async function POST(req: Request) {
             discount = Math.floor(calcDiscount);
             appliedCouponId = couponDoc.id;
             appliedCouponCode = coupon.code;
-            
-            // Increment usage count
-            await couponDoc.ref.update({
-              usedCount: FieldValue.increment(1)
-            });
+            couponRef = couponDoc.ref;
           }
         }
       }
@@ -231,118 +286,184 @@ export async function POST(req: Request) {
     }
 
     const now = new Date().toISOString();
-    
-    // Generate Order Number
-    const countSnap = await adminDb.collection("counters").doc("orders").get();
-    let orderCount = 1000;
-    if (countSnap.exists) {
-      orderCount = (countSnap.data()?.count || 1000) + 1;
-      await adminDb.collection("counters").doc("orders").update({ count: orderCount });
-    } else {
-      await adminDb.collection("counters").doc("orders").set({ count: orderCount });
-    }
-    const orderNumber = `LONA${orderCount}`;
-
     const orderDocRef = adminDb.collection("orders").doc();
     const orderId = orderDocRef.id;
 
-    const initialTimeline = [
-      {
-        status: "Pending",
-        title: "Order Placed",
-        description: "Your order has been placed successfully.",
-        timestamp: now
-      },
-      {
-        status: initialStatus,
-        title: initialStatus,
-        description: initialDesc,
-        timestamp: now
-      }
-    ];
-
-    const newOrder = {
-      id: orderId,
-      orderNumber,
-      userId: uid,
-      customerName: address.fullName,
-      customerEmail: userData?.email || "guest@example.com",
-      customerPhone: address.phone,
-      customerPhoneClean: address.phone.replace(/\D/g, ""),
-      shippingAddress: address,
-      address: address, // Fallback
-      items: finalItems,
-      subtotal,
-      shippingFee: shipping,
-      shipping: shipping, // Fallback
-      discount,
-      couponCode: appliedCouponCode || null,
-      couponId: appliedCouponId || null,
-      total,
-      paymentMethod: displayPaymentMethod,
-      advanceRequired,
-      advanceAmount,
-      amountPaid,
-      payOnDeliveryAmount,
-      codAdvanceStatus,
-      paymentStatus: initialPaymentStatus,
-      orderStatus: initialStatus,
-      status: initialStatus, // Fallback
-      giftWrapSelected: giftWrapSelected === true,
-      giftWrapPrice: giftWrapPrice,
-      giftMessage: giftMessage || null,
-      timeline: initialTimeline,
-      notes: notes || "",
-      createdAt: now,
-      updatedAt: now
-    };
-
-    // Clean undefined fields recursively
-    const cleanObject = (obj: any): any => {
-      if (Array.isArray(obj)) return obj.map(cleanObject);
-      if (obj !== null && typeof obj === 'object') {
-        const newObj: any = {};
-        for (const [k, v]  of Object.entries(obj)) {
-          if (v !== undefined) {
-             newObj[k] = cleanObject(v);
+    // Use a transaction for stock decrements and counter updates
+    await adminDb.runTransaction(async (t) => {
+      // 1. Resolve and validate bundle items
+      const bundleItemRefs: { ref: FirebaseFirestore.DocumentReference, item: any, originalFinalItem: any }[] = [];
+      
+      for (let i = 0; i < finalItems.length; i++) {
+        const finalItem = finalItems[i];
+        if (finalItem.type === "mix_and_match_bundle" && finalItem.product?.sourceType === "bundle_items") {
+          const selectedProductsData = finalItem.selectedProducts;
+          for (let j = 0; j < selectedProductsData.length; j++) {
+            const pData = selectedProductsData[j];
+            const ref = adminDb!.collection("bundleItems").doc(pData.productId);
+            bundleItemRefs.push({ ref, item: pData, originalFinalItem: finalItem });
           }
         }
-        return newObj;
       }
-      return obj;
-    };
 
-    const cleanOrder = cleanObject(newOrder);
+      // Read bundle items inside transaction
+      const bundleItemSnaps = bundleItemRefs.length > 0 ? await t.getAll(...bundleItemRefs.map(r => r.ref)) : [];
+      
+      for (let i = 0; i < bundleItemSnaps.length; i++) {
+        const snap = bundleItemSnaps[i];
+        const { item, originalFinalItem } = bundleItemRefs[i];
+        if (!snap.exists) {
+          throw new Error(`Bundle item not found: ${item.productId}`);
+        }
+        const bItem = snap.data() as any;
+        
+        if (bItem.bundleId !== originalFinalItem.bundleId) {
+          throw new Error(`Bundle item ${bItem.name} does not belong to bundle ${originalFinalItem.bundleName}`);
+        }
+        
+        if (!bItem.active) {
+          throw new Error(`Bundle item ${bItem.name} is no longer active`);
+        }
+        
+        // Check stock
+        // Note: quantity for mix_and_match_bundle is always 1 right now, but we decrement by the bundle's quantity
+        const quantityToDecrement = originalFinalItem.quantity;
+        if ((bItem.stock || 0) < quantityToDecrement) {
+          throw new Error(`Bundle item ${bItem.name} is out of stock`);
+        }
+        
+        // Hydrate the selected item snapshot in finalItems
+        item.name = bItem.name;
+        item.sku = bItem.sku;
+        item.image = bItem.images?.[0] || "";
+        item.quantity = 1;
+        item.price = 0;
 
-    // Save order
-    await orderDocRef.set(cleanOrder);
+        // Stage stock update
+        t.update(snap.ref, {
+          stock: FieldValue.increment(-quantityToDecrement),
+          updatedAt: now
+        });
+      }
 
-    // Save Public Tracking Order
-    const publicTrackingOrder = {
-      orderId,
-      orderNumber,
-      orderStatus: initialStatus,
-      status: initialStatus, // fallback
-      paymentMethod: displayPaymentMethod,
-      paymentStatus: initialPaymentStatus,
-      customerPhoneLast4: address.phone.replace(/\D/g, "").slice(-4),
-      timeline: initialTimeline,
-      createdAt: now,
-      updatedAt: now,
-      courierName: "",
-      trackingNumber: "",
-      trackingUrl: ""
-    };
-    await adminDb.collection("publicTrackingOrders").doc(orderId).set(publicTrackingOrder);
+      // 2. Generate Order Number
+      const counterRef = adminDb!.collection("counters").doc("orders");
+      const countSnap = await t.get(counterRef);
+      let orderCount = 1000;
+      if (countSnap.exists) {
+        orderCount = (countSnap.data()?.count || 1000) + 1;
+        t.update(counterRef, { count: orderCount });
+      } else {
+        t.set(counterRef, { count: orderCount });
+      }
+      const orderNumber = `LONA${orderCount}`;
 
-    // Save Order Lookup
-    const lookupData = {
-      orderId,
-      orderNumber,
-      customerPhoneLast4: address.phone.replace(/\D/g, "").slice(-4),
-      createdAt: now
-    };
-    await adminDb.collection("orderLookups").doc(orderId).set(lookupData);
+      const initialTimeline = [
+        {
+          status: "Pending",
+          title: "Order Placed",
+          description: "Your order has been placed successfully.",
+          timestamp: now
+        },
+        {
+          status: initialStatus,
+          title: initialStatus,
+          description: initialDesc,
+          timestamp: now
+        }
+      ];
+
+      const newOrder = {
+        id: orderId,
+        orderNumber,
+        userId: uid,
+        customerName: address.fullName,
+        customerEmail: userData?.email || "guest@example.com",
+        customerPhone: address.phone,
+        customerPhoneClean: address.phone.replace(/\D/g, ""),
+        shippingAddress: address,
+        address: address,
+        items: finalItems,
+        subtotal,
+        shippingFee: shipping,
+        shipping: shipping,
+        discount,
+        couponCode: appliedCouponCode || null,
+        couponId: appliedCouponId || null,
+        total,
+        paymentMethod: displayPaymentMethod,
+        advanceRequired,
+        advanceAmount,
+        amountPaid,
+        payOnDeliveryAmount,
+        codAdvanceStatus,
+        paymentStatus: initialPaymentStatus,
+        orderStatus: initialStatus,
+        status: initialStatus,
+        giftWrapSelected: giftWrapSelected === true,
+        giftWrapPrice: giftWrapPrice,
+        giftMessage: giftMessage || null,
+        timeline: initialTimeline,
+        notes: notes || "",
+        createdAt: now,
+        updatedAt: now
+      };
+
+      const cleanObject = (obj: any): any => {
+        if (Array.isArray(obj)) return obj.map(cleanObject);
+        if (obj !== null && typeof obj === 'object') {
+          const newObj: any = {};
+          for (const [k, v]  of Object.entries(obj)) {
+            if (v !== undefined) {
+               newObj[k] = cleanObject(v);
+            }
+          }
+          return newObj;
+        }
+        return obj;
+      };
+
+      const cleanOrder = cleanObject(newOrder);
+
+      // Save order
+      t.set(orderDocRef, cleanOrder);
+
+      // Save Public Tracking Order
+      const publicTrackingOrder = {
+        orderId,
+        orderNumber,
+        orderStatus: initialStatus,
+        status: initialStatus,
+        paymentMethod: displayPaymentMethod,
+        paymentStatus: initialPaymentStatus,
+        customerPhoneLast4: address.phone.replace(/\D/g, "").slice(-4),
+        timeline: initialTimeline,
+        createdAt: now,
+        updatedAt: now,
+        courierName: "",
+        trackingNumber: "",
+        trackingUrl: ""
+      };
+      const ptoRef = adminDb!.collection("publicTrackingOrders").doc(orderId);
+      t.set(ptoRef, publicTrackingOrder);
+
+      // Save Order Lookup
+      const lookupData = {
+        orderId,
+        orderNumber,
+        customerPhoneLast4: address.phone.replace(/\D/g, "").slice(-4),
+        createdAt: now
+      };
+      const lookupRef = adminDb!.collection("orderLookups").doc(orderId);
+      t.set(lookupRef, lookupData);
+
+      // Update coupon
+      if (couponRef) {
+        t.update(couponRef, {
+          usedCount: FieldValue.increment(1)
+        });
+      }
+    });
 
     return NextResponse.json({ success: true, orderId });
 
