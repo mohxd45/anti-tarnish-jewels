@@ -4,6 +4,7 @@ import { getProducts, getReviews, getSiteContent, getSiteSettings, getAnnounceme
 import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSaleBanner";
 import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 import { CategoryBar } from "@/components/storefront/CategoryBar";
+import { HomepageProductSlider } from "@/components/storefront/HomepageProductSlider";
 
 export const metadata = {
   title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
@@ -21,6 +22,8 @@ export default async function HomePage() {
 
   const bestsellers = products.filter(p => p.isBestSeller || (p.rating && p.rating >= 4.5)).slice(0, 8);
   const newArrivals = products.sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()).slice(0, 8);
+  const bundles = products.filter(p => p.isBundle === true && p.isActive !== false).slice(0, 8);
+  const hairAccessories = products.filter(p => p.isActive !== false && (p.categorySlug === "hair-accessories" || p.categoryId === "c8" || p.category?.toLowerCase().includes("hair"))).slice(0, 8);
 
   // Fallback reviews
   const safeReviews = reviews.length > 0 ? reviews : [
@@ -100,29 +103,35 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <HomepageProductSlider 
+        title="Bestsellers" 
+        subtitle="Most loved by our customers" 
+        ctaTo="/shop" 
+        products={bestsellers} 
+      />
 
+      <HomepageProductSlider 
+        title="Curated Bundles" 
+        subtitle="Combo offers made for you" 
+        ctaTo="/bundles" 
+        products={bundles}
+        bgColorClass="bg-gradient-to-b from-[#FFF0F5]/30 to-transparent"
+      />
 
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full overflow-hidden">
-        <SectionHeader title="Bestsellers" subtitle="Most loved by our customers" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-3 sm:gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
-          {bestsellers.map((p) => (
-            <div key={p.id} className="min-w-[45vw] max-w-[45vw] snap-start shrink-0 md:min-w-0 md:max-w-none">
-              <ProductCard product={p} />
-            </div>
-          ))}
-        </div>
-      </section>
+      <HomepageProductSlider 
+        title="New Arrivals" 
+        subtitle="Fresh additions to our collection" 
+        ctaTo="/shop" 
+        products={newArrivals} 
+      />
 
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-16 w-full bg-gradient-to-b from-[#FFF0F5]/30 to-transparent overflow-hidden">
-        <SectionHeader title="New Arrivals" subtitle="Fresh additions to our collection" ctaTo="/shop" />
-        <div className="flex overflow-x-auto gap-3 sm:gap-4 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-4">
-          {newArrivals.map((p) => (
-            <div key={p.id} className="min-w-[45vw] max-w-[45vw] snap-start shrink-0 md:min-w-0 md:max-w-none">
-              <ProductCard product={p} />
-            </div>
-          ))}
-        </div>
-      </section>
+      <HomepageProductSlider 
+        title="Hair Accessories" 
+        subtitle="Trendy picks for every look" 
+        ctaTo="/shop?category=hair-accessories" 
+        products={hairAccessories}
+        bgColorClass="bg-gradient-to-b from-[#FFF0F5]/30 to-transparent"
+      />
 
 
 
