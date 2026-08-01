@@ -60,7 +60,23 @@ function ShopContent() {
           setProducts(active.filter(p => {
             const catStr = String(p.category || "").toLowerCase().trim();
             const catSlugStr = String(p.categorySlug || "").toLowerCase().trim();
-            return catStr === cleanParam || catSlugStr === cleanParam;
+            const catIdStr = String(p.categoryId || "").toLowerCase().trim();
+            
+            // Handle plural/singular matching (e.g., ring vs rings)
+            const cleanParamSingular = cleanParam.endsWith('s') ? cleanParam.slice(0, -1) : cleanParam;
+            const cleanParamPlural = cleanParamSingular + 's';
+            
+            return (
+              catStr === cleanParam || 
+              catSlugStr === cleanParam || 
+              catIdStr === cleanParam ||
+              catStr === cleanParamSingular ||
+              catSlugStr === cleanParamSingular ||
+              catIdStr === cleanParamSingular ||
+              catStr === cleanParamPlural ||
+              catSlugStr === cleanParamPlural ||
+              catIdStr === cleanParamPlural
+            );
           }));
         }
       } catch (err) {

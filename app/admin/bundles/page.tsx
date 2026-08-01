@@ -146,6 +146,10 @@ export default function AdminBundlesPage() {
   }
 
   function handleAddProduct(p: Product) {
+    if (p.isBundle) {
+      toast.error("Bundles cannot be added as items.");
+      return;
+    }
     if (includedItems.find(item => item.productId === p.id)) {
       toast.error("Product already included in bundle");
       return;

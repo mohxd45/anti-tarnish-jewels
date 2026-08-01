@@ -1,4 +1,5 @@
-import { getProductBySlug, getSimilarProducts, getBundleItems } from "@/lib/firestore";
+import { getProductBySlug, getSimilarProducts, getBundleItems, getProduct } from "@/lib/firestore";
+import { Product } from "@/types";
 import { ProductDetailsClient } from "@/components/ProductDetailsClient";
 import { BundleDetailsClient } from "@/components/storefront/BundleDetailsClient";
 import { MixMatchBundleClient } from "@/components/storefront/MixMatchBundleClient";
@@ -35,8 +36,22 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
   const similarProducts = await getSimilarProducts(product.category, product.id, 4);
 
   let fetchedBundleItems: any[] = [];
-  if (product.isBundle && product.bundleType === "mix_and_match" && product.sourceType === "bundle_items") {
-    fetchedBundleItems = await getBundleItems(product.id);
+  let fetchedExistingProducts: Product[] = [];
+  
+  if (product.isBundle && product.bundleType === "mix_and_match") {
+    if (product.sourceType === "bundle_items") {
+      fetchedBundleItems = await getBundleItems(product.id);
+    } else {
+      if (product.eligibleProductsSnapshot && product.eligibleProductsSnapshot.length > 0) {
+        fetchedExistingProducts = await Promise.all(
+          product.eligibleProductsSnapshot.map(async (snap) => {
+            const pId = snap.productId || (snap as any).id;
+            if (!pId) return null;
+            return await getProduct(pId);
+          })
+        ).then(res => res.filter(Boolean) as Product[]);
+      }
+    }
   }
 
   return (
@@ -50,7 +65,7 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
             product.sourceType === "bundle_items" ? (
               <MixMatchBundleClient product={product} initialBundleItems={fetchedBundleItems} />
             ) : (
-              <MixMatchBundleClient product={product} />
+              <MixMatchBundleClient product={product} fetchedExistingProducts={fetchedExistingProducts} />
             )
           ) : (
             <BundleDetailsClient product={product} />

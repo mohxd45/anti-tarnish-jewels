@@ -119,14 +119,17 @@ export async function POST(req: Request) {
                return NextResponse.json({ error: `Duplicate selections are not allowed in ${bundle.name}.` }, { status: 400 });
             }
             
-            const serverEligibleIds = bundle.eligibleProductIds || [];
             const serverEligibleSnapshots = bundle.eligibleProductsSnapshot || [];
+            const allowedIds = new Set([
+              ...(bundle.eligibleProductIds || []),
+              ...serverEligibleSnapshots.map((s: any) => s.productId || s.id).filter(Boolean)
+            ]);
             
             for (const pid of item.selectedProductIds) {
-              if (!serverEligibleIds.includes(pid)) {
+              if (!allowedIds.has(pid)) {
                  return NextResponse.json({ error: `Invalid product selected in bundle ${bundle.name}: ${pid}` }, { status: 400 });
               }
-              const snap = serverEligibleSnapshots.find((s: any) => s.productId === pid);
+              const snap = serverEligibleSnapshots.find((s: any) => s.productId === pid || s.id === pid);
               if (snap) {
                 selectedProductsData.push(snap);
               }

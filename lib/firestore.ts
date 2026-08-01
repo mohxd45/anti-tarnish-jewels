@@ -1328,20 +1328,19 @@ export async function saveHomepageSections(sections: HomepageSection[]): Promise
   }
 }
 
+import { LONA_CATEGORIES } from "./categories";
+
 // DYNAMIC CATEGORIES
-const defaultCategories: Category[] = [
-  { id: "c1", name: "Earrings", slug: "earrings", priority: 1, isActive: true, subcategories: ["Hoop Earrings", "Drop Earrings", "Studs", "Dangle Earrings"] },
-  { id: "c2", name: "Rings", slug: "rings", priority: 2, isActive: true, subcategories: ["Solitaires", "Adjustable Rings", "Band Rings"] },
-  { id: "c3", name: "Necklaces", slug: "necklaces", priority: 3, isActive: true, subcategories: ["Chains", "Pendant Necklaces", "Layered Necklaces"] },
-  { id: "c4", name: "Bracelets", slug: "bracelets", priority: 4, isActive: true, subcategories: ["Tennis Bracelets", "Charm Bracelets", "Chain Bracelets"] },
-  { id: "c5", name: "Bangles", slug: "bangles", priority: 5, isActive: true, subcategories: ["Bangle Sets", "Single Bangles"] },
-  { id: "c6", name: "Anklets", slug: "anklets", priority: 6, isActive: true, subcategories: ["Anklet Pairs", "Single Anklets"] },
-  { id: "c7", name: "Nose Pins", slug: "nose-pins", priority: 7, isActive: true, subcategories: ["Clip-On", "Pierced"] },
-  { id: "c8", name: "Chokers", slug: "chokers", priority: 8, isActive: true, subcategories: ["Pearl Chokers", "Kundan Chokers"] },
-  { id: "c9", name: "Maang Tikka", slug: "maang-tikka", priority: 9, isActive: true, subcategories: ["Temple Style", "Pearl Style"] },
-  { id: "c10", name: "Haathphool", slug: "haathphool", priority: 10, isActive: true, subcategories: ["Bridal Haathphool", "Minimal Haathphool"] },
-  { id: "c11", name: "Bridal Sets", slug: "bridal-sets", priority: 11, isActive: true, subcategories: ["Kundan Sets", "Pearl Sets"] }
-];
+const defaultCategories: Category[] = LONA_CATEGORIES
+  .filter(c => c.slug !== "all" && c.slug !== "sale") // don't save generic collections as product categories
+  .map((c, idx) => ({
+    id: `c${idx + 1}`,
+    name: c.name,
+    slug: c.slug,
+    priority: idx + 1,
+    isActive: true,
+    subcategories: []
+  }));
 
 export async function getCategories(): Promise<Category[]> {
   if (!isServer && cachedCategories) return cachedCategories;

@@ -10,7 +10,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
 
-export function MixMatchBundleClient({ product: bundle, initialBundleItems = [] }: { product: Product, initialBundleItems?: BundleItem[] }) {
+export function MixMatchBundleClient({ 
+  product: bundle, 
+  initialBundleItems = [],
+  fetchedExistingProducts = []
+}: { 
+  product: Product, 
+  initialBundleItems?: BundleItem[],
+  fetchedExistingProducts?: Product[] 
+}) {
   const router = useRouter();
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
@@ -35,8 +43,30 @@ export function MixMatchBundleClient({ product: bundle, initialBundleItems = [] 
           image: item.image || "",
         } as BundleItemSnapshot));
     }
-    return bundle.eligibleProductsSnapshot || [];
-  }, [bundle]);
+    
+    // For existing_products
+    let snaps = bundle.eligibleProductsSnapshot || [];
+    
+    // Filter out the bundle itself just in case it was accidentally added!
+    snaps = snaps.filter(snap => (snap.productId || (snap as any).id) !== bundle.id);
+    
+    if (fetchedExistingProducts && fetchedExistingProducts.length > 0) {
+       // Filter snaps by checking the fetched real-time product stock & active status!
+       snaps = snaps.filter(snap => {
+         const realProduct = fetchedExistingProducts.find(p => p.id === (snap.productId || (snap as any).id));
+         if (!realProduct) return false;
+         if (realProduct.isActive === false) return false; // Hide inactive
+         if (realProduct.stock !== undefined && realProduct.stock <= 0) return false; // Hide out of stock
+         return true;
+       });
+    }
+
+    return snaps.map(snap => ({
+      ...snap,
+      productId: snap.productId || (snap as any).id,
+      image: snap.image || (snap as any).images?.[0] || "",
+    } as BundleItemSnapshot));
+  }, [bundle, fetchedExistingProducts]);
 
   function toggleItem(item: BundleItemSnapshot) {
     const isSelected = selectedItems.some((s) => s.productId === item.productId);
