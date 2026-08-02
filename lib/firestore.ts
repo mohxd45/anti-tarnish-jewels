@@ -94,7 +94,7 @@ export function withTimeout<T>(promise: Promise<T>, timeoutMs = 15000): Promise<
 }
 
 // Memory Cache Store
-const isServer = typeof window === undefined;
+const isServer = typeof window === "undefined";
 let cachedProducts: Product[] | null = null;
 let cachedProductBySlug: Record<string, Product> = {};
 let cachedCategories: Category[] | null = null;

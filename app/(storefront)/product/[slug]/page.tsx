@@ -19,11 +19,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const product = await getProductBySlug(resolvedParams.slug);
 
-  if (!product) {
+  if (!product || product.isActive === false) {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
         <h1 className="text-3xl font-semibold text-dustyRose">Product not found</h1>

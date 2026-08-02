@@ -11,6 +11,8 @@ export const metadata = {
   description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
 };
 
+export const revalidate = 60;
+
 export default async function HomePage() {
   const [products, reviews, content, settings, announcements] = await Promise.all([
     getProducts(),
