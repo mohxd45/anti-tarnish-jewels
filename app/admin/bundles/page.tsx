@@ -147,7 +147,7 @@ export default function AdminBundlesPage() {
 
   function handleAddProduct(p: Product) {
     if (p.isBundle) {
-      toast.error("Bundles cannot be added as items.");
+      toast.error("Bundles cannot be added as bundle items.");
       return;
     }
     if (includedItems.find(item => item.productId === p.id)) {
@@ -217,6 +217,32 @@ export default function AdminBundlesPage() {
   async function handleSave() {
 
     const isBundleItems = bundleType === "mix_and_match" && sourceType === "bundle_items";
+    
+    if (isBundleItems) {
+      if (independentItems.length === 0) {
+        toast.error("Please add at least one bundle item.");
+        return;
+      }
+      for (let i = 0; i < independentItems.length; i++) {
+        const item = independentItems[i];
+        if (!item.name?.trim() || !item.sku?.trim() || !item.image?.trim()) {
+          toast.error("All independent bundle items must have a name, SKU, and image.");
+          return;
+        }
+        if (item.stock === undefined || item.stock === null || item.stock < 0) {
+          toast.error(`Item "${item.name}" must have a valid stock >= 0.`);
+          return;
+        }
+        if (!item.id) {
+           item.id = Date.now().toString() + Math.random().toString();
+        }
+        // Auto-set inactive if stock is 0
+        if (item.stock === 0 && item.active) {
+           item.active = false;
+        }
+      }
+    }
+
     if (!name.trim() || !sku.trim() || !image.trim() || bundlePrice < 0 || (!isBundleItems && includedItems.length === 0)) {
       toast.error(isBundleItems ? "Please fill all required fields." : "Please fill all required fields and add at least one product.");
       return;
@@ -250,12 +276,12 @@ export default function AdminBundlesPage() {
       reviewCount: editingBundle ? editingBundle.reviewCount : 0,
       rating: editingBundle ? editingBundle.rating : 5,
       bundleType,
-      selectionLimit: bundleType === "mix_and_match" ? selectionLimit : undefined,
-      sourceType: bundleType === "mix_and_match" ? sourceType : undefined,
-      eligibleProductIds: bundleType === "mix_and_match" && sourceType === "existing_products" ? includedItems.map(i => i.productId) : undefined,
-      eligibleProductsSnapshot: bundleType === "mix_and_match" && sourceType === "existing_products" ? includedItems : undefined,
-      includedItems: bundleType === "fixed" ? includedItems : undefined,
-      independentBundleItems: isBundleItems ? independentItems : undefined,
+      selectionLimit: bundleType === "mix_and_match" ? selectionLimit : 0,
+      sourceType: bundleType === "mix_and_match" ? sourceType : "existing_products",
+      eligibleProductIds: bundleType === "mix_and_match" && sourceType === "existing_products" ? includedItems.map(i => i.productId) : [],
+      eligibleProductsSnapshot: bundleType === "mix_and_match" && sourceType === "existing_products" ? includedItems : [],
+      includedItems: bundleType === "fixed" ? includedItems : [],
+      independentBundleItems: isBundleItems ? independentItems : [],
       createdAt: editingBundle?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -364,13 +390,7 @@ export default function AdminBundlesPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        {bundle.bundleType === "mix_and_match" && bundle.sourceType === "bundle_items" && (
-                          <Link href={`/admin/bundles/${bundle.id}/items`}>
-                            <Button variant="ghost" size="sm" className="text-adminGold hover:bg-adminGold hover:text-white border border-adminGold rounded-xl h-8 text-xs px-3">
-                              Manage Items
-                            </Button>
-                          </Link>
-                        )}
+                        {/* Manage Items route hidden intentionally to deprecate old flow */}
                         <Button variant="ghost" size="icon" onClick={() => openEditModal(bundle)} className="h-8 w-8 text-adminSidebar hover:text-adminGold">
                           <Edit2 className="w-4 h-4" />
                         </Button>
