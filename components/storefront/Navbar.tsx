@@ -28,9 +28,9 @@ export function Navbar({ settings }: { settings?: any }) {
     <>
       <nav className="bg-white/95 backdrop-blur-md border-b border-stone-100 shadow-sm fixed left-0 right-0 top-0 z-50 px-4 py-3 md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 relative">
-          <div className="flex min-w-0 items-center gap-3 relative z-10">
-            <Link href="/" className="flex min-w-0 items-center gap-2">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-transparent overflow-hidden relative">
+          <div className="flex shrink-0 items-center gap-2 relative z-10">
+            <Link href="/" className="flex shrink-0 items-center gap-2">
+              <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-transparent overflow-hidden relative">
                 <Image src="/lona-monogram.jpg" alt="LONA JEWELS" fill sizes="48px" className="object-contain" priority />
               </div>
               <div className="hidden min-w-0 sm:block">
@@ -40,16 +40,16 @@ export function Navbar({ settings }: { settings?: any }) {
             </Link>
           </div>
 
-          {/* Centered Mobile Wordmark */}
-          <div className="absolute left-16 right-16 top-0 bottom-0 flex items-center justify-center pointer-events-none z-0 sm:hidden">
-             <Link href="/" className="pointer-events-auto flex flex-col items-center justify-center mt-0.5 max-w-full px-1">
-                <h1 className="font-serif text-[14px] xs:text-[15px] leading-tight text-[#3A2428] tracking-[0.05em] font-bold truncate">{brandName}</h1>
+          {/* Center Mobile Wordmark */}
+          <div className="flex-1 flex items-center justify-center z-0 sm:hidden min-w-0 px-2">
+             <Link href="/" className="flex flex-col items-center justify-center mt-0.5 min-w-0">
+                <h1 className="font-serif text-[14px] xs:text-[15px] leading-tight text-[#3A2428] tracking-[0.05em] font-bold truncate w-full text-center">{brandName}</h1>
              </Link>
           </div>
 
 
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1 relative z-10">
             <button
               className="rounded-full p-2 text-stone-900 transition hover:bg-stone-50/50/60"
               aria-label="Search"
@@ -94,9 +94,9 @@ export function Navbar({ settings }: { settings?: any }) {
           </div>
         </div>
 
-        {/* Desktop Category Nav (Premium Box Style) */}
-        <div className="hidden lg:flex w-full pb-3 px-8 justify-center">
-          <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 xl:gap-3 bg-gradient-to-r from-[#FFF5F8] to-[#FFF9E6] border border-[#E9C8A1]/40 rounded-xl shadow-[0_2px_12px_rgba(184,149,94,0.06)] px-3 py-2 overflow-x-auto scrollbar-hide">
+        {/* Category Nav (Premium Box Style) */}
+        <div className="hidden lg:flex w-full pb-2 sm:pb-3 px-2 sm:px-8 justify-center mt-1 sm:mt-0">
+          <div className="w-full max-w-5xl mx-auto flex items-center justify-start lg:justify-center gap-2 xl:gap-3 bg-gradient-to-r from-[#FFF5F8] to-[#FFF9E6] border border-[#E9C8A1]/40 rounded-xl shadow-[0_2px_12px_rgba(184,149,94,0.06)] px-3 py-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
             <NavItemPill href="/shop" label="All Jewellery" />
             <NavItemPill href="/shop?category=rings" label="Rings" />
             <NavItemPill href="/shop?category=earrings" label="Earrings" />
@@ -120,7 +120,7 @@ function NavItemPill({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="px-4 py-1.5 rounded-lg text-[13px] font-medium tracking-wide bg-white/80 border border-[#E9C8A1]/50 text-stone-700 hover:bg-white hover:border-[#B8955E] hover:text-[#B8955E] hover:shadow-sm transition-all whitespace-nowrap"
+      className="px-3 sm:px-4 py-1.5 rounded-lg text-[12px] sm:text-[13px] font-medium tracking-wide bg-white/80 border border-[#E9C8A1]/50 text-stone-700 hover:bg-white hover:border-[#B8955E] hover:text-[#B8955E] hover:shadow-sm transition-all whitespace-nowrap shrink-0 snap-start"
     >
       {label}
     </Link>
