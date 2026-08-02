@@ -183,28 +183,28 @@ export default async function HomePage() {
       />
 
       <HomepageProductSlider 
-        title="Curated Bundles" 
-        subtitle="Combo offers made for you" 
-        ctaTo="/bundles" 
-        products={bundles}
-        bgColorClass="bg-gradient-to-b from-[#FFF0F5]/50 to-transparent"
-        isSpecial={true}
-      />
-
-      <HomepageProductSlider 
         title="New Arrivals" 
         subtitle="Fresh additions to our collection" 
         ctaTo="/shop" 
         products={newArrivals}
-        bgColorClass="bg-[#FFF9FB]" 
+        bgColorClass="bg-white" 
+      />
+
+      <HomepageProductSlider 
+        title="Curated Bundles" 
+        subtitle="Combo offers made for you" 
+        ctaTo="/bundles" 
+        products={bundles}
+        bgColorClass="bg-[#FFF9FB] md:bg-gradient-to-b md:from-[#FFF0F5]/60 md:to-transparent"
+        isSpecial={true}
       />
 
       <HomepageProductSlider 
         title="Hair Accessories" 
         subtitle="Trendy picks for every look" 
-        ctaTo="/shop?category=hair-accessories" 
+        ctaTo="/collections/hair-accessories" 
         products={hairAccessories}
-        bgColorClass="bg-gradient-to-b from-[#FFF0F5]/40 to-transparent"
+        bgColorClass="bg-white"
       />
 
 

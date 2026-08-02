@@ -29,8 +29,8 @@ export function HomepageProductSlider({
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay" />
       )}
       
-      <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 lg:py-20 relative z-10">
-        <div className="mb-8 md:mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 border-b border-[#B8955E]/15 pb-4 md:pb-6">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:py-12 lg:py-14 relative z-10">
+        <div className="mb-6 md:mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 border-b border-[#B8955E]/15 pb-4 md:pb-5">
           <div className="min-w-0 flex-grow">
             <h2 className="mb-2 font-serif text-3xl md:text-4xl lg:text-5xl text-[#3A2428] tracking-tight flex items-center gap-2">
               {isSpecial && <span className="text-[#B8955E] text-2xl md:text-4xl">✦</span>}
