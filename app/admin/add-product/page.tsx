@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
-import { addProduct, getCategories, uploadImage, logActivity } from "@/lib/firestore";
+import { addProduct, uploadImage, logActivity } from "@/lib/firestore";
+import { LONA_CATEGORIES } from "@/lib/categories";
 import { Product, Category } from "@/types";
 import { slugify } from "@/lib/utils";
 import { X, Upload, Save, Loader } from "lucide-react";
@@ -100,8 +101,8 @@ export default function AddProductPage() {
 
   async function loadCategories() {
     setLoading(true);
-    const data = await getCategories();
-    setCategories(data);
+    const data = LONA_CATEGORIES.filter(c => c.slug !== "all" && c.slug !== "sale");
+    setCategories(data as any);
     if (data.length > 0) {
       setCategory(data[0].slug || slugify(data[0].name));
     }

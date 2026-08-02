@@ -3,7 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 
 
 import { useEffect, useState } from "react";
-import { getProducts, deleteProduct, updateProduct, getCategories, uploadImage , logActivity } from "@/lib/firestore";
+import { getProducts, deleteProduct, updateProduct, uploadImage , logActivity } from "@/lib/firestore";
+import { LONA_CATEGORIES } from "@/lib/categories";
 import { Product, Category } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -98,9 +99,10 @@ export default function ManageProductsPage() {
 
   async function loadData() {
     setLoading(true);
-    const [prodData, catData] = await Promise.all([getProducts(), getCategories()]);
+    const [prodData] = await Promise.all([getProducts()]);
     setProducts(prodData);
-    setCategories(catData);
+    const catData = LONA_CATEGORIES.filter(c => c.slug !== "all" && c.slug !== "sale");
+    setCategories(catData as any);
     setLoading(false);
   }
 
@@ -269,12 +271,17 @@ export default function ManageProductsPage() {
       const uniqueSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
       const finalBadges = editBadgesText.split(",").map(b => b.trim()).filter(Boolean);
 
+      const matchedCat = categories.find(c => c.name === editCategory.trim());
+      const newSlug = matchedCat ? matchedCat.slug : slugify(editCategory.trim());
+
       const updatedFields: Partial<Product> = {
         name: editName.trim(),
         sku: editSku.trim(),
         slug: uniqueSlug,
         description: (editDescription || "").trim(),
         category: editCategory.trim(),
+        categoryId: newSlug,
+        categorySlug: newSlug,
         subCategory: (editSubCategory || "").trim(),
         brand: (editBrand || "").trim(),
         regularPrice: finalRegularPrice,

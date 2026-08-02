@@ -45,7 +45,7 @@ function ShopContent() {
           getProducts()
         ]);
         
-        const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false) : [];
+        const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false && p.isBundle !== true) : [];
         const highestPrice = active.length > 0 ? Math.max(...active.map(p => p.salePrice || p.regularPrice || 0)) : 10000;
         setMaxPrice(highestPrice);
         setPriceRange([0, highestPrice]);
@@ -62,20 +62,24 @@ function ShopContent() {
             const catSlugStr = String(p.categorySlug || "").toLowerCase().trim();
             const catIdStr = String(p.categoryId || "").toLowerCase().trim();
             
+            const catStrSlug = catStr.replace(/\s+/g, '-');
+            const catSlugStrSlug = catSlugStr.replace(/\s+/g, '-');
+            const catIdStrSlug = catIdStr.replace(/\s+/g, '-');
+            
             // Handle plural/singular matching (e.g., ring vs rings)
             const cleanParamSingular = cleanParam.endsWith('s') ? cleanParam.slice(0, -1) : cleanParam;
             const cleanParamPlural = cleanParamSingular + 's';
             
             return (
-              catStr === cleanParam || 
-              catSlugStr === cleanParam || 
-              catIdStr === cleanParam ||
-              catStr === cleanParamSingular ||
-              catSlugStr === cleanParamSingular ||
-              catIdStr === cleanParamSingular ||
-              catStr === cleanParamPlural ||
-              catSlugStr === cleanParamPlural ||
-              catIdStr === cleanParamPlural
+              catStr === cleanParam || catStrSlug === cleanParam ||
+              catSlugStr === cleanParam || catSlugStrSlug === cleanParam ||
+              catIdStr === cleanParam || catIdStrSlug === cleanParam ||
+              catStr === cleanParamSingular || catStrSlug === cleanParamSingular ||
+              catSlugStr === cleanParamSingular || catSlugStrSlug === cleanParamSingular ||
+              catIdStr === cleanParamSingular || catIdStrSlug === cleanParamSingular ||
+              catStr === cleanParamPlural || catStrSlug === cleanParamPlural ||
+              catSlugStr === cleanParamPlural || catSlugStrSlug === cleanParamPlural ||
+              catIdStr === cleanParamPlural || catIdStrSlug === cleanParamPlural
             );
           }));
         }
