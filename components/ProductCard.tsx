@@ -20,7 +20,7 @@ export function ProductCard({ product }: { product: Product }) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); 
     if (product.isBundle && product.bundleType === "mix_and_match") {
-      router.push(`/bundles/${product.slug || product.id}`);
+      router.push(`/product/${product.slug || product.id}`);
       return;
     }
     if (product.selectedSizeRequired || product.selectedColorRequired) {
@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: Product }) {
     product.tags?.[0] ? { label: product.tags[0], cls: "bg-[#3A2428] text-white" } :
     null;
 
-  const productUrl = product.isBundle ? `/bundles/${product.slug || product.id}` : `/product/${product.slug || product.id}`;
+  const productUrl = `/product/${product.slug || product.id}`;
   const buttonText = (product.isBundle && product.bundleType === "mix_and_match") 
     ? "Build Bundle" 
     : (product.selectedSizeRequired || product.selectedColorRequired) 

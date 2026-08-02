@@ -5,6 +5,7 @@ import { getProducts } from "@/lib/firestore";
 import { Product } from "@/types";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ export default function BundlesPage() {
   const [bundles, setBundles] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     async function load() {
@@ -32,6 +34,10 @@ export default function BundlesPage() {
   }, []);
 
   function handleAddBundle(bundle: Product) {
+    if (bundle.bundleType === "mix_and_match") {
+      router.push(`/product/${bundle.slug || bundle.id}`);
+      return;
+    }
     if (!bundle.stock || bundle.stock <= 0) {
       toast.error("This bundle is currently out of stock");
       return;
@@ -121,10 +127,12 @@ export default function BundlesPage() {
 
                       <button
                         onClick={() => handleAddBundle(bundle)}
-                        disabled={!bundle.stock || bundle.stock <= 0}
+                        disabled={bundle.bundleType !== "mix_and_match" && (!bundle.stock || bundle.stock <= 0)}
                         className="w-full py-3 bg-[#3A2428] text-white rounded-xl font-medium tracking-wide hover:bg-[#2A1A1D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       >
-                        {!bundle.stock || bundle.stock <= 0 ? "Out of Stock" : "Add Bundle to Cart"}
+                        {bundle.bundleType === "mix_and_match" 
+                          ? "Build Bundle" 
+                          : (!bundle.stock || bundle.stock <= 0 ? "Out of Stock" : "Add Bundle to Cart")}
                       </button>
                     </div>
                   </div>
