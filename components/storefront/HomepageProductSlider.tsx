@@ -47,9 +47,9 @@ export function HomepageProductSlider({
         </div>
         
         {/* Improved slider container with smooth scroll snapping and balanced padding */}
-        <div className="flex overflow-x-auto gap-4 sm:gap-5 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6 lg:gap-8 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-6 -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex overflow-x-auto gap-3 sm:gap-4 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6 lg:gap-8 snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden pb-6 -mx-4 px-4 md:mx-0 md:px-0">
           {products.map((p) => (
-            <div key={p.id} className="min-w-[55vw] max-w-[55vw] sm:min-w-[40vw] sm:max-w-[40vw] md:min-w-0 md:max-w-none snap-center md:snap-align-none shrink-0">
+            <div key={p.id} className="min-w-[45vw] max-w-[45vw] sm:min-w-[35vw] sm:max-w-[35vw] md:min-w-0 md:max-w-none snap-start md:snap-align-none shrink-0">
               <ProductCard product={p} />
             </div>
           ))}

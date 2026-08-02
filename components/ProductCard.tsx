@@ -19,6 +19,10 @@ export function ProductCard({ product }: { product: Product }) {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); 
+    if (product.isBundle && product.bundleType === "mix_and_match") {
+      router.push(`/bundles/${product.slug || product.id}`);
+      return;
+    }
     if (product.selectedSizeRequired || product.selectedColorRequired) {
       router.push(`/product/${product.slug || product.id}`);
       return;
@@ -46,10 +50,17 @@ export function ProductCard({ product }: { product: Product }) {
     product.tags?.[0] ? { label: product.tags[0], cls: "bg-[#3A2428] text-white" } :
     null;
 
+  const productUrl = product.isBundle ? `/bundles/${product.slug || product.id}` : `/product/${product.slug || product.id}`;
+  const buttonText = (product.isBundle && product.bundleType === "mix_and_match") 
+    ? "Build Bundle" 
+    : (product.selectedSizeRequired || product.selectedColorRequired) 
+      ? "Select Options" 
+      : (product.isBundle ? "View Bundle" : "Add to Cart");
+
   return (
     <div className="group flex flex-col w-full bg-[#FFF9FB] rounded-2xl p-2 sm:p-2.5 shadow-[0_2px_12px_rgba(58,36,40,0.03)] border border-[#B8955E]/10 transition-all hover:shadow-[0_4px_16px_rgba(184,149,94,0.1)]">
       <Link
-        href={`/product/${product.slug || product.id}`}
+        href={productUrl}
         className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-[#FFF0F5]/50 mb-3 block"
       >
         <OptimizedImage
@@ -77,7 +88,7 @@ export function ProductCard({ product }: { product: Product }) {
           {(product.categorySlug || product.category || "").replace("-", " ")}
         </p>
         <Link
-          href={`/product/${product.slug || product.id}`}
+          href={productUrl}
           className="line-clamp-2 text-[13px] sm:text-sm font-semibold text-[#3A2428] hover:text-[#B8955E] leading-snug mb-2 flex-grow h-[36px] sm:h-[40px] transition-colors"
         >
           {product.name}
@@ -97,7 +108,7 @@ export function ProductCard({ product }: { product: Product }) {
           onClick={handleAddToCart}
         >
           <ShoppingBag className="h-3.5 w-3.5" />
-          <span>Add to Cart</span>
+          <span>{buttonText}</span>
         </button>
       </div>
     </div>
