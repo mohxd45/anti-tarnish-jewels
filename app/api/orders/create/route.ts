@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
     // Process items
     for (const item of items) {
-      if (!item.quantity || item.quantity <= 0) {
+      if (!item.quantity || typeof item.quantity !== "number" || item.quantity < 1 || !Number.isInteger(item.quantity)) {
         return NextResponse.json({ error: "Invalid item quantity" }, { status: 400 });
       }
 
@@ -295,58 +295,174 @@ export async function POST(req: Request) {
     // Use a transaction for stock decrements and counter updates
     await adminDb.runTransaction(async (t) => {
       // 1. Resolve and validate bundle items
-      const bundleItemRefs: { ref: FirebaseFirestore.DocumentReference, item: any, originalFinalItem: any }[] = [];
+      const bundlesToProcess = new Map<string, any[]>();
+      const existingProductIdsToFetch = new Set<string>();
       
       for (let i = 0; i < finalItems.length; i++) {
         const finalItem = finalItems[i];
-        if (finalItem.type === "mix_and_match_bundle" && finalItem.product?.sourceType === "bundle_items") {
-          const selectedProductsData = finalItem.selectedProducts;
-          for (let j = 0; j < selectedProductsData.length; j++) {
-            const pData = selectedProductsData[j];
-            const ref = adminDb!.collection("bundleItems").doc(pData.productId);
-            bundleItemRefs.push({ ref, item: pData, originalFinalItem: finalItem });
+        if (finalItem.type === "mix_and_match_bundle") {
+          if (!bundlesToProcess.has(finalItem.bundleId)) {
+            bundlesToProcess.set(finalItem.bundleId, []);
+          }
+          bundlesToProcess.get(finalItem.bundleId)!.push(finalItem);
+
+          if (finalItem.product?.sourceType === "existing_products") {
+             for (const p of finalItem.selectedProducts) {
+                existingProductIdsToFetch.add(p.productId || p.id || p.itemId);
+             }
           }
         }
       }
 
-      // Read bundle items inside transaction
-      const bundleItemSnaps = bundleItemRefs.length > 0 ? await t.getAll(...bundleItemRefs.map(r => r.ref)) : [];
+      // Fetch all unique bundles and live products inside transaction
+      const bundleRefs = Array.from(bundlesToProcess.keys()).map(id => adminDb!.collection("products").doc(id));
+      const existingProductRefs = Array.from(existingProductIdsToFetch).map(id => adminDb!.collection("products").doc(id));
       
-      for (let i = 0; i < bundleItemSnaps.length; i++) {
-        const snap = bundleItemSnaps[i];
-        const { item, originalFinalItem } = bundleItemRefs[i];
-        if (!snap.exists) {
-          throw new Error(`Bundle item not found: ${item.productId}`);
-        }
-        const bItem = snap.data() as any;
-        
-        if (bItem.bundleId !== originalFinalItem.bundleId) {
-          throw new Error(`Bundle item ${bItem.name} does not belong to bundle ${originalFinalItem.bundleName}`);
-        }
-        
-        if (!bItem.active) {
-          throw new Error(`Bundle item ${bItem.name} is no longer active`);
-        }
-        
-        // Check stock
-        // Note: quantity for mix_and_match_bundle is always 1 right now, but we decrement by the bundle's quantity
-        const quantityToDecrement = originalFinalItem.quantity;
-        if ((bItem.stock || 0) < quantityToDecrement) {
-          throw new Error(`Bundle item ${bItem.name} is out of stock`);
-        }
-        
-        // Hydrate the selected item snapshot in finalItems
-        item.name = bItem.name;
-        item.sku = bItem.sku;
-        item.image = bItem.images?.[0] || "";
-        item.quantity = 1;
-        item.price = 0;
+      const allRefs = [...bundleRefs, ...existingProductRefs];
+      const allSnaps = allRefs.length > 0 ? await t.getAll(...allRefs) : [];
+      
+      const bundleSnaps = allSnaps.slice(0, bundleRefs.length);
+      const existingProductSnaps = allSnaps.slice(bundleRefs.length);
+      
+      const existingProductsMap = new Map<string, any>();
+      existingProductSnaps.forEach(snap => {
+         if (snap.exists) {
+            existingProductsMap.set(snap.id, snap.data());
+         }
+      });
 
-        // Stage stock update
-        t.update(snap.ref, {
-          stock: FieldValue.increment(-quantityToDecrement),
-          updatedAt: now
-        });
+      for (let i = 0; i < bundleSnaps.length; i++) {
+        const snap = bundleSnaps[i];
+        if (!snap.exists) {
+          throw new Error(`Bundle not found: ${snap.id}`);
+        }
+        const bundle = snap.data() as any;
+        if (bundle.isBundle !== true) {
+          throw new Error(`Item is not a bundle: ${bundle.name}`);
+        }
+        if (bundle.isActive === false) {
+          throw new Error(`Bundle is not active: ${bundle.name}`);
+        }
+
+        const relatedFinalItems = bundlesToProcess.get(snap.id)!;
+        
+        // Verify selection limit strictly
+        if (relatedFinalItems.some(f => f.selectedProducts.length !== bundle.selectionLimit)) {
+          throw new Error(`Invalid selection count for bundle ${bundle.name}`);
+        }
+
+        if (bundle.sourceType === "bundle_items") {
+          const independentBundleItems = bundle.independentBundleItems || [];
+          if (independentBundleItems.length === 0) {
+            throw new Error(`Bundle ${bundle.name} has no items configured.`);
+          }
+          let updated = false;
+
+          for (const finalItem of relatedFinalItems) {
+            const selectedProductsData = finalItem.selectedProducts; 
+            for (let j = 0; j < selectedProductsData.length; j++) {
+              const pData = selectedProductsData[j];
+              const pId = pData.productId || pData.id || pData.itemId;
+              
+              const itemIndex = independentBundleItems.findIndex((x: any) => (x.id === pId) || (x.productId === pId));
+              if (itemIndex === -1) {
+                throw new Error(`Bundle item not found in bundle ${bundle.name}: ${pId}`);
+              }
+
+              const bItem = independentBundleItems[itemIndex];
+              if (bItem.active === false) {
+                throw new Error(`Bundle item ${bItem.name || pId} is no longer active`);
+              }
+
+              const quantityToDecrement = finalItem.quantity;
+              const hasStock = bItem.stock === undefined || bItem.stock === null || Number(bItem.stock) >= quantityToDecrement;
+              if (!hasStock) {
+                throw new Error(`Bundle item ${bItem.name || pId} is out of stock or insufficient quantity`);
+              }
+
+              // Decrement stock
+              if (bItem.stock !== undefined && bItem.stock !== null) {
+                bItem.stock -= quantityToDecrement;
+                if (bItem.stock <= 0) {
+                  bItem.active = false;
+                }
+                updated = true;
+              }
+              independentBundleItems[itemIndex] = bItem;
+
+              // Hydrate the selected item snapshot cleanly in finalItems
+              finalItem.selectedProducts[j] = {
+                itemId: pId,
+                name: bItem.name,
+                sku: bItem.sku || "",
+                image: bItem.image || bItem.images?.[0] || "",
+                selectedQuantity: quantityToDecrement
+              };
+            }
+          }
+
+          if (updated) {
+            t.update(snap.ref, { independentBundleItems });
+          }
+        } else if (bundle.sourceType === "existing_products") {
+          for (const finalItem of relatedFinalItems) {
+            const selectedProductsData = finalItem.selectedProducts; 
+            for (let j = 0; j < selectedProductsData.length; j++) {
+              const pData = selectedProductsData[j];
+              const pId = pData.productId || pData.id || pData.itemId;
+              
+              // Validate product active/stock safely from live product doc
+              const liveProduct = existingProductsMap.get(pId);
+              if (!liveProduct) {
+                throw new Error(`Product not found for bundle ${bundle.name}: ${pId}`);
+              }
+              if (liveProduct.isActive === false) {
+                 throw new Error(`Product ${liveProduct.name || pId} is no longer active`);
+              }
+              
+              const quantityToDecrement = finalItem.quantity;
+              const hasStock = liveProduct.stock === undefined || liveProduct.stock === null || Number(liveProduct.stock) >= quantityToDecrement;
+              if (!hasStock) {
+                 throw new Error(`Product ${liveProduct.name || pId} is out of stock`);
+              }
+
+              // Decrement stock for real existing products
+              if (liveProduct.stock !== undefined && liveProduct.stock !== null) {
+                liveProduct.stock -= quantityToDecrement;
+                if (liveProduct.stock <= 0) {
+                  liveProduct.isActive = false;
+                }
+                const pRef = adminDb!.collection("products").doc(pId);
+                t.update(pRef, { 
+                  stock: liveProduct.stock,
+                  isActive: liveProduct.isActive,
+                  updatedAt: new Date().toISOString()
+                });
+              }
+
+              const serverEligibleSnapshots = bundle.eligibleProductsSnapshot || [];
+              const eligibleSnap = serverEligibleSnapshots.find((s: any) => s.productId === pId || s.id === pId);
+              
+              if (!eligibleSnap) {
+                const allowedIds = new Set(bundle.eligibleProductIds || []);
+                if (!allowedIds.has(pId)) {
+                  throw new Error(`Invalid product selected in bundle ${bundle.name}: ${pId}`);
+                }
+              }
+
+              // Ensure the snapshot has safe formatting for old orders
+              finalItem.selectedProducts[j] = {
+                itemId: pId,
+                name: liveProduct.name || eligibleSnap?.name || pData.name || "",
+                sku: liveProduct.sku || eligibleSnap?.sku || pData.sku || "",
+                image: liveProduct.images?.[0] || eligibleSnap?.image || eligibleSnap?.images?.[0] || pData.image || pData.images?.[0] || "",
+                selectedQuantity: quantityToDecrement
+              };
+            }
+          }
+        } else {
+           throw new Error(`Unknown bundle source type configured for ${bundle.name}`);
+        }
       }
 
       // 2. Generate Order Number
