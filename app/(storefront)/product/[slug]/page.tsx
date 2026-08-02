@@ -44,13 +44,13 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
     if (product.sourceType === "bundle_items") {
       fetchedBundleItems = product.independentBundleItems || [];
     } else {
-      if (product.eligibleProductsSnapshot && product.eligibleProductsSnapshot.length > 0) {
+      const ids = product.eligibleProductIds?.length 
+        ? product.eligibleProductIds 
+        : product.eligibleProductsSnapshot?.map((s: any) => s.productId || s.id).filter(Boolean) || [];
+
+      if (ids.length > 0) {
         fetchedExistingProducts = await Promise.all(
-          product.eligibleProductsSnapshot.map(async (snap) => {
-            const pId = snap.productId || (snap as any).id;
-            if (!pId) return null;
-            return await getProduct(pId);
-          })
+          ids.map(async (pId: string) => await getProduct(pId))
         ).then(res => res.filter(Boolean) as Product[]);
       }
     }

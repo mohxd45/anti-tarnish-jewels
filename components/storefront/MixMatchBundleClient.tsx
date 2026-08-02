@@ -26,7 +26,10 @@ export function MixMatchBundleClient({
 
   const limit = bundle.selectionLimit || 5;
   const savings = (bundle.regularPrice || 0) - (bundle.salePrice || 0);
-  const outOfStock = !bundle.stock || bundle.stock <= 0;
+  const outOfStock =
+    bundle.stock !== undefined &&
+    bundle.stock !== null &&
+    Number(bundle.stock) <= 0;
 
   // Build eligible items. Hide out-of-stock items as per requirement
   const eligibleItems = useMemo(() => {

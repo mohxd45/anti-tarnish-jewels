@@ -132,6 +132,8 @@ export async function POST(req: Request) {
               const snap = serverEligibleSnapshots.find((s: any) => s.productId === pid || s.id === pid);
               if (snap) {
                 selectedProductsData.push(snap);
+              } else {
+                selectedProductsData.push({ productId: pid });
               }
             }
           } else if (item.selectedBundleItemIds) {
@@ -149,10 +151,6 @@ export async function POST(req: Request) {
             selectedProductsData = item.selectedBundleItemIds.map(id => ({ productId: id }));
           } else {
             return NextResponse.json({ error: `Missing selection for mix and match bundle: ${bundle.name}` }, { status: 400 });
-          }
-          
-          if (selectedProductsData.length !== bundle.selectionLimit) {
-            return NextResponse.json({ error: `Failed to resolve all selected products for bundle ${bundle.name}.` }, { status: 400 });
           }
           
           if (selectedProductsData.length !== bundle.selectionLimit) {
