@@ -559,6 +559,9 @@ export default function ManageProductsPage() {
                     <input type="checkbox" checked={editIsBestSeller} onChange={(e) => setEditIsBestSeller(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> Best Seller
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editIsNewArrival} onChange={(e) => setEditIsNewArrival(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> New Arrival
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={editIsFlashDeal} onChange={(e) => setEditIsFlashDeal(e.target.checked)} className="rounded text-adminGold focus:ring-adminGold" /> Flash Deal
                   </label>
                 </div>

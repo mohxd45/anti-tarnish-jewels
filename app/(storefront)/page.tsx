@@ -20,10 +20,17 @@ export default async function HomePage() {
     getAnnouncements()
   ]);
 
-  const bestsellers = products.filter(p => p.isBestSeller || (p.rating && p.rating >= 4.5)).slice(0, 8);
-  const newArrivals = products.sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()).slice(0, 8);
-  const bundles = products.filter(p => p.isBundle === true && p.isActive !== false).slice(0, 8);
-  const hairAccessories = products.filter(p => p.isActive !== false && (p.categorySlug === "hair-accessories" || p.categoryId === "c8" || p.category?.toLowerCase().includes("hair"))).slice(0, 8);
+  const activeProducts = products.filter(p => p.isActive !== false);
+
+  const bestsellers = activeProducts.filter(p => p.isBestSeller === true && !p.isBundle).slice(0, 8);
+  const newArrivals = activeProducts
+    .filter(p => p.isNewArrival === true && !p.isBundle)
+    .sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime())
+    .slice(0, 8);
+  const bundles = activeProducts.filter(p => p.isBundle === true).slice(0, 8);
+  const hairAccessories = activeProducts.filter(p => 
+    !p.isBundle && (p.categorySlug === "hair-accessories" || p.categoryId === "c8" || p.category?.toLowerCase().includes("hair"))
+  ).slice(0, 8);
 
   // Fallback reviews
   const safeReviews = reviews.length > 0 ? reviews : [
