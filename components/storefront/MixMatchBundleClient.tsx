@@ -31,16 +31,22 @@ export function MixMatchBundleClient({
   // Build eligible items. Hide out-of-stock items as per requirement
   const eligibleItems = useMemo(() => {
     if (bundle.sourceType === "bundle_items") {
-      const items = bundle.independentBundleItems || [];
+      let items = bundle.independentBundleItems || [];
+      // Filter out the bundle itself just in case
+      items = items.filter(item => item.id !== bundle.id && (item as any).productId !== bundle.id);
+      
       return items
-        .filter(item => item.active && item.stock > 0)
+        .filter(item => {
+          const hasStock = item.stock === undefined || item.stock === null || Number(item.stock) > 0;
+          return item.active !== false && hasStock;
+        })
         .map(item => ({
           productId: item.id,
           name: item.name,
           sku: item.sku,
           price: 0,
           quantity: 1,
-          image: item.image || "",
+          image: item.image || (item as any).images?.[0] || "",
         } as BundleItemSnapshot));
     }
     
@@ -56,7 +62,8 @@ export function MixMatchBundleClient({
          const realProduct = fetchedExistingProducts.find(p => p.id === (snap.productId || (snap as any).id));
          if (!realProduct) return false;
          if (realProduct.isActive === false) return false; // Hide inactive
-         if (realProduct.stock !== undefined && realProduct.stock <= 0) return false; // Hide out of stock
+         const hasStock = realProduct.stock === undefined || realProduct.stock === null || Number(realProduct.stock) > 0;
+         if (!hasStock) return false; // Hide out of stock
          return true;
        });
     }
@@ -75,7 +82,7 @@ export function MixMatchBundleClient({
       setSelectedItems((prev) => prev.filter((s) => s.productId !== item.productId));
     } else {
       if (selectedItems.length >= limit) {
-        toast.error(`You can select only ${limit} items for this box.`);
+        toast.error(`You can select only ${limit} items for this bundle.`);
         return;
       }
       setSelectedItems((prev) => [...prev, item]);
@@ -113,7 +120,7 @@ export function MixMatchBundleClient({
     
     setTimeout(() => {
       setIsAdding(false);
-      toast.success("Box added to cart!");
+      toast.success("Bundle added to cart!");
       // Optionally redirect to cart here if desired
     }, 500);
   }
@@ -123,7 +130,7 @@ export function MixMatchBundleClient({
     ? `Select ${limit} items to get the bundle at ${formatPrice(bundle.salePrice || 0)}`
     : remainingCount > 0 
       ? `Select ${remainingCount} more item${remainingCount > 1 ? 's' : ''} to get the bundle at ${formatPrice(bundle.salePrice || 0)}`
-      : "Your box is ready!";
+      : "Your bundle is ready!";
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12 pb-[240px] md:pb-[200px]">
@@ -164,7 +171,7 @@ export function MixMatchBundleClient({
           </div>
           <div className="flex-1 p-6 md:p-10 flex flex-col justify-center items-center md:items-start text-center md:text-left">
             <span className="rounded-full bg-[#3A2428] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm mb-4">
-              Build Your Box
+              Build Your Bundle
             </span>
             <h1 className="font-serif text-[28px] md:text-[38px] text-[#3A2428] font-medium leading-tight mb-3">
               {bundle.name}
@@ -186,7 +193,7 @@ export function MixMatchBundleClient({
             )}
             <div className="inline-flex items-center gap-2 font-medium text-[#B8955E] bg-[#B8955E]/10 px-4 py-2 rounded-xl">
               <Sparkles className="w-4 h-4" />
-              <span>Select any {limit} items to complete your box</span>
+              <span>Choose {limit} items to complete your bundle</span>
             </div>
           </div>
         </div>
@@ -194,7 +201,7 @@ export function MixMatchBundleClient({
 
       {/* Item Grid Section */}
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-serif text-2xl text-[#3A2428]">Choose Your Items</h2>
+        <h2 className="font-serif text-2xl text-[#3A2428]">Choose {limit} items</h2>
         <span className="text-sm font-medium text-[#8F817B]">{eligibleItems.length} available</span>
       </div>
 
@@ -252,7 +259,7 @@ export function MixMatchBundleClient({
                         : "bg-[#3A2428] text-white hover:bg-[#2A1A1D]"
                     } ${disabled ? "opacity-50" : ""}`}
                   >
-                    {isSelected ? "Added to Box" : "Add to Box"}
+                    {isSelected ? "Added to Bundle" : "Add to Bundle"}
                   </button>
                 </div>
               </div>
@@ -272,7 +279,7 @@ export function MixMatchBundleClient({
                 {progressText}
               </span>
               <span className="text-[11px] md:text-xs font-bold text-[#B8955E] bg-[#B8955E]/10 px-2.5 py-1 rounded-full whitespace-nowrap">
-                {selectedItems.length} / {limit}
+                Selected {selectedItems.length}/{limit}
               </span>
             </div>
             
@@ -331,9 +338,7 @@ export function MixMatchBundleClient({
                 ? "Adding..." 
                 : outOfStock 
                   ? "Out of Stock" 
-                  : selectedItems.length !== limit 
-                    ? "Add Box to Cart" 
-                    : "Add Box to Cart"}
+                  : "Add Bundle to Cart"}
             </button>
           </div>
           

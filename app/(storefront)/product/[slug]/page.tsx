@@ -42,7 +42,7 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
   
   if (product.isBundle && product.bundleType === "mix_and_match") {
     if (product.sourceType === "bundle_items") {
-      fetchedBundleItems = await getBundleItems(product.id);
+      fetchedBundleItems = product.independentBundleItems || [];
     } else {
       if (product.eligibleProductsSnapshot && product.eligibleProductsSnapshot.length > 0) {
         fetchedExistingProducts = await Promise.all(
