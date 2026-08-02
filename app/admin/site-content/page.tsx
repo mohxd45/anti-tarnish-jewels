@@ -118,7 +118,8 @@ export default function SiteContentPage() {
       <div className="max-w-4xl">
         {/* HOMEPAGE TABS */}
         {activeTab === "home" && (
-          <AdminCard title="Homepage Copy" className="bg-white border-adminBorder shadow-sm">
+          <div className="space-y-6">
+            <AdminCard title="Homepage Copy" className="bg-white border-adminBorder shadow-sm">
             <div className="space-y-6">
               <div>
                 <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Hero Small Title (Above Main)</label>
@@ -192,7 +193,7 @@ export default function SiteContentPage() {
 
               <div className="pt-4 border-t border-adminBorder flex justify-end">
                 <Button
-                  onClick={() => handleSave("home", ["heroSmallTitle", "heroTitle", "heroMainHeading", "heroSubtitle", "heroCtaText", "heroCtaLink", "promotionalText", "footerText"])}
+                  onClick={() => handleSave("home", ["heroSmallTitle", "heroTitle", "heroMainHeading", "heroSubtitle", "heroCtaText", "heroCtaLink", "promotionalText", "footerText", "promoSecondBannerImage", "promoSecondBannerHeading", "promoSecondBannerSubtext", "promoSecondBannerCtaText", "promoSecondBannerCtaLink"])}
                   disabled={saving}
                   className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-sm"
                 >
@@ -201,6 +202,59 @@ export default function SiteContentPage() {
               </div>
             </div>
           </AdminCard>
+
+          <AdminCard title="Secondary Promotional Banner (Optional)" className="bg-white border-adminBorder shadow-sm mt-6">
+            <div className="space-y-6">
+              <div>
+                <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Banner Image URL</label>
+                <input
+                  value={form.promoSecondBannerImage || ""}
+                  onChange={(e) => setForm({ ...form, promoSecondBannerImage: e.target.value })}
+                  className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                  placeholder="e.g. /images/promo.jpg or Firebase Storage URL. Leave blank to hide."
+                />
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Heading</label>
+                  <input
+                    value={form.promoSecondBannerHeading || ""}
+                    onChange={(e) => setForm({ ...form, promoSecondBannerHeading: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="e.g. Exclusive Collection"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">Subtext</label>
+                  <input
+                    value={form.promoSecondBannerSubtext || ""}
+                    onChange={(e) => setForm({ ...form, promoSecondBannerSubtext: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="e.g. Discover our newest rings"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">CTA Button Text</label>
+                  <input
+                    value={form.promoSecondBannerCtaText || ""}
+                    onChange={(e) => setForm({ ...form, promoSecondBannerCtaText: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="e.g. Shop Collection"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-adminMuted font-semibold block mb-2">CTA Link</label>
+                  <input
+                    value={form.promoSecondBannerCtaLink || ""}
+                    onChange={(e) => setForm({ ...form, promoSecondBannerCtaLink: e.target.value })}
+                    className="w-full rounded-md border border-adminBorder bg-white focus:ring-1 focus:ring-adminGold px-4 py-2.5 outline-none text-adminSidebar"
+                    placeholder="e.g. /collections/rings"
+                  />
+                </div>
+              </div>
+            </div>
+          </AdminCard>
+          </div>
         )}
 
         {/* ABOUT TAB */}

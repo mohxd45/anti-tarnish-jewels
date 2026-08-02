@@ -75,12 +75,12 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <section className="relative flex min-h-[560px] md:min-h-[85vh] items-center justify-center overflow-hidden w-full">
+      <section className="relative flex min-h-[360px] md:min-h-[85vh] items-center justify-center overflow-hidden w-full">
         <div className="absolute inset-0 z-0">
           <img
             src="/lona-hero-bg.png"
             alt="LONA JEWELS Collection"
-            className="h-full w-full object-cover opacity-90 md:opacity-100"
+            className="h-full w-full object-cover object-[center_30%] opacity-90 md:opacity-100"
           />
           {/* Soft dark/rose overlay for premium feel and text readability */}
           <div
@@ -94,23 +94,85 @@ export default async function HomePage() {
 
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 md:px-0 pt-8 md:pt-0">
           <div className="mb-6 md:mb-10 text-center flex flex-col items-center">
-            <p className="mb-3 md:mb-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white/90 md:text-stoneGray drop-shadow-sm md:drop-shadow-none">
+            <p className="mb-2 md:mb-4 text-[10px] sm:text-sm font-semibold uppercase tracking-widest text-white/90 md:text-stoneGray drop-shadow-sm md:drop-shadow-none">
               {heroSmallTitle}
             </p>
-            <h1 className="mb-4 md:mb-6 font-serif text-5xl leading-[1.1] md:text-7xl lg:text-8xl text-white md:text-charcoalBrown drop-shadow-md md:drop-shadow-none">
+            <h1 className="mb-3 md:mb-6 font-serif text-4xl leading-[1.15] md:text-7xl lg:text-8xl text-white md:text-charcoalBrown drop-shadow-md md:drop-shadow-none">
               {heroMainHeading}
             </h1>
-            <p className="mx-auto mb-8 max-w-lg text-base md:text-xl text-white/90 md:text-stoneGray drop-shadow-sm md:drop-shadow-none font-medium md:font-normal">
+            <p className="mx-auto mb-6 md:mb-8 max-w-lg text-sm md:text-xl text-white/90 md:text-stoneGray drop-shadow-sm md:drop-shadow-none font-medium md:font-normal px-4">
               {heroSubtitle}
             </p>
             <div className="w-full sm:w-auto px-4 sm:px-0">
-              <Link href={heroCtaLink} className="flex items-center justify-center w-full sm:w-auto px-8 h-14 bg-[#B8955E] text-white font-medium rounded-full shadow-[0_8px_20px_rgba(184,149,94,0.3)] hover:bg-[#A38250] hover:shadow-[0_12px_24px_rgba(184,149,94,0.4)] transition-all text-base tracking-wide">
+              <Link href={heroCtaLink} className="flex items-center justify-center w-full sm:w-auto px-8 h-12 md:h-14 bg-[#B8955E] text-white font-medium rounded-full shadow-[0_8px_20px_rgba(184,149,94,0.3)] hover:bg-[#A38250] hover:shadow-[0_12px_24px_rgba(184,149,94,0.4)] transition-all text-sm md:text-base tracking-wide">
                 {heroCtaText}
               </Link>
             </div>
           </div>
         </div>
       </section>
+
+      {/* SECONDARY PROMO BANNER */}
+      {content?.promoSecondBannerImage && (
+        <section className="w-full px-4 md:px-8 py-6 md:py-12 bg-white">
+          <div className="mx-auto max-w-7xl relative overflow-hidden rounded-2xl group cursor-pointer block">
+            {content.promoSecondBannerCtaLink ? (
+              <Link href={content.promoSecondBannerCtaLink} className="block relative h-full w-full">
+                <div className="relative min-h-[160px] md:min-h-[300px] w-full flex items-center p-6 md:p-12">
+                  <div className="absolute inset-0 z-0">
+                    <img 
+                      src={content.promoSecondBannerImage} 
+                      alt={content?.promoSecondBannerHeading || "Promotional Banner"} 
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-500" />
+                  </div>
+                  <div className="relative z-10 w-full max-w-lg">
+                    {content.promoSecondBannerSubtext && (
+                      <p className="text-white/90 text-xs md:text-sm uppercase tracking-widest font-semibold mb-2">
+                        {content.promoSecondBannerSubtext}
+                      </p>
+                    )}
+                    {content.promoSecondBannerHeading && (
+                      <h2 className="text-white font-serif text-2xl md:text-4xl mb-4 leading-tight">
+                        {content.promoSecondBannerHeading}
+                      </h2>
+                    )}
+                    {content.promoSecondBannerCtaText && (
+                      <span className="inline-block border border-white/50 text-white px-5 py-2 text-xs md:text-sm font-medium tracking-wide uppercase hover:bg-white hover:text-charcoalBrown transition-colors">
+                        {content.promoSecondBannerCtaText}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <div className="relative min-h-[160px] md:min-h-[300px] w-full flex items-center p-6 md:p-12">
+                  <div className="absolute inset-0 z-0">
+                    <img 
+                      src={content.promoSecondBannerImage} 
+                      alt={content?.promoSecondBannerHeading || "Promotional Banner"} 
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+                  </div>
+                  <div className="relative z-10 w-full max-w-lg">
+                    {content.promoSecondBannerSubtext && (
+                      <p className="text-white/90 text-xs md:text-sm uppercase tracking-widest font-semibold mb-2">
+                        {content.promoSecondBannerSubtext}
+                      </p>
+                    )}
+                    {content.promoSecondBannerHeading && (
+                      <h2 className="text-white font-serif text-2xl md:text-4xl leading-tight">
+                        {content.promoSecondBannerHeading}
+                      </h2>
+                    )}
+                  </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       <HomepageProductSlider 
         title="Bestsellers" 

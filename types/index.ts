@@ -222,6 +222,11 @@ export type SiteContent = {
   heroSubtitle?: string;
   heroCtaText?: string;
   heroCtaLink?: string;
+  promoSecondBannerImage?: string;
+  promoSecondBannerHeading?: string;
+  promoSecondBannerSubtext?: string;
+  promoSecondBannerCtaText?: string;
+  promoSecondBannerCtaLink?: string;
   footerText?: string;
   aboutText?: string;
   faqText?: string;
