@@ -202,12 +202,12 @@ export default function CheckoutPage() {
               <input type="radio" name="pm" defaultChecked={cart.total > 300} disabled={settings?.codEnabled === false || cart.total <= 300} className="mt-1 accent-[#B8955E] h-4 w-4" /> 
               <div className="flex flex-col w-full">
                 <span className={`text-base font-medium ${(settings?.codEnabled === false || cart.total <= 300) ? 'text-stone-400' : 'text-[#3A2428]'}`}>
-                  Cash on Delivery
+                  {cart.total > 300 ? "Partial COD" : "Cash on Delivery"}
                   {settings?.codEnabled === false && " (Disabled)"}
                 </span>
                 
                 {settings?.codEnabled !== false && cart.total <= 300 && (
-                  <span className="text-sm text-red-500 mt-0.5 font-medium">Minimum order value for COD is ₹301. Please add more items to your cart.</span>
+                  <span className="text-sm text-red-500 mt-0.5 font-medium">COD is available only for orders above ₹300.</span>
                 )}
               </div>
             </label>
@@ -220,7 +220,7 @@ export default function CheckoutPage() {
                   <ShieldCheck className="h-4 w-4 text-[#B8955E]" /> ₹100 Advance Required
                 </h4>
                 <p className="text-[13px] text-[#8F817B] mb-4 leading-relaxed">
-                  To confirm your COD order, ₹100 advance is required. After advance confirmation, the remaining amount will be collected when your jewellery is delivered.
+                  Please pay ₹100 advance to confirm this COD order. Remaining amount will be paid on delivery.
                 </p>
                 <div className="bg-white border border-[#E8D7C8]/50 rounded-xl p-3 text-sm space-y-1.5">
                   <div className="flex justify-between text-[#8F817B]">
@@ -232,13 +232,10 @@ export default function CheckoutPage() {
                     <span>₹100</span>
                   </div>
                   <div className="flex justify-between text-[#3A2428] font-medium pt-1">
-                    <span>Balance After Advance</span>
+                    <span>Remaining Amount on Delivery</span>
                     <span>₹{cart.total - 100}</span>
                   </div>
                 </div>
-                <p className="text-[11px] text-[#8F817B] mt-3 font-medium bg-[#B8955E]/5 inline-block px-2 py-1 rounded">
-                  * ₹100 advance is part of your total, not an extra charge.
-                </p>
               </div>
             )}
             
@@ -275,17 +272,17 @@ export default function CheckoutPage() {
             <div className="space-y-4 max-h-[40vh] overflow-y-auto no-scrollbar pr-1 mb-5">
               {cart.items.map((it) => (
                 <div key={it.product.id} className="flex gap-4">
-                  <div className="relative h-[64px] w-[64px] rounded-xl border border-[#E8D7C8] bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="relative h-[80px] w-[80px] md:h-[96px] md:w-[96px] rounded-xl border border-[#E8D7C8] bg-white overflow-hidden shrink-0 flex items-center justify-center">
                     {it.product.images?.[0] ? (
                       <OptimizedImage 
-                        src={getOptimizedImageUrl(it.product.images[0], 150)} 
+                        src={getOptimizedImageUrl(it.product.images[0], 250)} 
                         alt="" 
                         fill
-                        sizes="64px"
+                        sizes="96px"
                         className="object-cover" 
                       />
                     ) : (
-                      <OptimizedImage src="/product-stack.jpg" alt="Product" fill sizes="64px" className="object-cover opacity-80" />
+                      <OptimizedImage src="/product-stack.jpg" alt="Product" fill sizes="96px" className="object-cover opacity-80" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1 flex flex-col justify-center">
@@ -370,20 +367,28 @@ export default function CheckoutPage() {
           </aside>
 
           {/* Sticky Place Order Bar */}
-          <div className="fixed bottom-0 left-0 right-0 z-[100] bg-[#FFF9FB] border-t border-[#E8D7C8] px-4 py-3 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(58,36,40,0.06)] lg:static lg:bottom-auto lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:pb-0 lg:mt-0">
+          <div className="fixed bottom-0 left-0 right-0 z-[100] bg-[#FFF9FB] border-t border-[#E8D7C8] px-4 py-3 pb-[calc(16px+env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(58,36,40,0.06)] lg:static lg:bottom-auto lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:pb-0 lg:mt-0 mb-14 lg:mb-0">
             <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
               <div className="flex flex-col lg:hidden">
                 <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8F817B]">Total</span>
                 <span className="text-[20px] leading-tight font-bold text-[#B8955E]">₹{cart.total}</span>
               </div>
-              <button 
-                type="submit" 
-                form="checkout-form" 
-                disabled={loading || settings?.codEnabled === false || cart.total <= 300} 
-                className="w-[60%] lg:w-full bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] hover:from-[#A08050] hover:to-[#C6AE8B] text-white font-semibold py-3.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? "Processing..." : (cart.total > 300 ? "Place Order (₹100 Advance)" : "Minimum ₹301 Required")}
-              </button>
+              <div className="w-[60%] lg:w-full flex flex-col items-center">
+                <button 
+                  type="submit" 
+                  form="checkout-form" 
+                  disabled={loading || settings?.codEnabled === false || cart.total <= 300} 
+                  className="w-full bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] hover:from-[#A08050] hover:to-[#C6AE8B] text-white font-semibold py-3.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? "Processing..." : (cart.total > 300 ? "Confirm COD Order" : "Confirm Order")}
+                </button>
+                {cart.total > 300 && (
+                  <span className="text-[10px] text-[#8F817B] mt-1 font-medium hidden lg:block">₹100 advance required</span>
+                )}
+                {cart.total > 300 && (
+                  <span className="text-[10px] text-[#8F817B] mt-1 font-medium lg:hidden">₹100 advance required</span>
+                )}
+              </div>
             </div>
           </div>
         </div>

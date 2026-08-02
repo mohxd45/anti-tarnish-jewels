@@ -277,7 +277,7 @@ export async function POST(req: Request) {
         initialDesc = "Your order requires a ₹100 advance payment to be confirmed.";
         advanceRequired = true;
         advanceAmount = 100;
-        payOnDeliveryAmount = total;
+        payOnDeliveryAmount = total - 100;
         codAdvanceStatus = "pending";
         initialPaymentStatus = "pending_advance";
         displayPaymentMethod = "cod_with_advance";
