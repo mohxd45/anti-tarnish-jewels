@@ -15,6 +15,7 @@ import { HeartLoader } from "@/components/ui/HeartLoader";
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 import Link from "next/link";
 import { toast } from "sonner";
+import { revalidateStorefrontAction } from "@/app/actions/revalidate-storefront";
 
 export default function ManageProductsPage() {
   const { user } = useAuth();
@@ -125,6 +126,14 @@ export default function ManageProductsPage() {
       }
       setProducts(products.filter((p) => p.id !== id));
       toast.success("Product deleted successfully");
+      
+      const token = await user?.getIdToken();
+      if (token) {
+        const revRes = await revalidateStorefrontAction(token);
+        if (!revRes.success) {
+          toast.warning("Product deleted, but storefront cache refresh failed");
+        }
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete product.");
@@ -336,6 +345,14 @@ export default function ManageProductsPage() {
       setProducts(newProducts);
       setEditingProduct(null);
       toast.success("Product updated successfully!");
+      
+      const token = await user?.getIdToken();
+      if (token) {
+        const revRes = await revalidateStorefrontAction(token);
+        if (!revRes.success) {
+          toast.warning("Product updated, but storefront cache refresh failed");
+        }
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to save changes.");

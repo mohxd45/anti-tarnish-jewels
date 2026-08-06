@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { revalidateStorefrontAction } from "@/app/actions/revalidate-storefront";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -227,6 +228,13 @@ export default function AddProductPage() {
       }
       
       toast.success("Product added successfully!");
+      const token = await user?.getIdToken();
+      if (token) {
+        const revRes = await revalidateStorefrontAction(token);
+        if (!revRes.success) {
+          toast.warning("Product added, but storefront cache refresh failed");
+        }
+      }
       
       router.push("/admin/products");
     } catch (err: any) {

@@ -9,7 +9,7 @@ import { Metadata } from "next";
 // Optional: Dynamic metadata for SEO
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const product = await getProductBySlug(resolvedParams.slug);
+  const product = await getProductBySlug(resolvedParams.slug, true);
   if (!product) {
     return { title: "Product Not Found | LONA JEWELS" };
   }
@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ProductDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const product = await getProductBySlug(resolvedParams.slug);
+  const product = await getProductBySlug(resolvedParams.slug, true);
 
   if (!product || product.isActive === false) {
     return (

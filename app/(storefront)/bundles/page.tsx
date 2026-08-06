@@ -21,7 +21,7 @@ export default function BundlesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const all = await getProducts();
+        const all = await getProducts(true);
         const activeBundles = all.filter(p => p.isBundle && p.isActive !== false);
         setBundles(activeBundles);
       } catch (err) {

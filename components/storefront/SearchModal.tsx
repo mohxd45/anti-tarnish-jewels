@@ -25,7 +25,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       setQuery("");
       setLoading(true);
       // Pre-load products into memory when modal opens
-      getProducts().then((data) => {
+      getProducts(true).then((data) => {
         setProducts(data.filter((p) => p.isActive !== false));
         setLoading(false);
       }).catch((err) => {

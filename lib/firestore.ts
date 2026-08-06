@@ -84,7 +84,7 @@ function setSessionCache<T>(key: string, value: T, ttlMs = 5 * 60 * 1000): void 
   }
 }
 
-export function withTimeout<T>(promise: Promise<T>, timeoutMs = 15000): Promise<T> {
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> => {
   return Promise.race([
     promise,
     new Promise<never>((_, reject) =>
@@ -196,12 +196,15 @@ export async function getProducts(forceRefresh = false): Promise<Product[]> {
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  if (!isServer && cachedProductBySlug[slug]) return cachedProductBySlug[slug];
-  const sessionCached = getSessionCache<Product>(`atj_cache_product_slug_${slug}`);
-  if (sessionCached) {
-    cachedProductBySlug[slug] = sessionCached;
-    return sessionCached;
+export async function getProductBySlug(slug: string, forceRefresh = false): Promise<Product | null> {
+  if (!forceRefresh && !isServer && cachedProductBySlug[slug]) return cachedProductBySlug[slug];
+  
+  if (!forceRefresh) {
+    const sessionCached = getSessionCache<Product>(`atj_cache_product_slug_${slug}`);
+    if (sessionCached) {
+      cachedProductBySlug[slug] = sessionCached;
+      return sessionCached;
+    }
   }
   
   if (!hasFirebaseConfig || !db) {

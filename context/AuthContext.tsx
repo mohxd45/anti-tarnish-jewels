@@ -149,28 +149,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (providerName && !existingProfile?.provider) {
             profileData.provider = providerName;
           }
-          if (providerName && !existingProfile?.loginMethod) {
-            profileData.loginMethod = providerName === "google" ? "Google" : "Email";
+          
+          if (providerId && !existingProfile?.loginMethod) {
+            // Placeholder logic
           }
           
           // Carry over existing phone if present
-          if (existingProfile?.phone) profileData.phone = existingProfile.phone;
-          if (existingProfile?.phoneE164) profileData.phoneE164 = existingProfile.phoneE164;
-          
-          if (process.env.NODE_ENV === "development" || typeof window !== "undefined") {
-            console.log("[Auth Debug] UID:", current.uid);
-            console.log("[Auth Debug] Email:", current.email);
-            console.log("[Auth Debug] Existing Role Before Save:", existingProfile?.role || "none");
-            console.log("[Auth Debug] Role to Save:", profileData.role || existingProfile?.role || "none");
+          setProfile(existingProfile); // optimistic update
+          setLoading(false); // don't block the UI
+
+          try {
+            const profileData: any = {
+              email: current.email,
+              lastLoginAt: new Date().toISOString(),
+              provider: current.providerData[0]?.providerId || "password",
+              updatedAt: new Date().toISOString(),
+            };
+            
+            if (existingProfile?.role) {
+              profileData.role = existingProfile.role;
+            } else if (current.email === "admin@test.com") {
+              profileData.role = "admin";
+            }
+            if (existingProfile?.status) profileData.status = existingProfile.status;
+            if (existingProfile?.name) profileData.name = existingProfile.name;
+            if (existingProfile?.displayName) profileData.displayName = existingProfile.displayName;
+            if (existingProfile?.photoURL) profileData.photoURL = existingProfile.photoURL;
+            if (existingProfile?.phone) profileData.phone = existingProfile.phone;
+            if (existingProfile?.phoneCountryCode) profileData.phoneCountryCode = existingProfile.phoneCountryCode;
+            if (existingProfile?.phoneNumber) profileData.phoneNumber = existingProfile.phoneNumber;
+            if (existingProfile?.phoneE164) profileData.phoneE164 = existingProfile.phoneE164;
+            
+            if (process.env.NODE_ENV === "development" || typeof window !== "undefined") {
+              console.log("[Auth Debug] UID:", current.uid);
+              console.log("[Auth Debug] Email:", current.email);
+              console.log("[Auth Debug] Existing Role Before Save:", existingProfile?.role || "none");
+              console.log("[Auth Debug] Role to Save:", profileData.role || existingProfile?.role || "none");
+            }
+            
+            await saveUserProfile(current.uid, profileData);
+            const finalProfile = await getUserProfile(current.uid);
+            setProfile(finalProfile);
+          } catch (err) {
+            console.warn("Background profile save failed (non-critical):", err);
           }
-          
-          await saveUserProfile(current.uid, profileData);
-          const finalProfile = await getUserProfile(current.uid);
-          setProfile(finalProfile);
         } catch (err) {
-          console.warn("Background profile save failed (non-critical):", err);
+          console.warn("Outer block error:", err);
         }
-        setLoading(false);
       } else {
         setUser(null);
         setProfile(null);

@@ -41,35 +41,7 @@ export function BundleDetailsClient({ product: bundle }: { product: Product }) {
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-        <div className="space-y-4">
-          <div className="relative aspect-square sm:aspect-[4/5] md:aspect-auto md:h-[480px] rounded-[24px] overflow-hidden bg-[#FFF9FB] border border-[#E8D7C8]/50 shadow-sm flex items-center justify-center p-4">
-            {savings > 0 && (
-              <div className="absolute top-4 left-4 z-10 bg-[#B8955E] text-white text-[10px] font-bold uppercase tracking-widest py-1 px-3 rounded-full shadow-sm">
-                Save {formatPrice(savings)}
-              </div>
-            )}
-            {bundle.images?.[0] ? (
-              <OptimizedImage 
-                src={bundle.images[0]} 
-                alt={bundle.name} 
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-contain mix-blend-multiply" 
-              />
-            ) : (
-              <Image 
-                src="/product-stack.jpg" 
-                alt="Fallback bundle" 
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-contain mix-blend-multiply" 
-              />
-            )}
-          </div>
-        </div>
-
+      <div className="flex flex-col max-w-4xl mx-auto">
         {/* Info Column */}
         <div className="flex flex-col">
           <div className="mb-4 flex flex-wrap gap-2 items-center">

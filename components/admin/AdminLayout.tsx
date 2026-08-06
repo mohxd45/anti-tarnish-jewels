@@ -17,6 +17,7 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?
 const nav: NavItem[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/analytics", label: "Analytics", icon: LineChart, adminOnly: true },
+  { to: "/admin/sales-report", label: "Sales Report", icon: FileText, adminOnly: true },
   { to: "/admin/site-content", label: "Website Text", icon: FileText, adminOnly: true },
   { to: "/admin/banners", label: "Banner & Ads", icon: ImageIcon, adminOnly: true },
   { to: "/admin/homepage-sections", label: "Home Layout", icon: LayoutGrid, adminOnly: true },

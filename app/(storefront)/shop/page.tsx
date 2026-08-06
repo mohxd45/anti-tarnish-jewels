@@ -42,7 +42,7 @@ function ShopContent() {
       try {
         setLoading(true);
         const [allProds] = await Promise.all([
-          getProducts()
+          getProducts(true)
         ]);
         
         const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false && p.isBundle !== true) : [];

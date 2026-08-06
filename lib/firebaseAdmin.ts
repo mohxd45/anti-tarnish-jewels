@@ -5,7 +5,10 @@ import { getFirestore } from "firebase-admin/firestore";
 
 if (!getApps().length) {
   try {
-    if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    if (process.env.FIRESTORE_EMULATOR_HOST) {
+      initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || "demo-noore-jewels" });
+      console.log("Firebase Admin SDK initialized successfully for emulators.");
+    } else if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
       // EASIEST METHOD: Parse the entire JSON string if provided
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
       initializeApp({
