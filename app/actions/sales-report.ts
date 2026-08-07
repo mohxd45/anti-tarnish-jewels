@@ -23,6 +23,22 @@ export type ItemBreakdown = {
   childItems: { name: string; quantity: number }[];
 };
 
+export type ReportOrderItem = {
+  productId?: string;
+  name: string;
+  sku?: string;
+  type?: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  selectedBundleItems?: {
+    id?: string;
+    name: string;
+    sku?: string;
+    quantity?: number;
+  }[];
+};
+
 export type OrderSummary = {
   id: string;
   orderNumber: string;
@@ -32,7 +48,11 @@ export type OrderSummary = {
   paymentStatus: string;
   orderStatus: string;
   quantity: number;
+  subtotal: number;
+  discount: number;
+  shippingFee: number;
   total: number;
+  items: ReportOrderItem[];
 };
 
 export type SalesReportData = {
@@ -140,11 +160,46 @@ export async function getSalesReport(
       const orderDiscount = typeof order.discount === "number" ? order.discount : 0;
       const orderShipping = typeof order.shippingFee === "number" ? order.shippingFee : (order.shipping || 0);
 
-      // Quantities
+      // Quantities and Normalized Items
       let totalItemQty = 0;
+      const normalizedItems: ReportOrderItem[] = [];
+      
       if (Array.isArray(order.items)) {
          for (const item of order.items) {
-           totalItemQty += (item.quantity || 1);
+           const qty = typeof item.quantity === "number" ? item.quantity : 1;
+           const price = typeof item.price === "number" ? item.price : (item.bundlePrice || 0);
+           const sku = item.sku || item.bundleSku || "UNKNOWN-SKU";
+           const name = item.name || item.bundleName || "Unknown Item";
+           const type = item.type || "product";
+           
+           totalItemQty += qty;
+           
+           const isBundleParent = type === "bundle" || type === "mix_and_match_bundle";
+           const selectedBundleItems: { id?: string, name: string, sku?: string, quantity?: number }[] = [];
+           
+           if (isBundleParent && Array.isArray(item.selectedProducts)) {
+              for (const child of item.selectedProducts) {
+                 const childName = child.name || child.itemName || "Unknown Child";
+                 const childQty = (child.selectedQuantity || 1) * qty;
+                 selectedBundleItems.push({
+                   id: child.id || child.productId,
+                   name: childName,
+                   sku: child.sku,
+                   quantity: childQty
+                 });
+              }
+           }
+           
+           normalizedItems.push({
+             productId: item.productId || item.id,
+             name,
+             sku,
+             type,
+             quantity: qty,
+             unitPrice: price,
+             lineTotal: price * qty,
+             ...(selectedBundleItems.length > 0 ? { selectedBundleItems } : {})
+           });
          }
       }
 
@@ -162,47 +217,35 @@ export async function getSalesReport(
          summary.totalItemQuantity += totalItemQty;
 
          // Aggregate Items
-         if (Array.isArray(order.items)) {
-            for (const item of order.items) {
-               const qty = typeof item.quantity === "number" ? item.quantity : 1;
-               const price = typeof item.price === "number" ? item.price : (item.bundlePrice || 0);
-               const sku = item.sku || item.bundleSku || "UNKNOWN-SKU";
-               const name = item.name || item.bundleName || "Unknown Item";
-               const type = item.type || "product";
-               
-               const isBundleParent = type === "bundle" || type === "mix_and_match_bundle";
-               const uniqueKey = `${isBundleParent ? 'bundle' : 'product'}_${sku}_${name}`;
+         for (const item of normalizedItems) {
+            const isBundleParent = item.type === "bundle" || item.type === "mix_and_match_bundle";
+            const uniqueKey = `${isBundleParent ? 'bundle' : 'product'}_${item.sku}_${item.name}`;
 
-               let existing = itemMap.get(uniqueKey);
-               if (!existing) {
-                 existing = {
-                   id: uniqueKey,
-                   name,
-                   sku,
-                   quantity: 0,
-                   unitPrice: price,
-                   totalValue: 0,
-                   isBundleParent,
-                   childItems: []
-                 };
-                 itemMap.set(uniqueKey, existing);
-               }
+            let existing = itemMap.get(uniqueKey);
+            if (!existing) {
+              existing = {
+                id: uniqueKey,
+                name: item.name,
+                sku: item.sku || "UNKNOWN-SKU",
+                quantity: 0,
+                unitPrice: item.unitPrice,
+                totalValue: 0,
+                isBundleParent,
+                childItems: []
+              };
+              itemMap.set(uniqueKey, existing);
+            }
 
-               existing.quantity += qty;
-               existing.totalValue += (price * qty);
+            existing.quantity += item.quantity;
+            existing.totalValue += item.lineTotal;
 
-               // Extract child items if it's a mix & match bundle
-               if (isBundleParent && Array.isArray(item.selectedProducts)) {
-                  for (const child of item.selectedProducts) {
-                     const childName = child.name || child.itemName || "Unknown Child";
-                     // Do not double count price, just register existence/qty
-                     const childQty = (child.selectedQuantity || 1) * qty;
-                     const existingChild = existing.childItems.find(c => c.name === childName);
-                     if (existingChild) {
-                        existingChild.quantity += childQty;
-                     } else {
-                        existing.childItems.push({ name: childName, quantity: childQty });
-                     }
+            if (item.selectedBundleItems) {
+               for (const child of item.selectedBundleItems) {
+                  const existingChild = existing.childItems.find(c => c.name === child.name);
+                  if (existingChild) {
+                     existingChild.quantity += (child.quantity || 1);
+                  } else {
+                     existing.childItems.push({ name: child.name, quantity: child.quantity || 1 });
                   }
                }
             }
@@ -219,7 +262,11 @@ export async function getSalesReport(
         paymentStatus: order.paymentStatus || "Unknown",
         orderStatus: status || "Unknown",
         quantity: totalItemQty,
-        total: orderTotal
+        subtotal: orderSubtotal,
+        discount: orderDiscount,
+        shippingFee: orderShipping,
+        total: orderTotal,
+        items: normalizedItems
       });
     });
 

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/utils";
 import { getSalesReport, SalesReportData } from "@/app/actions/sales-report";
 import { toast } from "sonner";
-import { RefreshCw, Search, Calendar } from "lucide-react";
+import { RefreshCw, Search, Calendar, Download, Copy } from "lucide-react";
 import { format } from "date-fns";
 
 export default function SalesReportPage() {
@@ -55,6 +55,109 @@ export default function SalesReportPage() {
     fetchReport(date);
   }, [date, user]);
 
+  const escapeCsv = (val: any) => {
+    if (val === null || val === undefined) return "";
+    const str = String(val);
+    if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const triggerDownload = (filename: string, content: string) => {
+    const blob = new Blob(["\uFEFF" + content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const generateOrdersData = () => {
+    if (!data || data.orders.length === 0) return null;
+    const rows = [];
+    for (const order of data.orders) {
+      const timeStr = new Date(order.createdAt).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit' });
+      if (!order.items || order.items.length === 0) {
+        rows.push([
+          date, order.orderNumber, timeStr, order.customerName, order.paymentMethod, order.paymentStatus, order.orderStatus,
+          "No Items", "", "", 0, 0, 0, "", order.subtotal, order.discount, order.shippingFee, order.total, "INR"
+        ]);
+      } else {
+        for (const item of order.items) {
+          const selectedChildren = item.selectedBundleItems 
+            ? item.selectedBundleItems.map((c: any) => `${c.name} x${c.quantity}`).join(", ") 
+            : "";
+          rows.push([
+            date, order.orderNumber, timeStr, order.customerName, order.paymentMethod, order.paymentStatus, order.orderStatus,
+            item.name, item.sku || "", item.type || "product", item.quantity, item.unitPrice, item.lineTotal, selectedChildren,
+            order.subtotal, order.discount, order.shippingFee, order.total, "INR"
+          ]);
+        }
+      }
+    }
+    return rows;
+  };
+
+  const generateItemsData = () => {
+    if (!data || data.itemBreakdown.length === 0) return null;
+    return data.itemBreakdown.map(item => [
+      date, item.name, item.sku, item.quantity, item.unitPrice, item.totalValue, "INR"
+    ]);
+  };
+
+  const exportOrdersCsv = () => {
+    const rows = generateOrdersData();
+    if (!rows) return;
+    const headers = [
+      "Report Date", "Order Number", "Order Time", "Customer Name", "Payment Method", "Payment Status", "Order Status",
+      "Product / Bundle", "SKU", "Item Type", "Quantity", "Unit Price", "Line Total", "Selected Bundle Items",
+      "Order Subtotal", "Order Discount", "Shipping", "Final Order Total", "Currency"
+    ];
+    const csvContent = [headers, ...rows].map(row => row.map(escapeCsv).join(",")).join("\n");
+    triggerDownload(`lona-jewels-orders-${date}.csv`, csvContent);
+  };
+
+  const copyOrdersTsv = async () => {
+    const rows = generateOrdersData();
+    if (!rows) return;
+    const headers = [
+      "Report Date", "Order Number", "Order Time", "Customer Name", "Payment Method", "Payment Status", "Order Status",
+      "Product / Bundle", "SKU", "Item Type", "Quantity", "Unit Price", "Line Total", "Selected Bundle Items",
+      "Order Subtotal", "Order Discount", "Shipping", "Final Order Total", "Currency"
+    ];
+    const tsvContent = [headers, ...rows].map(row => row.map(val => String(val).replace(/\t|\n/g, " ")).join("\t")).join("\n");
+    try {
+      await navigator.clipboard.writeText(tsvContent);
+      toast.success("Orders copied for Google Sheets");
+    } catch (err) {
+      toast.error("Failed to copy to clipboard");
+    }
+  };
+
+  const exportItemsCsv = () => {
+    const rows = generateItemsData();
+    if (!rows) return;
+    const headers = ["Report Date", "Product / Bundle", "SKU", "Quantity Sold", "Unit Price", "Total Sales Value", "Currency"];
+    const csvContent = [headers, ...rows].map(row => row.map(escapeCsv).join(",")).join("\n");
+    triggerDownload(`lona-jewels-items-${date}.csv`, csvContent);
+  };
+
+  const copyItemsTsv = async () => {
+    const rows = generateItemsData();
+    if (!rows) return;
+    const headers = ["Report Date", "Product / Bundle", "SKU", "Quantity Sold", "Unit Price", "Total Sales Value", "Currency"];
+    const tsvContent = [headers, ...rows].map(row => row.map(val => String(val).replace(/\t|\n/g, " ")).join("\t")).join("\n");
+    try {
+      await navigator.clipboard.writeText(tsvContent);
+      toast.success("Item summary copied for Google Sheets");
+    } catch (err) {
+      toast.error("Failed to copy to clipboard");
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -63,6 +166,44 @@ export default function SalesReportPage() {
         <div>
           <h1 className="text-2xl font-serif text-adminSidebar">Daily Sales Report</h1>
           <p className="text-sm text-adminMuted">View sales and item breakdowns for a specific date (Asia/Kolkata).</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs bg-white text-adminSidebar border-adminBorder"
+              onClick={exportOrdersCsv}
+              disabled={loading || !data || data.orders.length === 0}
+            >
+              <Download className="h-3.5 w-3.5 mr-1.5" /> Export Orders CSV
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs bg-white text-adminSidebar border-adminBorder"
+              onClick={exportItemsCsv}
+              disabled={loading || !data || data.itemBreakdown.length === 0}
+            >
+              <Download className="h-3.5 w-3.5 mr-1.5" /> Export Item Summary
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs bg-white text-adminSidebar border-adminBorder"
+              onClick={copyOrdersTsv}
+              disabled={loading || !data || data.orders.length === 0}
+            >
+              <Copy className="h-3.5 w-3.5 mr-1.5" /> Copy Orders
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs bg-white text-adminSidebar border-adminBorder"
+              onClick={copyItemsTsv}
+              disabled={loading || !data || data.itemBreakdown.length === 0}
+            >
+              <Copy className="h-3.5 w-3.5 mr-1.5" /> Copy Item Summary
+            </Button>
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
