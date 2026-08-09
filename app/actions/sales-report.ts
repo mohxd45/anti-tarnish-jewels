@@ -1,6 +1,7 @@
 "use server";
 
 import { adminDb, adminAuth } from "@/lib/firebaseAdmin";
+import { verifyAdminAccess, AdminAuthorizationError } from "@/lib/server/admin-auth";
 
 export type SalesSummary = {
   totalOrders: number;
@@ -70,24 +71,13 @@ export async function getSalesReport(
       return { success: false, error: "Server misconfiguration. Admin SDK not initialized." };
     }
 
-    if (!idToken) {
-      return { success: false, error: "Unauthorized" };
-    }
-
     try {
-      // Verify token
-      const decodedToken = await adminAuth.verifyIdToken(idToken, true);
-      const userRef = adminDb.collection("users").doc(decodedToken.uid);
-      const userSnap = await userRef.get();
-      const userData = userSnap.data();
-      
-      // Strict role check matching existing project rules
-      if (!userSnap.exists || (userData?.role !== "admin" && userData?.role !== "owner")) {
+      await verifyAdminAccess(idToken);
+    } catch (err: any) {
+      if (err instanceof AdminAuthorizationError) {
         return { success: false, error: "Unauthorized" };
       }
-    } catch (err: any) {
-      console.warn("Sales report auth error:", err.message);
-      return { success: false, error: "Unauthorized" };
+      return { success: false, error: "Failed to load sales report." };
     }
 
     // Date calculations for Asia/Kolkata boundary (UTC+5:30)

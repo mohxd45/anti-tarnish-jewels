@@ -5,6 +5,7 @@ import { HomepageFlashSaleBanner } from "@/components/storefront/HomepageFlashSa
 import { AnnouncementTicker } from "@/components/storefront/AnnouncementTicker";
 import { CategoryBar } from "@/components/storefront/CategoryBar";
 import { HomepageProductSlider } from "@/components/storefront/HomepageProductSlider";
+import { HomepageBundleCarousel } from "@/components/storefront/HomepageBundleCarousel";
 
 export const metadata = {
   title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
@@ -112,6 +113,16 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <HomepageBundleCarousel />
+
+      <HomepageProductSlider 
+        title="Bestsellers" 
+        subtitle="Most loved by our customers" 
+        ctaTo="/shop" 
+        products={bestsellers}
+        bgColorClass="bg-[#FFF9FB]" 
+      />
+
       {/* SECONDARY PROMO BANNER */}
       {content?.promoSecondBannerImage && (
         <section className="w-full px-4 md:px-8 py-6 md:py-12 bg-white">
@@ -173,14 +184,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      <HomepageProductSlider 
-        title="Bestsellers" 
-        subtitle="Most loved by our customers" 
-        ctaTo="/shop" 
-        products={bestsellers}
-        bgColorClass="bg-[#FFF9FB]" 
-      />
 
       <HomepageProductSlider 
         title="New Arrivals" 

@@ -31,21 +31,27 @@ export default function SalesReportPage() {
   const [date, setDate] = useState<string>(getTodayStr());
   const [data, setData] = useState<SalesReportData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchReport = async (targetDate: string) => {
     if (!user) return;
     setLoading(true);
+    setErrorMsg(null);
     try {
       const token = await user.getIdToken(true);
       const res = await getSalesReport(targetDate, token);
       if (!res.success) {
-        toast.error(res.error || "Failed to load sales report");
+        if (res.error === "Unauthorized") {
+          setErrorMsg("You are not authorized to view this report.");
+        } else {
+          setErrorMsg("Failed to load sales report.");
+        }
         setData(null);
       } else {
         setData(res.data || null);
       }
     } catch (err) {
-      toast.error("Internal error fetching report");
+      setErrorMsg("Failed to load sales report.");
       setData(null);
     }
     setLoading(false);
@@ -235,10 +241,10 @@ export default function SalesReportPage() {
         </div>
       </div>
 
-      {!loading && !data && (
+      {!loading && errorMsg && (
         <AdminCard>
           <div className="p-12 text-center text-adminMuted">
-            Failed to load data or unauthorized.
+            {errorMsg}
           </div>
         </AdminCard>
       )}
@@ -320,7 +326,7 @@ export default function SalesReportPage() {
                <h2 className="text-lg font-serif text-adminSidebar">Order History</h2>
                <AdminCard>
                  {data.orders.length === 0 ? (
-                   <div className="p-8 text-center text-sm text-adminMuted">No orders found for the selected date.</div>
+                   <div className="p-8 text-center text-sm text-adminMuted">No sales found for the selected date.</div>
                  ) : (
                    <div className="overflow-x-auto">
                      <table className="w-full text-sm whitespace-nowrap">

@@ -5,6 +5,8 @@ import { invalidateStorefrontCache } from "@/lib/server/storefront-cache";
 import { z } from "zod";
 import { DocumentSnapshot } from "firebase-admin/firestore";
 
+import { verifyAdminAccess } from "@/lib/server/admin-auth";
+
 // --- Zod Schemas ---
 const IndependentItemSchema = z.object({
   id: z.string().min(1),
@@ -48,20 +50,8 @@ export async function saveBundleServer(rawPayload: any, bundleId?: string, idTok
     throw new Error("Admin SDK not initialized");
   }
 
-  // 1. Authorization
-  if (!idToken) {
-    throw new Error("Unauthorized");
-  }
-  try {
-    const decodedToken = await adminAuth.verifyIdToken(idToken, true);
-    const callerDoc = await adminDb.collection("users").doc(decodedToken.uid).get();
-    if (!callerDoc.exists || callerDoc.data()?.role !== "admin") {
-      throw new Error("Unauthorized");
-    }
-  } catch (error: any) {
-    console.error("[saveBundleServer] Auth Error:", error.message);
-    throw new Error("Unauthorized");
-  }
+  // 1. Authenticate caller
+  const adminUser = await verifyAdminAccess(idToken);
 
   // 2. Base Validation
   const parseResult = BundleMutationSchema.safeParse(rawPayload);

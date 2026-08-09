@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { AnnouncementSettings } from "@/types";
 import { X } from "lucide-react";
+import Link from "next/link";
 
 export function PromoPopup({ settings }: { settings: AnnouncementSettings | null }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,13 +34,13 @@ export function PromoPopup({ settings }: { settings: AnnouncementSettings | null
         <h2 className="text-2xl font-serif text-charcoalBrown mb-2">{settings.popupOfferTitle || "Join Our Newsletter"}</h2>
         <p className="text-stoneGray mb-6 text-sm">{settings.popupOfferText || "Sign up for exclusive offers and updates."}</p>
         {settings.popupOfferLinkUrl ? (
-          <a 
-            href={settings.popupOfferLinkUrl} 
+          <Link 
+            href="/bundles" 
             onClick={close}
             className="inline-block bg-[color:var(--color-gold)] text-white px-8 py-3 rounded-full hover:bg-[color:var(--color-gold)]/90 transition-colors font-medium shadow-lg hover:shadow-xl w-full sm:w-auto"
           >
             {settings.popupOfferLinkText || "Shop Now"}
-          </a>
+          </Link>
         ) : (
           <div className="flex gap-2">
             <input type="email" placeholder="Email address" className="w-full rounded-xl border border-stone-200 px-4 py-2 text-sm focus:border-[color:var(--color-gold)] focus:outline-none" />
