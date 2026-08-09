@@ -5,14 +5,14 @@ import { CapacitorListener } from "@/components/CapacitorListener";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://anti-tarnish-jewels-livid.vercel.app/"),
+  metadataBase: new URL("https://lonajewels.com/"),
   title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
   description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
   manifest: "/site.webmanifest",
   openGraph: {
     title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
     description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
-    url: "https://anti-tarnish-jewels-livid.vercel.app/",
+    url: "https://lonajewels.com/",
     siteName: "LONA JEWELS",
     images: [
       {
