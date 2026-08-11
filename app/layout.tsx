@@ -4,27 +4,43 @@ import { Providers } from "@/components/Providers";
 import { CapacitorListener } from "@/components/CapacitorListener";
 import { Analytics } from "@vercel/analytics/react";
 
+import { SITE_URL } from "@/lib/site-config";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lonajewels.com/"),
-  title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
-  description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    template: "%s | LONA JEWELS",
+    default: "LONA JEWELS | Anti-Tarnish Jewellery Online in India",
+  },
+  description: "Shop anti-tarnish jewellery from LONA JEWELS, including earrings, rings, bangles, necklaces, hair accessories, and curated bundles, available online in India.",
+  keywords: ["anti tarnish jewellery", "anti tarnish jewellery India", "earrings", "rings", "bangles", "necklaces", "jewellery bundles", "fashion jewellery", "LONA JEWELS"],
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
-    description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
-    url: "https://lonajewels.com/",
+    title: "LONA JEWELS | Anti-Tarnish Jewellery Online in India",
+    description: "Shop anti-tarnish jewellery from LONA JEWELS, including earrings, rings, bangles, necklaces, hair accessories, and curated bundles, available online in India.",
+    url: SITE_URL,
     siteName: "LONA JEWELS",
     images: [
       {
-        url: "/logo-pink.png",
-        width: 800,
-        height: 600,
-        alt: "LONA JEWELS Logo",
+        url: "/lona-hero-bg.png",
+        width: 1200,
+        height: 630,
+        alt: "LONA JEWELS Collection",
       },
     ],
     locale: "en_IN",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "LONA JEWELS | Anti-Tarnish Jewellery Online in India",
+    description: "Shop anti-tarnish jewellery from LONA JEWELS, including earrings, rings, bangles, necklaces, hair accessories, and curated bundles, available online in India.",
+    images: ["/lona-hero-bg.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  }
 };
 
 export const viewport = {

@@ -8,8 +8,13 @@ import { HomepageProductSlider } from "@/components/storefront/HomepageProductSl
 import { HomepageBundleCarousel } from "@/components/storefront/HomepageBundleCarousel";
 
 export const metadata = {
-  title: "LONA JEWELS | Fashion Jewellery & Hair Accessories",
-  description: "Shop trendy, budget-friendly fashion jewellery, Korean design pieces, earrings, rings, necklaces, bracelets, and stylish hair accessories at LONA JEWELS.",
+  title: {
+    absolute: "LONA JEWELS | Anti-Tarnish Jewellery Online in India",
+  },
+  description: "Shop anti-tarnish jewellery from LONA JEWELS, including earrings, rings, bangles, necklaces, hair accessories, and curated bundles, available online in India.",
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export const revalidate = 60;

@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Anti Tarnish Jewels',
   webDir: 'public',
   server: {
-    url: 'https://anti-tarnish-jewels-livid.vercel.app/',
+    url: 'https://lonajewels.com/',
     cleartext: false
   }
 };
