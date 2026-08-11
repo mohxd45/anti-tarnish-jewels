@@ -62,8 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     } catch (err) {
       console.error("Failed to fetch products for sitemap:", err);
-      // Fail the build rather than returning an empty or half-finished sitemap
-      throw new Error(`Sitemap generation blocked by Firestore Admin error: ${err}`);
+      console.warn("Falling back to static sitemap routes only. Please check your Firebase Admin credentials in Vercel.");
     }
   } else {
     console.warn("No Firebase Admin config found. Sitemap will only contain static routes.");
