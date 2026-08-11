@@ -198,7 +198,7 @@ export default function AccountOrdersPage() {
                               <div className="flex items-center gap-3">
                                 {item.product.images?.[0]?.trim() && (
                                   <div className="relative w-10 h-10 rounded overflow-hidden border border-stone-200/30">
-                                    <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
+                                    <Image src={item.product.images?.[0] || "/product-stack.jpg"} alt={item.product.name} fill className="object-cover" />
                                   </div>
                                 )}
                                 <div>

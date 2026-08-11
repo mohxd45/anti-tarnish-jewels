@@ -1173,12 +1173,14 @@ const defaultBanners: Banner[] = [
   }
 ];
 
-export async function getBanners(): Promise<Banner[]> {
-  if (!isServer && cachedBanners) return cachedBanners;
-  const sessionCached = getSessionCache<Banner[]>("atj_cache_banners");
-  if (sessionCached) {
-    cachedBanners = sessionCached;
-    return sessionCached;
+export async function getBanners(forceRefresh = false): Promise<Banner[]> {
+  if (!forceRefresh) {
+    if (!isServer && cachedBanners) return cachedBanners;
+    const sessionCached = getSessionCache<Banner[]>("atj_cache_banners");
+    if (sessionCached) {
+      cachedBanners = sessionCached;
+      return sessionCached;
+    }
   }
   if (!hasFirebaseConfig || !db) return defaultBanners;
   

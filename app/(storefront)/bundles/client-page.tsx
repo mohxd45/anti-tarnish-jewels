@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getProducts } from "@/lib/firestore";
-import { Product } from "@/types";
+import { getProducts, getBanners } from "@/lib/firestore";
+import { Product, Banner } from "@/types";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 export default function BundlesPage() {
   const [bundles, setBundles] = useState<Product[]>([]);
+  const [banner, setBanner] = useState<Banner | null>(null);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const router = useRouter();
@@ -21,9 +22,22 @@ export default function BundlesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const all = await getProducts(true);
+        const [all, allBanners] = await Promise.all([
+          getProducts(true),
+          getBanners(true)
+        ]);
+        
         const activeBundles = all.filter(p => p.isBundle && p.isActive !== false);
         setBundles(activeBundles);
+
+        const isBannerActive = (b: Banner) => typeof b.isActive === "boolean" ? b.isActive : b.active !== false;
+        const validBanners = allBanners.filter(b => b.placement === "bundles-page" && isBannerActive(b));
+        validBanners.sort((a, b) => {
+          const orderA = typeof a.priority === "number" ? a.priority : (a.order || 0);
+          const orderB = typeof b.priority === "number" ? b.priority : (b.order || 0);
+          return orderA - orderB;
+        });
+        setBanner(validBanners[0] || null);
       } catch (err) {
         console.error("Failed to load bundles", err);
       } finally {
@@ -38,7 +52,8 @@ export default function BundlesPage() {
       router.push(`/product/${bundle.slug || bundle.id}`);
       return;
     }
-    if (!bundle.stock || bundle.stock <= 0) {
+    const outOfStock = bundle.stock !== undefined && bundle.stock !== null && Number(bundle.stock) <= 0;
+    if (outOfStock) {
       toast.error("This bundle is currently out of stock");
       return;
     }
@@ -58,6 +73,46 @@ export default function BundlesPage() {
   return (
     <div className="bg-[#FFF9FB] min-h-screen pt-24 pb-20">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
+        {banner && (banner.imageUrl || banner.mobileImageUrl) && (
+          <div className="mb-10 w-full rounded-[1.25rem] overflow-hidden shadow-sm border border-[#E8D7C8]/50">
+            {banner.linkUrl || banner.link ? (
+              <Link href={banner.linkUrl || banner.link || "#"} className="block relative w-full aspect-[16/9] md:aspect-[21/9]">
+                <OptimizedImage
+                  src={banner.mobileImageUrl || banner.imageUrl || ""}
+                  alt={banner.title || "LONA JEWELS Bundle Collection"}
+                  fill
+                  className="object-cover md:hidden"
+                  sizes="100vw"
+                />
+                <OptimizedImage
+                  src={banner.imageUrl || banner.mobileImageUrl || ""}
+                  alt={banner.title || "LONA JEWELS Bundle Collection"}
+                  fill
+                  className="object-cover hidden md:block"
+                  sizes="100vw"
+                />
+              </Link>
+            ) : (
+              <div className="relative w-full aspect-[16/9] md:aspect-[21/9]">
+                <OptimizedImage
+                  src={banner.mobileImageUrl || banner.imageUrl || ""}
+                  alt={banner.title || "LONA JEWELS Bundle Collection"}
+                  fill
+                  className="object-cover md:hidden"
+                  sizes="100vw"
+                />
+                <OptimizedImage
+                  src={banner.imageUrl || banner.mobileImageUrl || ""}
+                  alt={banner.title || "LONA JEWELS Bundle Collection"}
+                  fill
+                  className="object-cover hidden md:block"
+                  sizes="100vw"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="mb-12 text-center space-y-4">
           <h1 className="font-serif text-3xl md:text-5xl font-medium text-[#3A2428]">Bundles & Combos</h1>
           <p className="text-stoneGray max-w-2xl mx-auto">
@@ -127,12 +182,12 @@ export default function BundlesPage() {
 
                       <button
                         onClick={() => handleAddBundle(bundle)}
-                        disabled={bundle.bundleType !== "mix_and_match" && (!bundle.stock || bundle.stock <= 0)}
+                        disabled={bundle.bundleType !== "mix_and_match" && (bundle.stock !== undefined && bundle.stock !== null && Number(bundle.stock) <= 0)}
                         className="w-full py-3 bg-[#3A2428] text-white rounded-xl font-medium tracking-wide hover:bg-[#2A1A1D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       >
                         {bundle.bundleType === "mix_and_match" 
                           ? "Build Bundle" 
-                          : (!bundle.stock || bundle.stock <= 0 ? "Out of Stock" : "Add Bundle to Cart")}
+                          : ((bundle.stock !== undefined && bundle.stock !== null && Number(bundle.stock) <= 0) ? "Out of Stock" : "Add Bundle to Cart")}
                       </button>
                     </div>
                   </div>

@@ -17,7 +17,7 @@ export function BundleDetailsClient({ product: bundle }: { product: Product }) {
   const [isAdding, setIsAdding] = useState(false);
 
   const savings = (bundle.regularPrice || 0) - (bundle.salePrice || 0);
-  const outOfStock = !bundle.stock || bundle.stock <= 0;
+  const outOfStock = bundle.stock !== undefined && bundle.stock !== null && Number(bundle.stock) <= 0;
 
   function handleAdd() {
     if (outOfStock) {

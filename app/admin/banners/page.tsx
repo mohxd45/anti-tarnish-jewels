@@ -287,6 +287,7 @@ export default function BannersPage() {
                       <option value="hero-floating-card">Hero Floating Card</option>
                       <option value="homepage-banner">Homepage Banner</option>
                       <option value="category-banner">Category Banner</option>
+                      <option value="bundles-page">Bundles Page Banner</option>
                     </select>
                   </Field>
                   <Field label="Sort Order">

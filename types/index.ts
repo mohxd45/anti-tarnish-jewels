@@ -252,7 +252,8 @@ export type BannerPlacement =
   | "hero-banner"
   | "hero-floating-card"
   | "homepage-banner"
-  | "category-banner";
+  | "category-banner"
+  | "bundles-page";
 
 export type Banner = {
   id: string;

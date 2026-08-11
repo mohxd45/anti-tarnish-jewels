@@ -24,7 +24,7 @@ export function CartItemCard({ item, increase, decrease, removeFromCart, closeDr
         onClick={closeDrawer}
       >
         <OptimizedImage
-          src={product.images[0]}
+          src={product.images?.[0]}
           alt={product.name || "Product image"}
           fill
           sizes="76px"
