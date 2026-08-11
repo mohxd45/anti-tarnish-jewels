@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site-config";
 import { adminDb } from "@/lib/firebaseAdmin";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
@@ -20,8 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   staticRoutes.forEach((route) => {
     sitemapEntries.push({
-      url: `${SITE_URL}${route}`,
-      lastModified: new Date(),
+      url: route === "" ? `${SITE_URL}/` : `${SITE_URL}${route}`,
       changeFrequency: route === "" ? "daily" : "weekly",
       priority: route === "" ? 1 : 0.8,
     });
@@ -62,9 +63,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     } catch (err) {
       console.error("Failed to fetch products for sitemap:", err);
-      console.warn("Falling back to static sitemap routes only. Please check your Firebase Admin credentials in Vercel.");
+      // Fail the build rather than returning an empty or half-finished sitemap
+      throw new Error(`Sitemap generation blocked by Firestore Admin error: ${err}`);
     }
   } else {
+    // If Admin config is not provided at all, we can't generate the dynamic part
     console.warn("No Firebase Admin config found. Sitemap will only contain static routes.");
   }
 
