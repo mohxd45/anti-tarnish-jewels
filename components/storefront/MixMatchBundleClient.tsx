@@ -206,7 +206,7 @@ export function MixMatchBundleClient({
               } ${disabled ? "opacity-50 grayscale-[20%] cursor-not-allowed" : "cursor-pointer"}`}
               onClick={() => !disabled && toggleItem(item)}
             >
-              <div className="aspect-square relative p-2 md:p-3 bg-[#FFF9FB]">
+              <div className="aspect-square relative p-2 md:p-3 bg-[#FFF9FB] overflow-hidden">
                 {isSelected && (
                   <div className="absolute top-2 right-2 md:top-3 md:right-3 z-10 w-5 h-5 md:w-7 md:h-7 bg-[#B8955E] rounded-full flex items-center justify-center shadow-sm">
                     <Check className="w-3 h-3 md:w-4 md:h-4 text-white" />
@@ -238,6 +238,11 @@ export function MixMatchBundleClient({
                 <div className="mt-auto pt-1 md:pt-2">
                   <button 
                     disabled={disabled}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      if (!disabled) toggleItem(item);
+                    }}
                     className={`w-full py-1.5 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-[12px] font-bold tracking-wider uppercase transition-colors flex justify-center items-center gap-1 md:gap-1.5 ${
                       isSelected 
                         ? "bg-[#B8955E]/10 text-[#B8955E] border border-[#B8955E]/30" 
@@ -277,7 +282,7 @@ export function MixMatchBundleClient({
                 return (
                   <div 
                     key={`slot-${i}`}
-                    className={`relative shrink-0 w-[36px] h-[36px] md:w-[55px] md:h-[55px] rounded-md md:rounded-xl border-[1.5px] flex items-center justify-center overflow-hidden transition-all ${
+                    className={`relative shrink-0 w-[36px] h-[36px] md:w-[55px] md:h-[55px] rounded-md md:rounded-xl border-[1.5px] flex items-center justify-center transition-all ${
                       selectedItem 
                         ? "border-[#B8955E] bg-white shadow-sm" 
                         : "border-dashed border-[#E8D7C8] bg-[#FDFBF9]"
@@ -286,7 +291,7 @@ export function MixMatchBundleClient({
                     {selectedItem ? (
                       <>
                         {selectedItem.image ? (
-                          <div className="relative w-full h-full p-0.5 md:p-1 bg-[#FFF9FB]">
+                          <div className="relative w-full h-full p-0.5 md:p-1 bg-[#FFF9FB] overflow-hidden rounded-md md:rounded-xl">
                             <OptimizedImage 
                               src={selectedItem.image} 
                               alt={selectedItem.name} 
