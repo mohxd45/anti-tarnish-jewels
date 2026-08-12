@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Gem, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { LoadingButton } from "@/components/ui/LoadingButton";
-import { BrandLogo } from "@/components/BrandLogo";
+
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db, hasFirebaseConfig } from "@/lib/firebase";
