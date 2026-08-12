@@ -14,13 +14,16 @@ const IndependentItemSchema = z.object({
   sku: z.string().trim().min(1),
   image: z.string().trim().min(1),
   stock: z.number().int().min(0),
-  active: z.boolean()
-}).strict();
+  active: z.boolean(),
+  sortOrder: z.number().optional()
+});
 
 const IncludedItemSchema = z.object({
   productId: z.string().min(1),
-  quantity: z.number().int().min(1)
-}).strict();
+  quantity: z.number().int().min(1),
+  selectedSize: z.string().optional(),
+  selectedColor: z.string().optional()
+});
 
 const BundleMutationSchema = z.object({
   name: z.string().trim().min(1),
@@ -35,6 +38,7 @@ const BundleMutationSchema = z.object({
   images: z.array(z.string()).optional().default([]),
   thumbnail: z.string().optional().default(""),
   isActive: z.boolean(),
+  isFeatured: z.boolean().optional().default(false),
 
   bundleType: z.enum(["fixed", "mix_and_match"]),
   sourceType: z.enum(["existing_products", "bundle_items"]).optional(),
@@ -43,7 +47,7 @@ const BundleMutationSchema = z.object({
   eligibleProductIds: z.array(z.string()).optional(),
   independentBundleItems: z.array(IndependentItemSchema).optional(),
   includedItems: z.array(IncludedItemSchema).optional()
-}).strict();
+});
 
 export async function saveBundleServer(rawPayload: any, bundleId?: string, idToken?: string) {
   if (!adminDb || !adminAuth) {
@@ -90,6 +94,7 @@ export async function saveBundleServer(rawPayload: any, bundleId?: string, idTok
     images: payload.images,
     thumbnail: payload.thumbnail,
     isActive: payload.isActive,
+    isFeatured: payload.isFeatured,
     bundleType: payload.bundleType,
     updatedAt: new Date().toISOString()
   };
@@ -213,7 +218,9 @@ export async function saveBundleServer(rawPayload: any, bundleId?: string, idTok
         name: data?.name || "",
         sku: data?.sku || "",
         image: data?.images?.[0] || data?.thumbnail || "",
-        price: typeof data?.salePrice === "number" && data?.salePrice >= 0 ? data.salePrice : (data?.regularPrice || 0)
+        price: typeof data?.salePrice === "number" && data?.salePrice >= 0 ? data.salePrice : (data?.regularPrice || 0),
+        selectedSize: item.selectedSize,
+        selectedColor: item.selectedColor
       });
     }
     sanitizedPayload.includedItems = validatedIncludedItems;
