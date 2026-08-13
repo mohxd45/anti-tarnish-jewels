@@ -3,8 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 
 
 import { useEffect, useState } from "react";
-import { getProducts, deleteProduct, updateProduct, uploadImage , logActivity } from "@/lib/firestore";
-import { LONA_CATEGORIES } from "@/lib/categories";
+import { getProducts, deleteProduct, updateProduct, uploadImage , logActivity, getCategories } from "@/lib/firestore";
+
 import { Product, Category } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -99,12 +99,23 @@ export default function ManageProductsPage() {
   }, []);
 
   async function loadData() {
-    setLoading(true);
-    const [prodData] = await Promise.all([getProducts()]);
-    setProducts(prodData);
-    const catData = LONA_CATEGORIES.filter(c => c.slug !== "all" && c.slug !== "sale");
-    setCategories(catData as any);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const [prodData, catData] = await Promise.all([
+        getProducts(),
+        getCategories(true).catch(e => {
+          console.error("Failed to load categories:", e);
+          return [];
+        })
+      ]);
+      setProducts(prodData);
+      const activeCatData = catData.filter(c => c.isActive !== false);
+      setCategories(activeCatData as any);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleDelete(id: string) {
@@ -280,16 +291,18 @@ export default function ManageProductsPage() {
       const uniqueSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
       const finalBadges = editBadgesText.split(",").map(b => b.trim()).filter(Boolean);
 
-      const matchedCat = categories.find(c => c.name === editCategory.trim());
+      const matchedCat = categories.find(c => c.name === editCategory.trim() || c.slug === editCategory.trim() || c.id === editCategory.trim() || slugify(c.name) === editCategory.trim());
       const newSlug = matchedCat ? matchedCat.slug : slugify(editCategory.trim());
+      const newId = matchedCat ? (matchedCat.id || newSlug) : newSlug;
+      const newName = matchedCat ? matchedCat.name : editCategory.trim();
 
       const updatedFields: Partial<Product> = {
         name: editName.trim(),
         sku: editSku.trim(),
         slug: uniqueSlug,
         description: (editDescription || "").trim(),
-        category: editCategory.trim(),
-        categoryId: newSlug,
+        category: newName,
+        categoryId: newId,
         categorySlug: newSlug,
         subCategory: (editSubCategory || "").trim(),
         brand: (editBrand || "").trim(),
@@ -533,9 +546,13 @@ export default function ManageProductsPage() {
                         value={editCategory}
                         onChange={(e) => setEditCategory(e.target.value)}
                         className="w-full rounded-xl border border-adminBorder bg-white px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-adminGold"
+                        disabled={loading}
                       >
                         <option value="">Select</option>
-                        {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+                        {editCategory && !categories.find(c => c.name === editCategory) && (
+                          <option value={editCategory}>{editCategory} (Current)</option>
+                        )}
+                        {categories.map((c) => <option key={c.id || c.slug} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
                     <div>

@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
-import { addProduct, uploadImage, logActivity } from "@/lib/firestore";
-import { LONA_CATEGORIES } from "@/lib/categories";
+import { addProduct, uploadImage, logActivity, getCategories } from "@/lib/firestore";
+
 import { Product, Category } from "@/types";
 import { slugify } from "@/lib/utils";
 import { X, Upload, Save, Loader } from "lucide-react";
@@ -101,13 +101,20 @@ export default function AddProductPage() {
   }, [category]);
 
   async function loadCategories() {
-    setLoading(true);
-    const data = LONA_CATEGORIES.filter(c => c.slug !== "all" && c.slug !== "sale");
-    setCategories(data as any);
-    if (data.length > 0) {
-      setCategory(data[0].slug || slugify(data[0].name));
+    try {
+      setLoading(true);
+      const data = await getCategories(true);
+      const activeData = data.filter(c => c.isActive !== false);
+      setCategories(activeData as any);
+      if (activeData.length > 0) {
+        setCategory(activeData[0].slug || slugify(activeData[0].name));
+      }
+    } catch (err) {
+      console.error("Failed to load categories for Add Product:", err);
+      setCategories([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -163,16 +170,18 @@ export default function AddProductPage() {
       const uniqueSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
       const finalBadges = badgesText.split(",").map(b => b.trim()).filter(Boolean);
 
-      const selectedCat = categories.find(c => c.slug === category || c.id === category);
+      const selectedCat = categories.find(c => c.slug === category || c.id === category || slugify(c.name) === category);
       const catName = selectedCat ? selectedCat.name : category;
+      const catSlug = selectedCat ? selectedCat.slug : category;
+      const catId = selectedCat ? (selectedCat.id || category) : category;
       
       const productPayload: Omit<Product, "id"> = {
         name: name.trim(),
         slug: uniqueSlug,
         sku: sku.trim(),
         category: catName.trim(),
-        categoryId: category.trim(),
-        categorySlug: category.trim(),
+        categoryId: catId.trim(),
+        categorySlug: catSlug.trim(),
         description: (description || "").trim(),
         regularPrice: finalRegularPrice,
         salePrice: finalSalePrice,
@@ -275,13 +284,20 @@ export default function AddProductPage() {
                   <Input value={sku} onChange={(e) => setSku(e.target.value)} placeholder="e.g. LJ-RNG-001" className="border-adminBorder bg-white" />
                 </Field>
                 <Field label="Category">
-                  <select 
-                    value={category} 
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full h-9 rounded-md border border-adminBorder bg-white px-3 text-sm outline-none focus:ring-1 focus:ring-adminGold"
-                  >
-                    {categories.map((c) => <option key={c.id} value={c.slug || slugify(c.name)}>{c.name}</option>)}
-                  </select>
+                    <select 
+                      value={category} 
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full h-9 rounded-md border border-adminBorder bg-white px-3 text-sm outline-none focus:ring-1 focus:ring-adminGold"
+                      disabled={loading || categories.length === 0}
+                    >
+                      {loading ? (
+                        <option value="">Loading categories...</option>
+                      ) : categories.length === 0 ? (
+                        <option value="">Unable to load categories.</option>
+                      ) : (
+                        categories.map((c) => <option key={c.id || c.slug} value={c.slug || slugify(c.name)}>{c.name}</option>)
+                      )}
+                    </select>
                 </Field>
                 <Field label="Regular Price (₹)">
                   <Input type="number" value={regularPrice || ""} onChange={(e) => setRegularPrice(Number(e.target.value))} placeholder="4999" className="border-adminBorder bg-white" />
