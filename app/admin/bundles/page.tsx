@@ -142,8 +142,37 @@ export default function AdminBundlesPage() {
       setIndependentItems([]);
     }
     
-    if (bundle.bundleType === "mix_and_match" && bundle.eligibleProductsSnapshot) {
-      setIncludedItems(bundle.eligibleProductsSnapshot);
+    const effectiveSourceType = bundle.sourceType || "existing_products";
+    if (bundle.bundleType === "mix_and_match" && effectiveSourceType === "existing_products") {
+      if (bundle.eligibleProductsSnapshot && bundle.eligibleProductsSnapshot.length > 0) {
+        setIncludedItems(bundle.eligibleProductsSnapshot);
+      } else if (bundle.eligibleProductIds && bundle.eligibleProductIds.length > 0) {
+        const reconstructed: BundleItemSnapshot[] = [];
+        let missingCount = 0;
+        bundle.eligibleProductIds.forEach(id => {
+          const product = products.find(p => p.id === id);
+          if (product) {
+            reconstructed.push({
+              productId: product.id,
+              name: product.name,
+              sku: product.sku || "",
+              price: product.salePrice || product.regularPrice || 0,
+              quantity: 1,
+              image: product.images?.[0] || product.thumbnail || "",
+              selectedSize: product.sizeOptions?.[0] || "",
+              selectedColor: product.colorOptions?.[0] || ""
+            });
+          } else {
+            missingCount++;
+          }
+        });
+        if (missingCount > 0) {
+          toast.warning("Some eligible products could not be found.");
+        }
+        setIncludedItems(reconstructed);
+      } else {
+        setIncludedItems(bundle.includedItems || []);
+      }
     } else {
       setIncludedItems(bundle.includedItems || []);
     }
