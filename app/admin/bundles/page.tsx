@@ -105,7 +105,7 @@ export default function AdminBundlesPage() {
     setName(bundle.name || "");
     setSku(bundle.sku || "");
     setDescription(bundle.description || "");
-    setImage(bundle.images?.[0] || "");
+    setImage(bundle.images?.[0] || bundle.thumbnail || "");
     setCategory(bundle.category || "Bundles");
     setRegularPrice(bundle.regularPrice || 0);
     setBundlePrice(bundle.salePrice || 0);
