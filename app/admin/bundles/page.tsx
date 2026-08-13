@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { getProducts, addProduct, updateProduct, deleteProduct, uploadImage, getCategories, logActivity } from "@/lib/firestore";
+import { getProducts, addProduct, updateProduct, deleteProduct, uploadImage, getCategories, logActivity, getBundleItems } from "@/lib/firestore";
 import { Product, Category, BundleItemSnapshot, IndependentBundleItem } from "@/types";
 import { formatPrice, slugify } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -99,7 +99,7 @@ export default function AdminBundlesPage() {
     setIsModalOpen(true);
   }
 
-  function openEditModal(bundle: Product) {
+  async function openEditModal(bundle: Product) {
     resetModalState();
     setEditingBundle(bundle);
     setName(bundle.name || "");
@@ -116,7 +116,31 @@ export default function AdminBundlesPage() {
     setBundleType(bundle.bundleType || "fixed");
     setSelectionLimit(bundle.selectionLimit || 5);
     setSourceType(bundle.sourceType || "existing_products");
-    setIndependentItems(bundle.independentBundleItems || []);
+    
+    const embeddedItems = bundle.independentBundleItems || [];
+    if (embeddedItems.length > 0) {
+      setIndependentItems(embeddedItems);
+    } else if (bundle.bundleType === "mix_and_match" && bundle.sourceType === "bundle_items") {
+      try {
+        const legacyItems = await getBundleItems(bundle.id);
+        const mappedLegacyItems: IndependentBundleItem[] = legacyItems.map((item: any, index: number) => ({
+          id: item.id,
+          name: item.name || "",
+          sku: item.sku || "",
+          stock: typeof item.stock === "number" ? item.stock : 0,
+          active: item.active !== false,
+          image: item.images?.[0] || "",
+          sortOrder: typeof item.sortOrder === "number" ? item.sortOrder : index
+        }));
+        setIndependentItems(mappedLegacyItems);
+      } catch (err) {
+        console.error("Failed to load legacy bundle items", err);
+        toast.error("Failed to load legacy bundle items.");
+        setIndependentItems([]);
+      }
+    } else {
+      setIndependentItems([]);
+    }
     
     if (bundle.bundleType === "mix_and_match" && bundle.eligibleProductsSnapshot) {
       setIncludedItems(bundle.eligibleProductsSnapshot);
