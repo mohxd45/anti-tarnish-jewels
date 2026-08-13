@@ -1333,43 +1333,30 @@ export async function saveHomepageSections(sections: HomepageSection[]): Promise
   }
 }
 
-import { LONA_CATEGORIES } from "./categories";
-
-// DYNAMIC CATEGORIES
-const defaultCategories: Category[] = LONA_CATEGORIES
-  .filter(c => c.slug !== "all" && c.slug !== "sale") // don't save generic collections as product categories
-  .map((c, idx) => ({
-    id: `c${idx + 1}`,
-    name: c.name,
-    slug: c.slug,
-    priority: idx + 1,
-    isActive: true,
-    subcategories: []
-  }));
-
-export async function getCategories(forceRefresh: boolean = false): Promise<Category[]> {
-  if (!forceRefresh) {
-    if (!isServer && cachedCategories) return cachedCategories;
-    const sessionCached = getSessionCache<Category[]>("atj_cache_categories");
-    if (sessionCached) {
-      cachedCategories = sessionCached;
-      return sessionCached;
+  export async function getCategories(forceRefresh: boolean = false): Promise<Category[]> {
+    if (!forceRefresh) {
+      if (!isServer && cachedCategories) return cachedCategories;
+      const sessionCached = getSessionCache<Category[]>("atj_cache_categories");
+      if (sessionCached) {
+        cachedCategories = sessionCached;
+        return sessionCached;
+      }
+    }
+    
+    if (!hasFirebaseConfig || !db) return [];
+    
+    try {
+      const snap = await withTimeout(getDocs(collection(db, "categories")));
+      const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Category));
+      cachedCategories = list.length ? list.sort((a, b) => a.priority - b.priority) : [];
+      setSessionCache("atj_cache_categories", cachedCategories);
+      return cachedCategories;
+    } catch (err) {
+      console.error("Firestore operation failed:", err);
+      // Return safe empty result on genuine failure
+      return [];
     }
   }
-  
-  if (!hasFirebaseConfig || !db) return defaultCategories;
-  
-  try {
-    const snap = await withTimeout(getDocs(collection(db, "categories")));
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Category));
-    cachedCategories = list.length ? list.sort((a, b) => a.priority - b.priority) : defaultCategories;
-    setSessionCache("atj_cache_categories", cachedCategories);
-    return cachedCategories;
-  } catch (err) {
-    console.error("Firestore operation failed:", err);
-    throw err;
-  }
-}
 
 export async function addCategory(category: Omit<Category, "id">): Promise<string> {
   clearAllCaches(); // Invalidate cache
