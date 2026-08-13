@@ -132,7 +132,7 @@ export async function saveBundleServer(rawPayload: any, bundleId?: string, idTok
            throw new Error(`Validation Error: Product not found: ${pId}`);
         }
         const data = docSnap.data();
-        if (data?.isActive !== true) {
+        if (data?.isActive === false) {
            throw new Error(`Validation Error: Product is not active: ${pId}`);
         }
         if (data?.isBundle === true) {
@@ -206,7 +206,7 @@ export async function saveBundleServer(rawPayload: any, bundleId?: string, idTok
          throw new Error(`Validation Error: Product not found: ${item.productId}`);
       }
       const data = docSnap.data();
-      if (data?.isActive !== true) {
+      if (data?.isActive === false) {
          throw new Error(`Validation Error: Product is not active: ${item.productId}`);
       }
       if (data?.isBundle === true) {
