@@ -260,17 +260,8 @@ export async function deleteBundleServer(bundleId: string, idToken?: string) {
   if (!adminDb || !adminAuth) {
     throw new Error("Admin SDK not initialized");
   }
-  if (!idToken) throw new Error("Unauthorized");
   
-  try {
-    const decodedToken = await adminAuth.verifyIdToken(idToken, true);
-    const callerDoc = await adminDb.collection("users").doc(decodedToken.uid).get();
-    if (!callerDoc.exists || callerDoc.data()?.role !== "admin") {
-      throw new Error("Unauthorized");
-    }
-  } catch (error: any) {
-    throw new Error("Unauthorized");
-  }
+  await verifyAdminAccess(idToken);
 
   const docSnap = await adminDb.collection("products").doc(bundleId).get();
   if (!docSnap.exists) throw new Error("Bundle not found");
