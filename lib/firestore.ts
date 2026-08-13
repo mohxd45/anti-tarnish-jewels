@@ -1347,13 +1347,16 @@ const defaultCategories: Category[] = LONA_CATEGORIES
     subcategories: []
   }));
 
-export async function getCategories(): Promise<Category[]> {
-  if (!isServer && cachedCategories) return cachedCategories;
-  const sessionCached = getSessionCache<Category[]>("atj_cache_categories");
-  if (sessionCached) {
-    cachedCategories = sessionCached;
-    return sessionCached;
+export async function getCategories(forceRefresh: boolean = false): Promise<Category[]> {
+  if (!forceRefresh) {
+    if (!isServer && cachedCategories) return cachedCategories;
+    const sessionCached = getSessionCache<Category[]>("atj_cache_categories");
+    if (sessionCached) {
+      cachedCategories = sessionCached;
+      return sessionCached;
+    }
   }
+  
   if (!hasFirebaseConfig || !db) return defaultCategories;
   
   try {
