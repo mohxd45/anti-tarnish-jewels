@@ -63,7 +63,7 @@ export default function AdminBundlesPage() {
   async function loadData() {
     setLoading(true);
     try {
-      const [allProducts, cats] = await Promise.all([getProducts(), getCategories()]);
+      const [allProducts, cats] = await Promise.all([getProducts(true), getCategories()]);
       setProducts(allProducts.filter(p => !p.isBundle));
       setBundles(allProducts.filter(p => p.isBundle));
       setCategories(cats);
