@@ -287,8 +287,7 @@ export default function ManageProductsPage() {
       const discountPercentage = finalRegularPrice ? Math.round(((finalRegularPrice - finalSalePrice) / finalRegularPrice) * 100) : 0;
       const finalImages = editImages && editImages.length > 0 ? editImages : ["/placeholder.png"];
 
-      const baseSlug = slugify(editName);
-      const uniqueSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
+      const preservedSlug = editingProduct.slug || slugify(editName);
       const finalBadges = editBadgesText.split(",").map(b => b.trim()).filter(Boolean);
 
       const matchedCat = categories.find(c => c.name === editCategory.trim() || c.slug === editCategory.trim() || c.id === editCategory.trim() || slugify(c.name) === editCategory.trim());
@@ -299,7 +298,7 @@ export default function ManageProductsPage() {
       const updatedFields: Partial<Product> = {
         name: editName.trim(),
         sku: editSku.trim(),
-        slug: uniqueSlug,
+        slug: preservedSlug,
         description: (editDescription || "").trim(),
         category: newName,
         categoryId: newId,
