@@ -7,13 +7,12 @@ import { getProducts, getCategories } from "@/lib/firestore";
 import { Product } from "@/types";
 import Link from "next/link";
 import { Filter, SlidersHorizontal, X } from "lucide-react";
-import { LONA_CATEGORIES } from "@/lib/categories";
 
 function ShopContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category") || "all";
   
-  const [categories, setCategories] = useState<any[]>(LONA_CATEGORIES);
+  const [categories, setCategories] = useState<any[]>([{ name: "All Jewellery", slug: "all" }]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -41,9 +40,24 @@ function ShopContent() {
     async function load() {
       try {
         setLoading(true);
-        const [allProds] = await Promise.all([
-          getProducts(true)
+        const [allProds, rawCategories] = await Promise.all([
+          getProducts(true),
+          getCategories(true).catch(e => {
+            console.error("Failed to load categories for Shop:", e);
+            return [];
+          })
         ]);
+        
+        const activeCategories = rawCategories.filter(c => c.isActive !== false);
+        const navCategories = [
+          { name: "All Jewellery", slug: "all", blurb: "Explore our complete luxury collection." },
+          ...activeCategories.map(c => ({ name: c.name, slug: c.slug, blurb: c.description || "" }))
+        ];
+        
+        // Only update categories if we fetched them successfully to prevent flashing empty state
+        if (rawCategories.length > 0) {
+          setCategories(navCategories);
+        }
         
         const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false && p.isBundle !== true) : [];
         const highestPrice = active.length > 0 ? Math.max(...active.map(p => p.salePrice || p.regularPrice || 0)) : 10000;
