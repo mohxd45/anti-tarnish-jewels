@@ -108,7 +108,7 @@ export default function ManageProductsPage() {
           return [];
         })
       ]);
-      setProducts(prodData);
+      setProducts(prodData.filter((product) => product.isBundle !== true));
       const activeCatData = catData.filter(c => c.isActive !== false);
       setCategories(activeCatData as any);
     } catch (err) {
