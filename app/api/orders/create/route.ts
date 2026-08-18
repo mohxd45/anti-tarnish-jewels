@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { createOrderSchema } from "@/lib/validation/order";
@@ -307,6 +308,9 @@ export async function POST(req: Request) {
       const bundlesToProcess = new Map<string, any[]>();
       const existingProductIdsToFetch = new Set<string>();
       
+      const normalProductQuantities = new Map<string, number>();
+      const normalBundleQuantities = new Map<string, number>();
+      
       for (let i = 0; i < finalItems.length; i++) {
         const finalItem = finalItems[i];
         if (finalItem.type === "mix_and_match_bundle") {
@@ -320,6 +324,14 @@ export async function POST(req: Request) {
                 existingProductIdsToFetch.add(p.productId || p.id || p.itemId);
              }
           }
+        } else if (finalItem.type === "product") {
+          existingProductIdsToFetch.add(finalItem.productId);
+          const currentQty = normalProductQuantities.get(finalItem.productId) || 0;
+          normalProductQuantities.set(finalItem.productId, currentQty + finalItem.quantity);
+        } else if (finalItem.type === "bundle") {
+          existingProductIdsToFetch.add(finalItem.bundleId);
+          const currentQty = normalBundleQuantities.get(finalItem.bundleId) || 0;
+          normalBundleQuantities.set(finalItem.bundleId, currentQty + finalItem.quantity);
         }
       }
 
@@ -474,6 +486,64 @@ export async function POST(req: Request) {
         }
       }
 
+      // Process standard products
+      for (const [pId, quantityToDecrement] of normalProductQuantities.entries()) {
+        const liveProduct = existingProductsMap.get(pId);
+        if (!liveProduct) {
+          throw new ValidationError(`Product not found: ${pId}`);
+        }
+        if (liveProduct.isActive === false) {
+          throw new ValidationError(`Product ${liveProduct.name || pId} is no longer active`);
+        }
+        
+        const hasStock = liveProduct.stock === undefined || liveProduct.stock === null || Number(liveProduct.stock) >= quantityToDecrement;
+        if (!hasStock) {
+           throw new ValidationError(`Product ${liveProduct.name || pId} is out of stock`);
+        }
+        
+        if (liveProduct.stock !== undefined && liveProduct.stock !== null) {
+          liveProduct.stock -= quantityToDecrement;
+          if (liveProduct.stock <= 0) {
+            liveProduct.isActive = false;
+          }
+          const pRef = adminDb!.collection("products").doc(pId);
+          t.update(pRef, {
+            stock: liveProduct.stock,
+            isActive: liveProduct.isActive,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      }
+
+      // Process standard fixed bundles
+      for (const [bId, quantityToDecrement] of normalBundleQuantities.entries()) {
+        const liveBundle = existingProductsMap.get(bId);
+        if (!liveBundle) {
+          throw new ValidationError(`Bundle not found: ${bId}`);
+        }
+        if (liveBundle.isActive === false) {
+          throw new ValidationError(`Bundle ${liveBundle.name || bId} is no longer active`);
+        }
+        
+        const hasStock = liveBundle.stock === undefined || liveBundle.stock === null || Number(liveBundle.stock) >= quantityToDecrement;
+        if (!hasStock) {
+           throw new ValidationError(`Bundle ${liveBundle.name || bId} is out of stock`);
+        }
+        
+        if (liveBundle.stock !== undefined && liveBundle.stock !== null) {
+          liveBundle.stock -= quantityToDecrement;
+          if (liveBundle.stock <= 0) {
+            liveBundle.isActive = false;
+          }
+          const bRef = adminDb!.collection("products").doc(bId);
+          t.update(bRef, {
+            stock: liveBundle.stock,
+            isActive: liveBundle.isActive,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      }
+
       // 2. Generate Order Number
       const counterRef = adminDb!.collection("counters").doc("orders");
       const countSnap = await t.get(counterRef);
@@ -592,6 +662,12 @@ export async function POST(req: Request) {
         });
       }
     });
+
+    try {
+      revalidatePath("/");
+    } catch (e) {
+      console.error("Failed to revalidate path:", e);
+    }
 
     return NextResponse.json({ success: true, orderId });
 

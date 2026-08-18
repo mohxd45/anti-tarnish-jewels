@@ -28,7 +28,7 @@ export default async function HomePage() {
     getAnnouncements()
   ]);
 
-  const activeProducts = products.filter(p => p.isActive !== false);
+  const activeProducts = products.filter(p => p.isActive !== false && Number(p.stock) > 0);
 
   const bestsellers = activeProducts.filter(p => p.isBestSeller === true && !p.isBundle).slice(0, 8);
   const newArrivals = activeProducts

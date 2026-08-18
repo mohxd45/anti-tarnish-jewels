@@ -27,7 +27,7 @@ export default function BundlesPage() {
           getBanners(true)
         ]);
         
-        const activeBundles = all.filter(p => p.isBundle && p.isActive !== false);
+        const activeBundles = all.filter(p => p.isBundle && p.isActive !== false && Number(p.stock) > 0);
         setBundles(activeBundles);
 
         const isBannerActive = (b: Banner) => typeof b.isActive === "boolean" ? b.isActive : b.active !== false;

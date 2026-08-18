@@ -59,7 +59,7 @@ function ShopContent() {
           setCategories(navCategories);
         }
         
-        const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false && p.isBundle !== true) : [];
+        const active = Array.isArray(allProds) ? allProds.filter(p => p.isActive !== false && p.isBundle !== true && Number(p.stock) > 0) : [];
         const highestPrice = active.length > 0 ? Math.max(...active.map(p => p.salePrice || p.regularPrice || 0)) : 10000;
         setMaxPrice(highestPrice);
         setPriceRange([0, highestPrice]);
