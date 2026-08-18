@@ -4,6 +4,7 @@ import { CartItem, Product, Coupon } from "@/types";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getCoupons, getAnnouncements, validateCoupon, getSiteSettings, getCart, saveCart } from "@/lib/firestore";
 import { useAuth } from "./AuthContext";
+import { sendGAEvent } from "@next/third-parties/google";
 
 type CartContextType = {
   items: CartItem[];
@@ -269,6 +270,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }];
       });
       setIsDrawerOpen(true); // Auto-open drawer when adding to cart
+
+      try {
+        const isMixMatchGA = product.bundleType === "mix_and_match";
+        const actualQuantity = isMixMatchGA ? 1 : quantity;
+        const price = typeof product.salePrice === "number" ? product.salePrice : Number(product.regularPrice || 0);
+        
+        const itemVariant = [selectedSize, selectedColor].filter(Boolean).join(" / ");
+        const gaItem: any = {
+          item_id: product.sku || product.id,
+          item_name: product.name,
+          item_brand: "LONA JEWELS",
+          item_category: product.categorySlug || product.category || (product.isBundle ? "Bundles" : "Jewellery"),
+          price,
+          quantity: actualQuantity
+        };
+        if (itemVariant) {
+          gaItem.item_variant = itemVariant;
+        }
+
+        sendGAEvent("event", "add_to_cart", {
+          currency: "INR",
+          value: price * actualQuantity,
+          items: [gaItem]
+        });
+      } catch (err) {
+        console.error("Failed to send GA event", err);
+      }
     },
     removeFromCart: (id) => setItems((prev) => prev.filter((item) => (item.cartItemId || item.product.id) !== id)),
     increase: (id) => setItems((prev) => prev.map((item) => (item.cartItemId || item.product.id) === id ? { ...item, quantity: item.quantity + 1 } : item)),

@@ -3,6 +3,7 @@ import { Product } from "@/types";
 import { ProductDetailsClient } from "@/components/ProductDetailsClient";
 import { BundleDetailsClient } from "@/components/storefront/BundleDetailsClient";
 import { MixMatchBundleClient } from "@/components/storefront/MixMatchBundleClient";
+import { GAViewItem } from "@/components/analytics/GAViewItem";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -64,6 +65,7 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
       <style>{`
         .whatsapp-button { display: none !important; }
       `}</style>
+      <GAViewItem product={product} />
       <div className="bg-[#FFF0F5] min-h-[100dvh] pb-40 md:pb-24">
         {product.isBundle ? (
           product.bundleType === "mix_and_match" ? (
