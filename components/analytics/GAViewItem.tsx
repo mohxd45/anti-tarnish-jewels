@@ -10,13 +10,15 @@ export function GAViewItem({ product }: { product: Product }) {
   useEffect(() => {
     if (!product) return;
 
-    const productId = product.id || product.sku || "unknown";
+    const trackingKey = product.id || product.sku || "unknown";
 
-    if (trackedRef.current === productId) {
+    if (trackedRef.current === trackingKey) {
       return;
     }
 
-    trackedRef.current = productId;
+    trackedRef.current = trackingKey;
+
+    const itemId = product.sku || product.id || "unknown";
 
     const price = typeof product.salePrice === "number" 
       ? product.salePrice 
@@ -29,7 +31,7 @@ export function GAViewItem({ product }: { product: Product }) {
       value: price,
       items: [
         {
-          item_id: productId,
+          item_id: itemId,
           item_name: product.name,
           item_brand: "LONA JEWELS",
           item_category: itemCategory,
