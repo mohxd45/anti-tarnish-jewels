@@ -3,6 +3,23 @@
 import { useEffect } from "react";
 import { sendGAEvent } from "@next/third-parties/google";
 
+export interface GAPurchaseItem {
+  type?: "product" | "bundle" | "mix_and_match_bundle" | string;
+  sku?: string;
+  bundleSku?: string;
+  productId?: string;
+  bundleId?: string;
+  name?: string;
+  bundleName?: string;
+  categorySlug?: string;
+  category?: string;
+  price?: number;
+  bundlePrice?: number;
+  quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+}
+
 export interface GAPurchaseData {
   transaction_id: string;
   subtotal: number;
@@ -11,7 +28,7 @@ export interface GAPurchaseData {
   giftWrapPrice: number;
   shipping: number;
   couponCode?: string;
-  items: Array<any>;
+  items: GAPurchaseItem[];
 }
 
 export function GAPurchase({ data }: { data: GAPurchaseData }) {
@@ -39,16 +56,16 @@ export function GAPurchase({ data }: { data: GAPurchaseData }) {
 
     const gaItems = data.items.map((item) => {
       const quantity = Number(item.quantity || 1);
-      const originalUnitPrice = Number(item.price || item.bundlePrice || 0);
+      const originalUnitPrice = typeof item.price === "number" ? item.price : Number(item.bundlePrice || 0);
       const lineGross = originalUnitPrice * quantity;
 
       const lineDiscount = subtotal > 0 ? discount * (lineGross / subtotal) : 0;
       const unitDiscount = quantity > 0 ? lineDiscount / quantity : 0;
       const actualUnitPrice = Math.max(originalUnitPrice - unitDiscount, 0);
 
-      const itemId = item.sku || item.bundleSku || item.product?.sku || item.productId || item.bundleId || "unknown";
-      const itemName = item.name || item.bundleName || item.product?.name || "Unknown Product";
-      const itemCategory = item.product?.categorySlug || item.product?.category || (item.type === "bundle" || item.type === "mix_and_match_bundle" ? "Bundles" : "Jewellery");
+      const itemId = item.sku || item.bundleSku || item.productId || item.bundleId || "unknown";
+      const itemName = item.name || item.bundleName || "Unknown Product";
+      const itemCategory = item.categorySlug || item.category || (item.type === "bundle" || item.type === "mix_and_match_bundle" ? "Bundles" : "Jewellery");
 
       const gaItem: any = {
         item_id: itemId,

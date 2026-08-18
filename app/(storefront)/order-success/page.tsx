@@ -22,6 +22,23 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
   const transactionId = order?.orderNumber || order?.id || orderId;
   const validPurchase = order && transactionId && order.items && Array.isArray(order.items) && order.items.length > 0;
 
+  const analyticsItems = validPurchase ? order.items.map((item: any) => ({
+    type: item.type,
+    sku: item.sku || item.product?.sku || undefined,
+    bundleSku: item.bundleSku || undefined,
+    productId: item.productId || (item.type === "product" ? item.product?.id : undefined),
+    bundleId: item.bundleId || ((item.type === "bundle" || item.type === "mix_and_match_bundle") ? item.product?.id : undefined),
+    name: item.name || (item.type === "product" ? item.product?.name : undefined),
+    bundleName: item.bundleName || ((item.type === "bundle" || item.type === "mix_and_match_bundle") ? item.product?.name : undefined),
+    categorySlug: item.product?.categorySlug,
+    category: item.product?.category,
+    price: typeof item.price === "number" ? item.price : undefined,
+    bundlePrice: typeof item.bundlePrice === "number" ? item.bundlePrice : undefined,
+    quantity: Number(item.quantity || 1),
+    selectedSize: item.selectedSize || undefined,
+    selectedColor: item.selectedColor || undefined
+  })) : [];
+
   return (
     <section className="mx-auto max-w-xl px-4 py-20 text-center relative">
       {validPurchase && (
@@ -33,7 +50,7 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
           giftWrapPrice: Number(order.giftWrapPrice || 0),
           shipping: order.shippingFee || order.shipping || 0,
           couponCode: order.couponCode,
-          items: order.items
+          items: analyticsItems
         }} />
       )}
       <OrderSuccessCard>
