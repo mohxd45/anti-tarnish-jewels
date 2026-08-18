@@ -4,6 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { trackBeginCheckout } from "@/lib/analytics/ga-ecommerce";
 
 interface StickyCartSummaryBarProps {
   closeDrawer?: () => void;
@@ -11,10 +12,11 @@ interface StickyCartSummaryBarProps {
 }
 
 export function StickyCartSummaryBar({ closeDrawer, isPage = false }: StickyCartSummaryBarProps) {
-  const { total } = useCart();
+  const { items, subtotal, total, coupon } = useCart();
   const router = useRouter();
 
   const handleCheckout = () => {
+    trackBeginCheckout({ items, subtotal, coupon });
     if (closeDrawer) closeDrawer();
     router.push("/checkout");
   };

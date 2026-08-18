@@ -15,10 +15,17 @@ import { useRouter } from "next/navigation";
 import { SavingsBanner } from "@/components/storefront/SavingsBanner";
 import { CouponSection } from "@/components/storefront/CouponSection";
 import { GiftAddon } from "@/components/storefront/GiftAddon";
+import { trackBeginCheckout } from "@/lib/analytics/ga-ecommerce";
 
 export default function CartPage() {
   const { items, subtotal, total, discount, coupon, increase, decrease, removeFromCart, shipping, isGiftWrap, giftWrapPrice } = useCart();
   const router = useRouter();
+
+  const handleCheckout = () => {
+    trackBeginCheckout({ items, subtotal, coupon });
+    router.push("/checkout");
+  };
+
   return (
     <>
       <style>{`
@@ -109,7 +116,7 @@ export default function CartPage() {
                   <CouponSection />
                   <GiftAddon />
                 </div>
-                <button onClick={() => router.push("/checkout")} className="w-full py-3.5 bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white rounded-xl font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
+                <button onClick={handleCheckout} className="w-full py-3.5 bg-gradient-to-r from-[#B8955E] to-[#E3C9A3] text-white rounded-xl font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
                   Proceed to Checkout
                 </button>
                 
