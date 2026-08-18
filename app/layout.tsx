@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { CapacitorListener } from "@/components/CapacitorListener";
 import { Analytics } from "@vercel/analytics/react";
-
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -76,6 +76,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
         </Providers>
         <Analytics />
+        <GoogleAnalytics gaId="G-KYT4CD82NQ" />
       </body>
     </html>
   );
