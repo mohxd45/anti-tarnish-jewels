@@ -4,6 +4,7 @@ import { getWhatsAppNumber, createWhatsAppUrl } from "@/lib/whatsapp";
 import { OrderSuccessCard } from "@/components/ui/OrderSuccessCard";
 import { getOrderById } from "@/lib/firestore";
 import { ShieldCheck } from "lucide-react";
+import { GAPurchase } from "@/components/analytics/GAPurchase";
 
 export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ order?: string, id?: string }> }) {
   const resolvedSearchParams = await searchParams;
@@ -18,8 +19,23 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
   const order = orderId ? await getOrderById(orderId) : null;
   const advanceRequired = order?.advanceRequired === true;
 
+  const transactionId = order?.orderNumber || order?.id || orderId;
+  const validPurchase = order && transactionId && order.items && Array.isArray(order.items) && order.items.length > 0;
+
   return (
     <section className="mx-auto max-w-xl px-4 py-20 text-center relative">
+      {validPurchase && (
+        <GAPurchase data={{
+          transaction_id: transactionId,
+          subtotal: Number(order.subtotal || 0),
+          discount: Number(order.discount || 0),
+          giftWrapSelected: Boolean(order.giftWrapSelected),
+          giftWrapPrice: Number(order.giftWrapPrice || 0),
+          shipping: order.shippingFee || order.shipping || 0,
+          couponCode: order.couponCode,
+          items: order.items
+        }} />
+      )}
       <OrderSuccessCard>
         <OrderSuccessAnimation />
         <h1 className="text-4xl font-serif font-semibold text-champagne">Order Received!</h1>
