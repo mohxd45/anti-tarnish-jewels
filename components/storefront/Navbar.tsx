@@ -30,8 +30,8 @@ export function Navbar({ settings }: { settings?: any }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 relative">
           <div className="flex shrink-0 items-center gap-2 relative z-10">
             <Link href="/" className="flex shrink-0 items-center gap-2">
-              <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-transparent overflow-hidden relative">
-                <Image src="/lona-monogram.jpg" alt="LONA JEWELS" fill sizes="48px" className="object-contain" priority />
+              <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center bg-transparent relative">
+                <Image src="/lona-logo-official.png" alt="LONA JEWELS" fill sizes="48px" className="object-contain" priority />
               </div>
               <div className="hidden min-w-0 sm:block">
                 <h1 className="truncate font-serif text-lg leading-tight text-stone-900 md:text-xl">{brandName}</h1>
