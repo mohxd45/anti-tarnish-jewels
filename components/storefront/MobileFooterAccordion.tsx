@@ -74,7 +74,11 @@ export function MobileFooterAccordion({
               <Link href="/track-order" className="block hover:text-brandGoldDeep transition-colors">Track Order</Link>
               <Link href="/contact" className="block hover:text-brandGoldDeep transition-colors">Contact Us</Link>
               <Link href="/faq" className="block hover:text-brandGoldDeep transition-colors">FAQ</Link>
-              <Link href="/return-policy" className="block hover:text-brandGoldDeep transition-colors">Returns</Link>
+              <Link href="/terms-and-conditions" className="block hover:text-brandGoldDeep transition-colors">Terms & Conditions</Link>
+              <Link href="/privacy-policy" className="block hover:text-brandGoldDeep transition-colors">Privacy Policy</Link>
+              <Link href="/refund-cancellation-policy" className="block hover:text-brandGoldDeep transition-colors">Refund & Cancellation Policy</Link>
+              <Link href="/return-policy" className="block hover:text-brandGoldDeep transition-colors">Return Policy</Link>
+              <Link href="/shipping-policy" className="block hover:text-brandGoldDeep transition-colors">Shipping Policy</Link>
             </AccordionContent>
           </AccordionItem>
 

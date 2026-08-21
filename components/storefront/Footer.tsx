@@ -46,7 +46,11 @@ export async function Footer() {
             { href: "/track-order", label: "Track Order" },
             { href: "/contact", label: "Contact Us" },
             { href: "/faq", label: "FAQ" },
-            { href: "/return-policy", label: "Returns" },
+            { href: "/terms-and-conditions", label: "Terms & Conditions" },
+            { href: "/privacy-policy", label: "Privacy Policy" },
+            { href: "/refund-cancellation-policy", label: "Refund & Cancellation Policy" },
+            { href: "/return-policy", label: "Return Policy" },
+            { href: "/shipping-policy", label: "Shipping Policy" },
           ]}/>
           <div>
             <h4 className="mb-4 font-semibold text-brandEspresso">Connect</h4>
@@ -64,10 +68,13 @@ export async function Footer() {
             <p>© 2026 LONA JEWELS. All rights reserved.</p>
             <p>LONA JEWELS is owned and operated by BMST Enterprise.</p>
           </div>
-          <div className="flex gap-4 text-sm text-brandMutedText mb-4 md:mb-0">
+          <div className="flex gap-4 flex-wrap justify-center text-sm text-brandMutedText mb-4 md:mb-0">
             {settings?.deliveryText && <span className="mr-2 border-r border-[#E8D7C8] pr-4 hidden md:inline">{settings.deliveryText}</span>}
+            <Link href="/terms-and-conditions" className="hover:text-brandGoldDeep transition-colors">Terms</Link>
             <Link href="/privacy-policy" className="hover:text-brandGoldDeep transition-colors">Privacy</Link>
+            <Link href="/refund-cancellation-policy" className="hover:text-brandGoldDeep transition-colors">Refund</Link>
             <Link href="/return-policy" className="hover:text-brandGoldDeep transition-colors">Returns</Link>
+            <Link href="/shipping-policy" className="hover:text-brandGoldDeep transition-colors">Shipping</Link>
             <Link href="/contact" className="hover:text-brandGoldDeep transition-colors">Contact</Link>
           </div>
         </div>
