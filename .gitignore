@@ -7,3 +7,13 @@ dist
 
 .vercel
 .env*
+
+# Local artifacts
+jre21/
+desktop-visual-test.png
+diff.txt
+emulator_boot.log
+emulator_err.log
+emulator_out.log
+files_to_delete.txt
+check_utf8.js
