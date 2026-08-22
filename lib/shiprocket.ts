@@ -2,8 +2,12 @@
 export let cachedTokenExpiry: number = 0;
 
 export async function getShiprocketToken(forceRefresh = false): Promise<string> {
-  const email = process.env.SHIPROCKET_API_EMAIL;
-  const password = process.env.SHIPROCKET_API_PASSWORD;
+  let email = process.env.SHIPROCKET_API_EMAIL || "";
+  let password = process.env.SHIPROCKET_API_PASSWORD || "";
+
+  // Strip possible accidental quotes or whitespace
+  email = email.replace(/^["']|["']$/g, "").trim();
+  password = password.replace(/^["']|["']$/g, "").trim();
 
   if (!email || !password) {
     throw new Error("Shiprocket credentials missing from server environment");
