@@ -1,4 +1,4 @@
-export let cachedToken: string | null = null;
+﻿export let cachedToken: string | null = null;
 export let cachedTokenExpiry: number = 0;
 
 export async function getShiprocketToken(forceRefresh = false): Promise<string> {
@@ -24,7 +24,8 @@ export async function getShiprocketToken(forceRefresh = false): Promise<string> 
   });
 
   if (!res.ok) {
-    throw new Error("Shiprocket authentication failed");
+    const errorBody = await res.text();
+    throw new Error("Shiprocket authentication failed: " + res.status + " " + errorBody);
   }
 
   const data = await res.json();
