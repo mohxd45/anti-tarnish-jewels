@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 import { useAuth } from "@/context/AuthContext";
 
 
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { listenToAllOrders, updateOrderStatus, updateOrderTracking , logActivity, markAdvancePaid } from "@/lib/firestore";
+import { auth } from "@/lib/firebase";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -186,7 +187,7 @@ export default function ManageOrdersPage() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search order…"
+              placeholder="Search orderâ€¦"
               className="pl-9 w-48 bg-white border-adminBorder text-adminSidebar rounded-full text-xs"
             />
           </div>
@@ -324,7 +325,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4 py-1.5 text-sm border-b border-adminBorder last:border-0">
       <span className="text-adminMuted">{label}</span>
-      <span className="text-right font-medium text-adminSidebar">{value || "—"}</span>
+      <span className="text-right font-medium text-adminSidebar">{value || "â€”"}</span>
     </div>
   );
 }
@@ -354,7 +355,7 @@ function ViewOrderDialog({
             Order {order.orderNumber || (order.id ? order.id.slice(-6).toUpperCase() : "N/A")}
           </DialogTitle>
           <DialogDescription className="text-adminMuted">
-            Placed on {order.createdAt ? new Date(order.createdAt).toLocaleString() : "Unknown"} ·{" "}
+            Placed on {order.createdAt ? new Date(order.createdAt).toLocaleString() : "Unknown"} Â·{" "}
             <StatusBadge status={status} />
           </DialogDescription>
         </DialogHeader>
@@ -372,7 +373,7 @@ function ViewOrderDialog({
               Delivery
             </h3>
             <Row label="Address" value={`${addr?.line1 || ""} ${addr?.line2 || ""}`} />
-            <Row label="City / State" value={`${addr?.city ?? "—"} ${addr?.state ? `, ${addr?.state}` : ""}`} />
+            <Row label="City / State" value={`${addr?.city ?? "â€”"} ${addr?.state ? `, ${addr?.state}` : ""}`} />
             <Row label="Pincode" value={addr?.pincode} />
           </div>
         </div>
@@ -433,7 +434,7 @@ function ViewOrderDialog({
                             <div className="text-[10px] uppercase tracking-wider text-adminMuted font-semibold mb-1">Included in bundle:</div>
                             {it.product.includedItems.map((inc: any, idx: number) => (
                               <div key={idx} className="flex justify-between text-[11px] text-adminSidebar">
-                                <span>• {inc.quantity}x {inc.name} {inc.selectedSize || inc.selectedColor ? `(${[inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - ")})` : ""}</span>
+                                <span>â€¢ {inc.quantity}x {inc.name} {inc.selectedSize || inc.selectedColor ? `(${[inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - ")})` : ""}</span>
                                 <span className="font-mono text-adminMuted">{inc.sku}</span>
                               </div>
                             ))}
@@ -448,7 +449,7 @@ function ViewOrderDialog({
                             <div className="text-[10px] uppercase tracking-wider text-adminMuted font-semibold mb-1">Selected items ({it.selectedProducts.length}):</div>
                             {it.selectedProducts.map((inc: any, idx: number) => (
                               <div key={idx} className="flex justify-between text-[11px] text-adminSidebar">
-                                <span>• {inc.name}</span>
+                                <span>â€¢ {inc.name}</span>
                                 <span className="font-mono text-adminMuted">{inc.sku}</span>
                               </div>
                             ))}
@@ -553,6 +554,7 @@ function EditOrderDialog({
   const [trackingUrl, setTrackingUrl] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [creatingShipment, setCreatingShipment] = useState(false);
 
   useEffect(() => {
     if (order) {
@@ -565,6 +567,33 @@ function EditOrderDialog({
   }, [order]);
 
   if (!order) return null;
+
+  
+  const handleCreateShipment = async () => {
+    if (!order) return;
+    setCreatingShipment(true);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const res = await fetch("/api/admin/orders/shiprocket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + idToken
+        },
+        body: JSON.stringify({ orderId: order.id })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create shipment");
+      }
+      toast.success(data.message || "Shiprocket shipment created!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message);
+    } finally {
+      setCreatingShipment(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -604,7 +633,72 @@ function EditOrderDialog({
               </Select>
             </Field>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            
+            {/* Shiprocket Section */}
+            <section className="space-y-4 pt-4 border-t border-adminBorder">
+              <h3 className="text-sm font-semibold text-adminSidebar">Shiprocket Fulfillment</h3>
+              {order.shiprocketOrderId ? (
+                <div className="bg-adminBg p-3 rounded-xl border border-adminBorder space-y-1 text-sm">
+                  <p><span className="text-adminMuted">Order ID:</span> {order.shiprocketOrderId}</p>
+                  {order.shiprocketShipmentId && <p><span className="text-adminMuted">Shipment ID:</span> {order.shiprocketShipmentId}</p>}
+                  <p><span className="text-adminMuted">Status:</span> {order.shiprocketStatus}</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {(() => {
+                    const isCodWithAdvance = order.paymentMethod === "cod_with_advance" || order.advanceRequired;
+                    const advancePaid = order.amountPaid && order.amountPaid >= (order.advanceAmount || 100);
+                    const isPrepaid = order.paymentMethod !== "Cash on Delivery" && order.paymentMethod !== "cod_with_advance" && !order.paymentMethod?.toLowerCase().includes("cod");
+                    
+                    let eligible = false;
+                    let reason = "";
+
+                    if (order.status === "Cancelled" || order.orderStatus === "Cancelled") {
+                      reason = "Order is cancelled.";
+                    } else if (isCodWithAdvance) {
+                      if (advancePaid) {
+                        eligible = true;
+                      } else {
+                        reason = "Awaiting â‚¹100 advance payment.";
+                      }
+                    } else if (isPrepaid) {
+                      if (order.paymentStatus === "Paid") {
+                        eligible = true;
+                      } else {
+                        reason = "Awaiting payment verification.";
+                      }
+                    } else {
+                      if (order.status !== "Pending" && order.orderStatus !== "Pending") {
+                        eligible = true;
+                      } else {
+                        reason = "Awaiting manual approval (Order is still Pending).";
+                      }
+                    }
+
+                    if (eligible) {
+                      return (
+                        <Button 
+                          onClick={handleCreateShipment} 
+                          disabled={creatingShipment}
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                          type="button"
+                        >
+                          {creatingShipment ? "Creating..." : "Create Shiprocket Shipment"}
+                        </Button>
+                      );
+                    } else {
+                      return (
+                        <p className="text-sm text-adminMuted">
+                          Shipment creation not yet available. {reason}
+                        </p>
+                      );
+                    }
+                  })()}
+                </div>
+              )}
+            </section>
+
+              <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Courier Partner">
                 <Input
                   value={courierName}
@@ -652,7 +746,7 @@ function EditOrderDialog({
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={saving} className="rounded-full bg-adminRose text-white hover:bg-adminRose/90 border-none shadow-md">
-            {saving ? "Saving…" : "Save Changes"}
+            {saving ? "Savingâ€¦" : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -707,7 +801,7 @@ function printInvoice(o: Order) {
                 <div style="font-weight:600; text-transform:uppercase; margin-bottom:4px; font-size:9px; letter-spacing:0.05em;">Included in bundle:</div>
                 ${it.product.includedItems.map((inc: any) => `
                   <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                    <span>• ${inc.quantity}x ${escapeHtml(inc.name)} ${inc.selectedSize || inc.selectedColor ? `(${escapeHtml([inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - "))})` : ""}</span>
+                    <span>â€¢ ${inc.quantity}x ${escapeHtml(inc.name)} ${inc.selectedSize || inc.selectedColor ? `(${escapeHtml([inc.selectedSize, inc.selectedColor].filter(Boolean).join(" - "))})` : ""}</span>
                     <span style="font-family:monospace">${escapeHtml(inc.sku)}</span>
                   </div>
                 `).join("")}
@@ -721,7 +815,7 @@ function printInvoice(o: Order) {
                 <div style="font-weight:600; text-transform:uppercase; margin-bottom:4px; font-size:9px; letter-spacing:0.05em;">Selected items (${it.selectedProducts.length}):</div>
                 ${it.selectedProducts.map((inc: any) => `
                   <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                    <span>• ${escapeHtml(inc.name)}</span>
+                    <span>â€¢ ${escapeHtml(inc.name)}</span>
                     <span style="font-family:monospace">${escapeHtml(inc.sku)}</span>
                   </div>
                 `).join("")}
@@ -738,7 +832,7 @@ function printInvoice(o: Order) {
   const status = o.status || o.orderStatus || "Pending";
 
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"/>
-    <title>${o.orderNumber || o.id} — LONA JEWELS</title>
+    <title>${o.orderNumber || o.id} â€” LONA JEWELS</title>
     <style>
       * { box-sizing: border-box }
       body { font-family: 'Inter', system-ui, sans-serif; color:#1f1a17; padding:32px; max-width:720px; margin:auto }

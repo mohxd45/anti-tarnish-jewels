@@ -191,6 +191,10 @@ export type Order = {
   trackingUrl?: string;
   timeline: OrderTimelineEvent[];
   notes?: string;
+  shiprocketOrderId?: string | number;
+  shiprocketShipmentId?: string | number;
+  shiprocketStatus?: string;
+  shiprocketCreatedAt?: string;
   createdAt: string;
   updatedAt: string;
 };
