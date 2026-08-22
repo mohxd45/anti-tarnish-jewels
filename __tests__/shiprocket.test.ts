@@ -1,6 +1,7 @@
 ﻿
 import assert from "node:assert";
 import { getShiprocketEligibility } from "../lib/shiprocketEligibility";
+import { buildShiprocketOrderPayload } from "../lib/shiprocketService";
 
 console.log("Running Shiprocket unit tests...");
 
@@ -49,81 +50,124 @@ try {
   // 1. Missing name rejected
   const orderMissingName = { ...MOCK_ORDER, customerName: "", address: {} };
   assert.throws(() => {
-    if (!orderMissingName.customerName && !orderMissingName.address.fullName) throw new Error("Missing customer name");
+    buildShiprocketOrderPayload(orderMissingName, "1");
   }, /Missing customer name/); testsPassed++;
 
   // 2. Missing SKU rejected
   const orderMissingSku = { ...MOCK_ORDER, items: [{ name: "Ring", quantity: 1, price: 100 }] };
   assert.throws(() => {
-    orderMissingSku.items.forEach((item: any) => { if (!item.sku) throw new Error("One or more items are missing SKU"); });
+    buildShiprocketOrderPayload(orderMissingSku, "1");
   }, /missing SKU/); testsPassed++;
 
   // 3. Missing quantity rejected
   const orderMissingQty = { ...MOCK_ORDER, items: [{ name: "Ring", sku: "R1", price: 100 }] };
   assert.throws(() => {
-    orderMissingQty.items.forEach((item: any) => { if (!Number.isFinite(item.quantity) || item.quantity < 1) throw new Error("Invalid or missing quantity"); });
+    buildShiprocketOrderPayload(orderMissingQty, "1");
   }, /Invalid or missing quantity/); testsPassed++;
 
   // 4. Quantity 0 rejected
   const orderZeroQty = { ...MOCK_ORDER, items: [{ name: "Ring", sku: "R1", quantity: 0, price: 100 }] };
   assert.throws(() => {
-    orderZeroQty.items.forEach((item: any) => { if (!Number.isFinite(item.quantity) || item.quantity < 1) throw new Error("Invalid or missing quantity"); });
+    buildShiprocketOrderPayload(orderZeroQty, "1");
   }, /Invalid or missing quantity/); testsPassed++;
 
   // 5. Missing price rejected
   const orderMissingPrice = { ...MOCK_ORDER, items: [{ name: "Ring", sku: "R1", quantity: 1 }] };
   assert.throws(() => {
-    orderMissingPrice.items.forEach((item: any) => { if (!Number.isFinite(item.price) || item.price < 0) throw new Error("Invalid or missing price"); });
+    buildShiprocketOrderPayload(orderMissingPrice, "1");
   }, /Invalid or missing price/); testsPassed++;
 
-  // 6. Concurrency: request B cannot replace A state
-  const reqA_Order = createTransactionPayload({ ...MOCK_ORDER }, "attempt-A", false);
-  let reqB_Error = "";
-  try {
-    if (reqA_Order.shiprocketCreationState === "creating" && (Date.now() - new Date(reqA_Order.shiprocketLastAttemptAt).getTime() < 60000)) {
-      throw new Error("Shiprocket shipment creation is currently in progress");
-    }
-  } catch (e: any) {
-    reqB_Error = e.message;
-  }
-  assert.strictEqual(reqB_Error, "Shiprocket shipment creation is currently in progress"); testsPassed++;
-
-  // 7. Concurrency: owning attemptId checks
-  const successCallback = (order: any, callerAttemptId: string) => {
-    if (order.shiprocketCreationAttemptId === callerAttemptId) {
-      order.shiprocketCreationState = "created";
-    }
-  };
-  const reqC_Order = createTransactionPayload({ ...MOCK_ORDER }, "attempt-C", false);
-  successCallback(reqC_Order, "attempt-D"); // competing request tries to update
-  assert.strictEqual(reqC_Order.shiprocketCreationState, "creating"); // Should not change
-  testsPassed++;
-
-  successCallback(reqC_Order, "attempt-C"); // owner updates
-  assert.strictEqual(reqC_Order.shiprocketCreationState, "created");
-  testsPassed++;
-
-  // 8. Idempotency: existing shiprocketOrderId => no API call
+  // 6. Idempotency: existing shiprocketOrderId => logic bypass handled in runTransaction
   const existingShiprocketOrder = { ...MOCK_ORDER, shiprocketOrderId: "12345" };
   assert.strictEqual(existingShiprocketOrder.shiprocketOrderId, "12345"); testsPassed++;
 
-  // 9. Reconciliation for expired claim
-  const expiredOrder = createTransactionPayload({ ...MOCK_ORDER }, "attempt-A", true);
-  try {
-    if (expiredOrder.shiprocketCreationState === "creating" && (Date.now() - new Date(expiredOrder.shiprocketLastAttemptAt).getTime() >= 60000)) {
-       expiredOrder.shiprocketCreationState = "reconcile_required";
-       throw new Error("reconcile");
-    }
-  } catch(e) {}
-  assert.strictEqual(expiredOrder.shiprocketCreationState, "reconcile_required"); testsPassed++;
+  // 7. Test Partial COD Correct Mapping
+  const codOrder = { 
+    ...MOCK_ORDER, 
+    total: 700, 
+    amountPaid: 100, 
+    payOnDeliveryAmount: 600, 
+    paymentMethod: "cod_with_advance", 
+    codAdvanceStatus: "paid",
+    paymentStatus: "advance_paid"
+  };
+  const payload1 = buildShiprocketOrderPayload(codOrder, "1");
+  assert.strictEqual(payload1.payment_method, "COD");
+  assert.strictEqual(payload1.sub_total, 700);
+  assert.strictEqual(payload1.advance_amount, 100);
+  assert.strictEqual(payload1.cod_amount, 600);
+  testsPassed++;
 
-  // 10. Financial COD Mapping Failure (Partial Payment block)
-  const codOrder = { ...MOCK_ORDER, paymentMethod: "cod_with_advance", amountPaid: 100, advanceRequired: true };
+  // 8. Test Partial COD - not eligible if unpaid
+  const codUnpaid = {
+    ...MOCK_ORDER,
+    total: 700,
+    amountPaid: 0,
+    paymentMethod: "cod_with_advance",
+    codAdvanceStatus: "pending"
+  };
+  const payload2 = buildShiprocketOrderPayload(codUnpaid, "1");
+  assert.strictEqual(payload2.payment_method, "COD");
+  assert.strictEqual(payload2.advance_amount, undefined);
+  testsPassed++;
+
+  // 9. Test Partial COD - Financial Mismatch
+  const codMismatch = {
+    ...MOCK_ORDER,
+    total: 700,
+    amountPaid: 100,
+    payOnDeliveryAmount: 650, 
+    paymentMethod: "cod_with_advance",
+    codAdvanceStatus: "paid",
+    paymentStatus: "advance_paid"
+  };
   assert.throws(() => {
-    if (codOrder.paymentMethod === "cod_with_advance" && (codOrder.advanceRequired || codOrder.amountPaid > 0)) {
-       throw new Error("Shiprocket Create Custom Order API lacks native support for partial-payment");
-    }
-  }, /lacks native support/); testsPassed++;
+    buildShiprocketOrderPayload(codMismatch, "1");
+  }, /Partial COD financial amounts are inconsistent with stored payOnDeliveryAmount/); testsPassed++;
+
+  const codMismatch2 = {
+    ...MOCK_ORDER,
+    total: 700,
+    amountPaid: 150,
+    paymentMethod: "cod_with_advance",
+    codAdvanceStatus: "paid",
+    paymentStatus: "advance_paid"
+  };
+  const payload3 = buildShiprocketOrderPayload(codMismatch2, "1");
+  assert.strictEqual(payload3.advance_amount, 150);
+  assert.strictEqual(payload3.cod_amount, 550);
+  testsPassed++;
+
+  // 10. Normal Prepaid Mapping
+  const prepaidOrder = {
+    ...MOCK_ORDER,
+    total: 999,
+    paymentMethod: "Stripe",
+    paymentStatus: "Paid"
+  };
+  const payload4 = buildShiprocketOrderPayload(prepaidOrder, "1");
+  assert.strictEqual(payload4.payment_method, "Prepaid");
+  assert.strictEqual(payload4.sub_total, 999);
+  assert.strictEqual(payload4.advance_amount, undefined);
+  testsPassed++;
+  
+  // 11. Bundle item mapping
+  const bundleOrder = {
+    ...MOCK_ORDER,
+    items: [
+      { bundleName: "Gift Set", bundleSku: "GIFT-1", quantity: 2, bundlePrice: 500 },
+      { product: { name: "Nested Prod", sku: "N-1" }, quantity: 1, price: 150 }
+    ],
+    total: 1150
+  };
+  const payload5 = buildShiprocketOrderPayload(bundleOrder, "1");
+  assert.strictEqual(payload5.order_items[0].name, "Gift Set");
+  assert.strictEqual(payload5.order_items[0].sku, "GIFT-1");
+  assert.strictEqual(payload5.order_items[0].selling_price, 500);
+  assert.strictEqual(payload5.order_items[1].name, "Nested Prod");
+  assert.strictEqual(payload5.order_items[1].sku, "N-1");
+  assert.strictEqual(payload5.order_items[1].selling_price, 150);
+  testsPassed++;
 
   console.log(`${testsPassed} REAL test cases passed!`);
 } catch (err) {

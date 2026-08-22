@@ -1,10 +1,133 @@
-﻿import { SHIPROCKET_CONFIG, shiprocketFetch } from './shiprocket';
+﻿import { SHIPROCKET_CONFIG, shiprocketFetch, ShiprocketApiError } from './shiprocket';
 import { adminDb } from './firebaseAdmin';
 import { getShiprocketEligibility } from './shiprocketEligibility';
 import crypto from 'crypto';
 
 export interface ShiprocketOrderCreationParams {
   orderId: string;
+}
+
+export function buildShiprocketOrderPayload(orderData: any, orderId: string): any {
+  const billName = orderData.customerName || orderData.address?.fullName;
+  if (!billName || String(billName).trim() === "") throw new Error("Missing customer name");
+  
+  const billEmail = orderData.customerEmail || orderData.address?.email;
+  if (!billEmail || String(billEmail).trim() === "") throw new Error("Missing customer email");
+  
+  const billPhone = orderData.customerPhone || orderData.address?.phone;
+  if (!billPhone || String(billPhone).trim() === "") throw new Error("Missing customer phone");
+
+  if (!orderData.address || !orderData.address.line1 || !orderData.address.city || !orderData.address.pincode || !orderData.address.state) {
+    throw new Error("Missing essential shipping address fields (line1, city, pincode, state)");
+  }
+  if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
+    throw new Error("Order has no items");
+  }
+
+  const orderItems = orderData.items.map((item: any) => {
+    const itemName = item.name || item.bundleName || item.product?.name;
+    const itemSku = item.sku || item.bundleSku || item.product?.sku;
+    const itemPrice = item.price !== undefined ? item.price : item.bundlePrice;
+    const itemQty = Number(item.quantity);
+    
+    if (!itemName || String(itemName).trim() === "") throw new Error("One or more items are missing product name");
+    if (!itemSku || String(itemSku).trim() === "") throw new Error("One or more items are missing SKU");
+    if (!Number.isFinite(itemQty) || itemQty < 1) throw new Error("Invalid or missing quantity for item");
+    if (!Number.isFinite(itemPrice) || itemPrice < 0) throw new Error("Invalid or missing price for item");
+    
+    return {
+      name: itemName,
+      sku: itemSku,
+      units: itemQty,
+      selling_price: itemPrice,
+      discount: "",
+      tax: ""
+    };
+  });
+
+  const totalOrderValue = Number(orderData.total);
+  if (!Number.isFinite(totalOrderValue) || totalOrderValue < 0) {
+    throw new Error("Invalid order total");
+  }
+
+  let shiprocketPaymentMethod = "Prepaid";
+  let shiprocketSubTotal = totalOrderValue;
+  let advanceAmount: number | undefined = undefined;
+  let codAmount: number | undefined = undefined;
+  
+  const rawPaymentMethod = (orderData.paymentMethod || "").toLowerCase();
+  
+  if (rawPaymentMethod.includes("cod") || rawPaymentMethod === "cash on delivery") {
+    shiprocketPaymentMethod = "COD";
+    
+    if (orderData.paymentStatus === "advance_paid" || orderData.codAdvanceStatus === "paid") {
+      const advancePaid = Number(orderData.amountPaid);
+      const codRemaining = totalOrderValue - advancePaid;
+      
+      if (!Number.isFinite(advancePaid) || advancePaid <= 0) {
+        throw new Error("Partial COD financial amounts are inconsistent (invalid advance paid).");
+      }
+      if (!Number.isFinite(codRemaining) || codRemaining <= 0) {
+        throw new Error("Partial COD financial amounts are inconsistent (invalid COD remaining).");
+      }
+      
+      const expectedTotal = advancePaid + codRemaining;
+      if (Math.abs(totalOrderValue - expectedTotal) > 0.01) {
+        throw new Error("Partial COD financial amounts are inconsistent.");
+      }
+      
+      if (orderData.payOnDeliveryAmount !== undefined) {
+        const storedCodAmount = Number(orderData.payOnDeliveryAmount);
+        if (Math.abs(storedCodAmount - codRemaining) > 0.01) {
+          throw new Error("Partial COD financial amounts are inconsistent with stored payOnDeliveryAmount.");
+        }
+      }
+      
+      advanceAmount = advancePaid;
+      codAmount = codRemaining;
+    }
+  }
+  
+  const orderDateObj = orderData.createdAt ? new Date(orderData.createdAt) : new Date();
+  const yyyy = orderDateObj.getFullYear();
+  const mm = String(orderDateObj.getMonth() + 1).padStart(2, '0');
+  const dd = String(orderDateObj.getDate()).padStart(2, '0');
+  const hh = String(orderDateObj.getHours()).padStart(2, '0');
+  const mins = String(orderDateObj.getMinutes()).padStart(2, '0');
+  const orderDate = yyyy + "-" + mm + "-" + dd + " " + hh + ":" + mins;
+
+  const payload: any = {
+    order_id: orderData.orderNumber || orderId,
+    order_date: orderDate,
+    pickup_location: SHIPROCKET_CONFIG.pickupLocation,
+    billing_customer_name: billName,
+    billing_last_name: "",
+    billing_address: orderData.address.line1,
+    billing_address_2: orderData.address.line2 || "",
+    billing_city: orderData.address.city,
+    billing_pincode: orderData.address.pincode,
+    billing_state: orderData.address.state,
+    billing_country: "India",
+    billing_email: billEmail,
+    billing_phone: billPhone,
+    shipping_is_billing: true,
+    order_items: orderItems,
+    payment_method: shiprocketPaymentMethod,
+    sub_total: shiprocketSubTotal,
+    length: SHIPROCKET_CONFIG.defaultLength,
+    breadth: SHIPROCKET_CONFIG.defaultBreadth,
+    height: SHIPROCKET_CONFIG.defaultHeight,
+    weight: SHIPROCKET_CONFIG.defaultWeight
+  };
+
+  if (advanceAmount !== undefined) {
+    payload.advance_amount = advanceAmount;
+  }
+  if (codAmount !== undefined) {
+    payload.cod_amount = codAmount;
+  }
+
+  return payload;
 }
 
 export async function createShiprocketOrderForDbOrder(orderId: string): Promise<any> {
@@ -34,7 +157,6 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
         if (Date.now() - lastAttempt < 60000) {
           throw new Error("Shiprocket shipment creation is currently in progress for this order.");
         } else {
-          // Expired claim: do not blindly retry.
           t.update(orderRef, {
             shiprocketCreationState: 'reconcile_required',
             shiprocketLastError: 'Previous creation attempt timed out. Manual reconciliation required.'
@@ -52,32 +174,8 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
         throw new Error("Order is not eligible for shipment: " + eligibility.reason);
       }
 
-      const billName = orderData.customerName || orderData.address?.fullName;
-      if (!billName || String(billName).trim() === "") throw new Error("Missing customer name");
-      
-      const billEmail = orderData.customerEmail || orderData.address?.email;
-      if (!billEmail || String(billEmail).trim() === "") throw new Error("Missing customer email");
-      
-      const billPhone = orderData.customerPhone || orderData.address?.phone;
-      if (!billPhone || String(billPhone).trim() === "") throw new Error("Missing customer phone");
-
-      if (!orderData.address || !orderData.address.line1 || !orderData.address.city || !orderData.address.pincode || !orderData.address.state) {
-        throw new Error("Missing essential shipping address fields (line1, city, pincode, state)");
-      }
-      if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
-        throw new Error("Order has no items");
-      }
-
-      orderData.items.forEach((item: any) => {
-        if (!item.name || String(item.name).trim() === "") throw new Error("One or more items are missing product name");
-        if (!item.sku || String(item.sku).trim() === "") throw new Error("One or more items are missing SKU");
-        if (!Number.isFinite(item.quantity) || item.quantity < 1) throw new Error("Invalid or missing quantity for item");
-        if (!Number.isFinite(item.price) || item.price < 0) throw new Error("Invalid or missing price for item");
-      });
-
-      if (!Number.isFinite(orderData.total) || orderData.total < 0) {
-        throw new Error("Invalid order total");
-      }
+      // We call the builder inside the transaction to fail fast on validation
+      buildShiprocketOrderPayload(orderData, orderId);
 
       t.update(orderRef, {
         shiprocketCreationState: 'creating',
@@ -93,80 +191,43 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
     }
 
     const { orderData } = transactionResult;
-    
-    let shiprocketPaymentMethod = "Prepaid";
-    let shiprocketSubTotal = orderData.total;
-    
-    const rawPaymentMethod = (orderData.paymentMethod || "").toLowerCase();
-    
-    if (rawPaymentMethod.includes("cod") || rawPaymentMethod === "cash on delivery") {
-      shiprocketPaymentMethod = "COD";
-      if (orderData.advanceRequired || orderData.amountPaid > 0) {
-        throw new Error("Shiprocket Create Custom Order API lacks native support for partial-payment/advance. Modifying discount or sub_total corrupts tax invoices. A 'Partial COD' field or 'disable invoice' config is required from Shiprocket.");
+    const payload = buildShiprocketOrderPayload(orderData, orderId);
+
+    let res: any;
+    try {
+      res = await shiprocketFetch("/orders/create/adhoc", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    } catch (apiError: any) {
+      if (apiError instanceof ShiprocketApiError) {
+        let safeErrorMessage = apiError.message;
+        if (apiError.status === 400 && typeof safeErrorMessage === 'string' && safeErrorMessage.includes('order id already exists')) {
+          await adminDb!.runTransaction(async (t) => {
+            const snap = await t.get(orderRef);
+            if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
+              t.update(orderRef, {
+                shiprocketCreationState: 'reconcile_required',
+                shiprocketLastError: "Order ID already exists in Shiprocket. Manual reconciliation required."
+              });
+            }
+          });
+          throw new Error("Order ID already exists in Shiprocket. Manual reconciliation required.");
+        }
+        
+        const financials = {
+          payment_method: payload.payment_method,
+          sub_total: payload.sub_total,
+          advance_amount: payload.advance_amount,
+          cod_amount: payload.cod_amount
+        };
+        throw new Error("Shiprocket API Rejected (Status " + apiError.status + "): " + safeErrorMessage + " | Response: " + JSON.stringify(apiError.safeResponse || {}) + " | Payload Sent: " + JSON.stringify(financials));
       }
+      throw apiError;
     }
-    
-    const orderItems = orderData.items.map((item: any) => ({
-      name: item.name,
-      sku: item.sku,
-      units: item.quantity,
-      selling_price: item.price,
-      discount: "",
-      tax: ""
-    }));
-
-    const orderDateObj = orderData.createdAt ? new Date(orderData.createdAt) : new Date();
-    const yyyy = orderDateObj.getFullYear();
-    const mm = String(orderDateObj.getMonth() + 1).padStart(2, '0');
-    const dd = String(orderDateObj.getDate()).padStart(2, '0');
-    const hh = String(orderDateObj.getHours()).padStart(2, '0');
-    const mins = String(orderDateObj.getMinutes()).padStart(2, '0');
-    const orderDate = yyyy + "-" + mm + "-" + dd + " " + hh + ":" + mins;
-
-    const payload = {
-      order_id: orderData.orderNumber || orderId,
-      order_date: orderDate,
-      pickup_location: SHIPROCKET_CONFIG.pickupLocation,
-      billing_customer_name: orderData.customerName || orderData.address.fullName,
-      billing_last_name: "",
-      billing_address: orderData.address.line1,
-      billing_address_2: orderData.address.line2 || "",
-      billing_city: orderData.address.city,
-      billing_pincode: orderData.address.pincode,
-      billing_state: orderData.address.state,
-      billing_country: "India",
-      billing_email: orderData.customerEmail || orderData.address.email,
-      billing_phone: orderData.customerPhone || orderData.address.phone,
-      shipping_is_billing: true,
-      order_items: orderItems,
-      payment_method: shiprocketPaymentMethod,
-      sub_total: shiprocketSubTotal,
-      length: SHIPROCKET_CONFIG.defaultLength,
-      breadth: SHIPROCKET_CONFIG.defaultBreadth,
-      height: SHIPROCKET_CONFIG.defaultHeight,
-      weight: SHIPROCKET_CONFIG.defaultWeight
-    };
-
-    const res = await shiprocketFetch("/orders/create/adhoc", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
     
     if (!res || (!res.order_id && !res.status_code)) {
        throw new Error("Shiprocket did not return an order_id");
-    }
-    
-    if (res.status_code === 400 && typeof res.message === 'string' && res.message.includes('order id already exists')) {
-      await adminDb!.runTransaction(async (t) => {
-        const snap = await t.get(orderRef);
-        if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
-          t.update(orderRef, {
-            shiprocketCreationState: 'reconcile_required',
-            shiprocketLastError: "Order ID already exists in Shiprocket. Manual reconciliation required."
-          });
-        }
-      });
-      throw new Error("Order ID already exists in Shiprocket. Manual reconciliation required.");
     }
 
     await adminDb!.runTransaction(async (t) => {
@@ -191,7 +252,7 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
 
   } catch (error: any) {
     console.error("Shiprocket shipment creation failed for order", orderId, error);
-    if (error.message !== "Shiprocket shipment creation is currently in progress for this order." && error.message !== "Order requires manual reconciliation with Shiprocket." && !error.message.includes("Previous creation attempt timed out")) {
+    if (error.message !== "Shiprocket shipment creation is currently in progress for this order." && error.message !== "Order requires manual reconciliation with Shiprocket." && !error.message.includes("Previous creation attempt timed out") && !error.message.includes("Order ID already exists in Shiprocket")) {
       try {
         await adminDb!.runTransaction(async (t) => {
           const snap = await t.get(orderRef);

@@ -1,4 +1,16 @@
-﻿export interface ShiprocketConfig {
+﻿export class ShiprocketApiError extends Error {
+  public status: number;
+  public safeResponse: any;
+  
+  constructor(status: number, message: string, safeResponse: any) {
+    super(message);
+    this.name = "ShiprocketApiError";
+    this.status = status;
+    this.safeResponse = safeResponse;
+  }
+}
+
+export interface ShiprocketConfig {
   pickupLocation: string;
   defaultWeight: number;
   defaultLength: number;
@@ -7,7 +19,7 @@
 }
 
 export const SHIPROCKET_CONFIG: ShiprocketConfig = {
-  pickupLocation: "work",
+  pickupLocation: process.env.SHIPROCKET_PICKUP_LOCATION || "Primary",
   defaultWeight: 0.5,
   defaultLength: 20,
   defaultBreadth: 15,
@@ -88,10 +100,23 @@ export async function shiprocketFetch<T = any>(path: string, options: RequestIni
     });
   }
 
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  
   if (!res.ok) {
-    throw new Error("Shiprocket API error: " + res.status + " " + res.statusText);
+    let safeResponse: any = null;
+    let errorMessage = "Shiprocket API error: " + res.status + " " + res.statusText;
+    
+    try {
+      safeResponse = isJson ? await res.json() : await res.text();
+      if (safeResponse && safeResponse.message) {
+        errorMessage = safeResponse.message;
+      }
+    } catch (e) {
+      // Ignored
+    }
+    
+    throw new ShiprocketApiError(res.status, errorMessage, safeResponse);
   }
 
-  const isJson = res.headers.get("content-type")?.includes("application/json");
   return (isJson ? await res.json() : await res.text()) as T;
 }
