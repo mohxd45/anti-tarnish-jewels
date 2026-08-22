@@ -131,11 +131,15 @@ export function buildShiprocketOrderPayload(orderData: any, orderId: string): an
 }
 
 export async function createShiprocketOrderForDbOrder(orderId: string): Promise<any> {
-  const orderRef = adminDb!.collection("orders").doc(orderId);
+  return _createShiprocketOrderForDbOrder(orderId, adminDb!, shiprocketFetch);
+}
+
+export async function _createShiprocketOrderForDbOrder(orderId: string, db: any, fetchFn: any): Promise<any> {
+  const orderRef = db.collection("orders").doc(orderId);
   const attemptId = crypto.randomUUID();
 
   try {
-    const transactionResult = await adminDb!.runTransaction(async (t) => {
+    const transactionResult = await db.runTransaction(async (t: any) => {
       const orderSnap = await t.get(orderRef);
       if (!orderSnap.exists) {
         throw new Error("Order " + orderId + " not found in database");
@@ -195,7 +199,7 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
 
     let res: any;
     try {
-      res = await shiprocketFetch("/orders/create/adhoc", {
+      res = await fetchFn("/orders/create/adhoc", {
         method: "POST",
         body: JSON.stringify(payload)
       });
@@ -203,7 +207,7 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
       if (apiError instanceof ShiprocketApiError) {
         let safeErrorMessage = apiError.message;
         if (apiError.status === 400 && typeof safeErrorMessage === 'string' && safeErrorMessage.includes('order id already exists')) {
-          await adminDb!.runTransaction(async (t) => {
+          await db.runTransaction(async (t: any) => {
             const snap = await t.get(orderRef);
             if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
               t.update(orderRef, {
@@ -226,10 +230,11 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
       throw apiError;
     }
     
-    if (!res || !res.order_id) {
-       const safeErrorMessage = res?.message || "Shiprocket response missing order_id";
-       if (typeof safeErrorMessage === 'string' && safeErrorMessage.toLowerCase().includes('order id already exists')) {
-         await adminDb!.runTransaction(async (t) => {
+    try {
+      validateShiprocketCreateResponse(res, payload);
+    } catch (valError: any) {
+      if (valError.message === "DUPLICATE_ORDER_ID") {
+         await db.runTransaction(async (t: any) => {
            const snap = await t.get(orderRef);
            if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
              t.update(orderRef, {
@@ -239,17 +244,11 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
            }
          });
          throw new Error("Order ID already exists in Shiprocket. Manual reconciliation required.");
-       }
-       const financials = {
-         payment_method: payload.payment_method,
-         sub_total: payload.sub_total,
-         advance_amount: payload.advance_amount,
-         cod_amount: payload.cod_amount
-       };
-       throw new Error("Shiprocket Application Error (HTTP 200): " + safeErrorMessage + " | Response: " + JSON.stringify(res || {}) + " | Payload Sent: " + JSON.stringify(financials));
+      }
+      throw valError;
     }
 
-    await adminDb!.runTransaction(async (t) => {
+    await db.runTransaction(async (t: any) => {
       const snap = await t.get(orderRef);
       if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
         t.update(orderRef, {
@@ -273,7 +272,7 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
     console.error("Shiprocket shipment creation failed for order", orderId, error);
     if (error.message !== "Shiprocket shipment creation is currently in progress for this order." && error.message !== "Order requires manual reconciliation with Shiprocket." && !error.message.includes("Previous creation attempt timed out") && !error.message.includes("Order ID already exists in Shiprocket")) {
       try {
-        await adminDb!.runTransaction(async (t) => {
+        await db.runTransaction(async (t: any) => {
           const snap = await t.get(orderRef);
           if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
             t.update(orderRef, {
@@ -289,13 +288,13 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
 }
 
 
-export async function testableResponseValidation(res: any, payload: any, attemptId: string, orderData: any): Promise<any> {
+
+
+export function validateShiprocketCreateResponse(res: any, payload: any): void {
     if (!res || !res.order_id) {
        const safeErrorMessage = res?.message || "Shiprocket response missing order_id";
        if (typeof safeErrorMessage === 'string' && safeErrorMessage.toLowerCase().includes('order id already exists')) {
-         orderData.shiprocketCreationState = 'reconcile_required';
-         orderData.shiprocketLastError = "Order ID already exists in Shiprocket. Manual reconciliation required.";
-         throw new Error("Order ID already exists in Shiprocket. Manual reconciliation required.");
+         throw new Error("DUPLICATE_ORDER_ID");
        }
        const financials = {
          payment_method: payload?.payment_method,
@@ -305,17 +304,6 @@ export async function testableResponseValidation(res: any, payload: any, attempt
        };
        throw new Error("Shiprocket Application Error (HTTP 200): " + safeErrorMessage + " | Response: " + JSON.stringify(res || {}) + " | Payload Sent: " + JSON.stringify(financials));
     }
-
-    orderData.shiprocketOrderId = res.order_id;
-    orderData.shiprocketShipmentId = res.shipment_id || null;
-    orderData.shiprocketStatus = res.status || "NEW";
-    orderData.shiprocketCreationState = 'created';
-    orderData.shiprocketCreatedAt = new Date().toISOString();
-    
-    return {
-      success: true,
-      shiprocketOrderId: res.order_id,
-      shiprocketShipmentId: res.shipment_id || null,
-      status: res.status || "NEW"
-    };
 }
+
+

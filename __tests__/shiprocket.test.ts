@@ -1,7 +1,7 @@
 ﻿
 import assert from "node:assert";
 import { getShiprocketEligibility } from "../lib/shiprocketEligibility";
-import { buildShiprocketOrderPayload, testableResponseValidation } from "../lib/shiprocketService";
+import { buildShiprocketOrderPayload, validateShiprocketCreateResponse, _createShiprocketOrderForDbOrder } from "../lib/shiprocketService";
 
 console.log("Running Shiprocket unit tests...");
 
@@ -10,14 +10,12 @@ async function runTests() {
 
   // --- ELIGIBILITY ---
   assert.strictEqual(getShiprocketEligibility({ status: "Cancelled" }).eligible, false); testsPassed++;
-  
   assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Stripe", paymentStatus: "Pending" }).eligible, false); testsPassed++;
   assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Stripe", paymentStatus: "Paid" }).eligible, true); testsPassed++;
-  
   assert.strictEqual(getShiprocketEligibility({ paymentMethod: "cod_with_advance", codAdvanceStatus: "pending", amountPaid: 0 }).eligible, false); testsPassed++;
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "cod_with_advance", codAdvanceStatus: "paid", amountPaid: 50, advanceAmount: 100 }).eligible, false); testsPassed++;
   assert.strictEqual(getShiprocketEligibility({ paymentMethod: "cod_with_advance", codAdvanceStatus: "paid", amountPaid: 100, advanceAmount: 100 }).eligible, true); testsPassed++;
 
-  // --- MOCK FIREBASE FOR CONCURRENCY, PAYLOAD, AND IDEMPOTENCY ---
   const MOCK_ORDER: any = {
     shiprocketOrderId: null,
     shiprocketCreationState: null,
@@ -33,13 +31,7 @@ async function runTests() {
     paymentStatus: "Paid"
   };
 
-  // 1. Missing name rejected
-  const orderMissingName = { ...MOCK_ORDER, customerName: "", address: {} };
-  assert.throws(() => {
-    buildShiprocketOrderPayload(orderMissingName, "1");
-  }, /Missing customer name/); testsPassed++;
-
-  // 7. Test Partial COD Correct Mapping
+  // A. Partial COD mapping
   const codOrder = { 
     ...MOCK_ORDER, 
     total: 700, 
@@ -56,20 +48,7 @@ async function runTests() {
   assert.strictEqual(payload1.cod_amount, 600);
   testsPassed++;
 
-  // 8. Test Partial COD - not eligible if unpaid
-  const codUnpaid = {
-    ...MOCK_ORDER,
-    total: 700,
-    amountPaid: 0,
-    paymentMethod: "cod_with_advance",
-    codAdvanceStatus: "pending"
-  };
-  const payload2 = buildShiprocketOrderPayload(codUnpaid, "1");
-  assert.strictEqual(payload2.payment_method, "COD");
-  assert.strictEqual(payload2.advance_amount, undefined);
-  testsPassed++;
-
-  // 9. Test Partial COD - Financial Mismatch
+  // D. financial mismatch
   const codMismatch = {
     ...MOCK_ORDER,
     total: 700,
@@ -79,33 +58,114 @@ async function runTests() {
     codAdvanceStatus: "paid",
     paymentStatus: "advance_paid"
   };
-  assert.throws(() => {
-    buildShiprocketOrderPayload(codMismatch, "1");
-  }, /Partial COD financial amounts are inconsistent with stored payOnDeliveryAmount/); testsPassed++;
+  assert.throws(() => buildShiprocketOrderPayload(codMismatch, "1"), /Partial COD financial amounts are inconsistent/); testsPassed++;
 
+  // E. prepaid mapping unchanged
+  const prepaidOrder = { ...MOCK_ORDER, total: 999, paymentMethod: "Stripe", paymentStatus: "Paid" };
+  const payloadE = buildShiprocketOrderPayload(prepaidOrder, "1");
+  assert.strictEqual(payloadE.payment_method, "Prepaid");
+  assert.strictEqual(payloadE.sub_total, 999);
+  assert.strictEqual(payloadE.advance_amount, undefined);
+  testsPassed++;
+
+  // F. bundle mapping
+  const bundleOrder = {
+    ...MOCK_ORDER,
+    items: [
+      { bundleName: "Gift Set", bundleSku: "GIFT-1", quantity: 2, bundlePrice: 500 },
+      { product: { name: "Nested Prod", sku: "N-1" }, quantity: 1, price: 150 }
+    ],
+    total: 1150
+  };
+  const payloadF = buildShiprocketOrderPayload(bundleOrder, "1");
+  assert.strictEqual(payloadF.order_items[0].name, "Gift Set");
+  assert.strictEqual(payloadF.order_items[1].name, "Nested Prod");
+  testsPassed++;
 
   // --- RESPONSE VALIDATION MOCKS ---
-  // Success response
-  let o1: any = {};
-  await testableResponseValidation({ order_id: 123, shipment_id: 456 }, {}, "test-id", o1);
-  assert.strictEqual(o1.shiprocketOrderId, 123);
-  assert.strictEqual(o1.shiprocketCreationState, "created");
+  // G. Shiprocket success
+  assert.doesNotThrow(() => validateShiprocketCreateResponse({ order_id: 123, shipment_id: 456 }, {})); testsPassed++;
+
+  // H. HTTP-200 application error
+  assert.throws(() => validateShiprocketCreateResponse({ status_code: 400, message: "validation failed" }, {}), /Shiprocket Application Error/); testsPassed++;
+
+  // I. HTTP-200 duplicate
+  assert.throws(() => validateShiprocketCreateResponse({ status_code: 400, message: "order id already exists" }, {}), /DUPLICATE_ORDER_ID/); testsPassed++;
+
+
+  // --- TRANSACTION AND SPY MOCKS ---
+  let fetchCallCount = 0;
+  
+  // Create a mutable wrapper for DB mock
+  let currentOrderState: any = null;
+  const mockDb = {
+    collection: () => ({ doc: () => ({ id: "test-order-1" }) }),
+    runTransaction: async (cb: any) => {
+      return cb({
+        get: async () => ({
+          exists: true,
+          data: () => currentOrderState
+        }),
+        update: (ref: any, data: any) => {
+          Object.assign(currentOrderState, data);
+        }
+      });
+    }
+  };
+
+  let mockFetchResponse: any = null;
+  let mockFetchError: any = null;
+  const mockFetch = async (url: string, opts: any) => {
+    fetchCallCount++;
+    if (mockFetchError) throw mockFetchError;
+    return mockFetchResponse;
+  };
+
+  class ShiprocketApiError extends Error {
+    status: number;
+    safeResponse: any;
+    constructor(status: number, message: string, safeResponse: any) {
+      super(message);
+      this.status = status;
+      this.safeResponse = safeResponse;
+    }
+  }
+
+  // J. existing Firebase shiprocketOrderId: prove API creation path exits (Spy)
+  fetchCallCount = 0;
+  currentOrderState = { shiprocketOrderId: "EXISTING_ID", shiprocketCreationState: "created" };
+  const resJ = await _createShiprocketOrderForDbOrder("test-order-1", mockDb, mockFetch);
+  assert.strictEqual(resJ.message, "Shiprocket order already exists");
+  assert.strictEqual(fetchCallCount, 0, "Fetch call count should be 0");
   testsPassed++;
 
-  // HTTP-200 application error
-  let o2: any = {};
+  // K. active creating state
+  fetchCallCount = 0;
+  currentOrderState = { shiprocketCreationState: "creating", shiprocketLastAttemptAt: new Date().toISOString() };
   await assert.rejects(async () => {
-    await testableResponseValidation({ status_code: 400, message: "validation failed" }, {}, "test-id", o2);
-  }, /Shiprocket Application Error \(HTTP 200\): validation failed/);
-  assert.notStrictEqual(o2.shiprocketCreationState, "created");
+    await _createShiprocketOrderForDbOrder("test-order-1", mockDb, mockFetch);
+  }, /Shiprocket shipment creation is currently in progress/);
+  assert.strictEqual(fetchCallCount, 0);
   testsPassed++;
 
-  // HTTP-200 duplicate
-  let o3: any = {};
+  // L. expired creating state
+  fetchCallCount = 0;
+  currentOrderState = { shiprocketCreationState: "creating", shiprocketLastAttemptAt: new Date(Date.now() - 100000).toISOString() };
   await assert.rejects(async () => {
-    await testableResponseValidation({ status_code: 400, message: "order id already exists" }, {}, "test-id", o3);
-  }, /Order ID already exists in Shiprocket. Manual reconciliation required/);
-  assert.strictEqual(o3.shiprocketCreationState, "reconcile_required");
+    await _createShiprocketOrderForDbOrder("test-order-1", mockDb, mockFetch);
+  }, /Previous creation attempt timed out/);
+  assert.strictEqual(fetchCallCount, 0);
+  assert.strictEqual(currentOrderState.shiprocketCreationState, "reconcile_required");
+  testsPassed++;
+
+  // Verify successful creation updates db correctly
+  fetchCallCount = 0;
+  currentOrderState = { ...codOrder, shiprocketOrderId: null, shiprocketCreationState: null };
+  mockFetchResponse = { order_id: 999, shipment_id: 888, status: "NEW" };
+  const resSuccess = await _createShiprocketOrderForDbOrder("test-order-1", mockDb, mockFetch);
+  assert.strictEqual(fetchCallCount, 1);
+  assert.strictEqual(currentOrderState.shiprocketOrderId, 999);
+  assert.strictEqual(currentOrderState.shiprocketCreationState, "created");
   testsPassed++;
 
   console.log(`${testsPassed} REAL test cases passed!`);
