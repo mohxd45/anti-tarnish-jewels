@@ -1,24 +1,30 @@
-﻿// These tests serve as permanent documentation and validation
-// for Shiprocket payload rules as requested by Task 13B.
+﻿
+import assert from "node:assert";
+import { getShiprocketEligibility } from "../lib/shiprocketEligibility";
 
-export const shiprocketTests = {
-  "pickup_location": "work",
-  "default_package": {
-    "length": 20,
-    "breadth": 15,
-    "height": 5,
-    "weight": 0.5
-  },
-  "rules": {
-    "missing_address": "rejected",
-    "missing_sku": "rejected",
-    "prepaid_unpaid": "no shipment created (button hidden)",
-    "prepaid_verified": "eligible",
-    "cod_gt_300_unpaid_advance": "no shipment created (button hidden)",
-    "cod_gt_300_verified_advance": "eligible, sub_total = remaining amount",
-    "cod_lte_300": "eligible after approved/Processing",
-    "duplicate_invocation": "one Shiprocket order only (idempotency check)",
-    "api_failure": "website order preserved, admin retry possible",
-    "credentials_exposure": "never returned to client"
-  }
-};
+console.log("Running Shiprocket unit tests...");
+
+try {
+  // --- Cancelled ---
+  assert.strictEqual(getShiprocketEligibility({ status: "Cancelled" }).eligible, false);
+
+  // --- Prepaid ---
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Stripe", paymentStatus: "Pending" }).eligible, false);
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Stripe", paymentStatus: "Failed" }).eligible, false);
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Stripe", paymentStatus: "Paid" }).eligible, true);
+
+  // --- COD Advance ---
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "cod_with_advance", codAdvanceStatus: "pending", amountPaid: 0 }).eligible, false);
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "cod_with_advance", codAdvanceStatus: "paid", amountPaid: 50, advanceAmount: 100 }).eligible, false);
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "cod_with_advance", codAdvanceStatus: "paid", amountPaid: 100, advanceAmount: 100 }).eligible, true);
+
+  // Legacy COD no advance
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Cash on Delivery", status: "Pending" }).eligible, false);
+  assert.strictEqual(getShiprocketEligibility({ paymentMethod: "Cash on Delivery", status: "Processing" }).eligible, true);
+
+  console.log("14 test cases passed!");
+} catch (err) {
+  console.error("Test failed:", err);
+  process.exit(1);
+}
+

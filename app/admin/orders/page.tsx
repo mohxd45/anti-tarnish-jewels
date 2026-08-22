@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { listenToAllOrders, updateOrderStatus, updateOrderTracking , logActivity, markAdvancePaid } from "@/lib/firestore";
 import { auth } from "@/lib/firebase";
+import { getShiprocketEligibility } from "@/lib/shiprocketEligibility";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { AdminCard, StatusBadge } from "@/components/admin/Bits";
@@ -646,34 +647,11 @@ function EditOrderDialog({
               ) : (
                 <div className="space-y-2">
                   {(() => {
-                    const isCodWithAdvance = order.paymentMethod === "cod_with_advance" || order.advanceRequired;
-                    const advancePaid = order.amountPaid && order.amountPaid >= (order.advanceAmount || 100);
-                    const isPrepaid = order.paymentMethod !== "Cash on Delivery" && order.paymentMethod !== "cod_with_advance" && !order.paymentMethod?.toLowerCase().includes("cod");
                     
-                    let eligible = false;
-                    let reason = "";
+                    const eligibility = getShiprocketEligibility(order);
+                    const eligible = eligibility.eligible;
+                    const reason = eligibility.reason;
 
-                    if (order.status === "Cancelled" || order.orderStatus === "Cancelled") {
-                      reason = "Order is cancelled.";
-                    } else if (isCodWithAdvance) {
-                      if (advancePaid) {
-                        eligible = true;
-                      } else {
-                        reason = "Awaiting â‚¹100 advance payment.";
-                      }
-                    } else if (isPrepaid) {
-                      if (order.paymentStatus === "Paid") {
-                        eligible = true;
-                      } else {
-                        reason = "Awaiting payment verification.";
-                      }
-                    } else {
-                      if (order.status !== "Pending" && order.orderStatus !== "Pending") {
-                        eligible = true;
-                      } else {
-                        reason = "Awaiting manual approval (Order is still Pending).";
-                      }
-                    }
 
                     if (eligible) {
                       return (

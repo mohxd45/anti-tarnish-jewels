@@ -1,39 +1,42 @@
-﻿import { NextResponse } from "next/server";
-import { adminAuth } from "@/lib/firebaseAdmin";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createShiprocketOrderForDbOrder } from "@/lib/shiprocketService";
+import { verifyAdminAccess } from "@/lib/server/admin-auth";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("Authorization");
+    const authHeader = req.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized: Missing token" }, { status: 401 });
+      return NextResponse.json({ error: "Missing or invalid authorization header" }, { status: 401 });
     }
-
-    const token = authHeader.split("Bearer ")[1];
-    let uid = "";
-    if (token === "TEST_TOKEN") {
-      uid = "test-user-id";
-    } else {
-      try {
-        const decodedToken = await adminAuth!.verifyIdToken(token);
-        uid = decodedToken.uid;
-      } catch (err) {
-        return NextResponse.json({ error: "Unauthorized: Invalid token" }, { status: 401 });
-      }
-    }
-
-    // In a real app we might verify if the user has an admin role here
     
+    const token = authHeader.split("Bearer ")[1];
+    
+    let adminInfo;
+    try {
+      adminInfo = await verifyAdminAccess(token);
+    } catch (err: any) {
+      if (err.name === 'AdminAuthorizationError') {
+        return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+      }
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
+    if (!adminInfo || !adminInfo.uid) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
-    if (!body.orderId) {
+    const { orderId } = body;
+
+    if (!orderId) {
       return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
     }
 
-    const result = await createShiprocketOrderForDbOrder(body.orderId);
-    return NextResponse.json(result);
+    const result = await createShiprocketOrderForDbOrder(orderId);
 
+    return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
-    console.error("Admin Shiprocket Create Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to create shipment" }, { status: 500 });
+    console.error("Shiprocket creation endpoint error:", error);
+    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 }
