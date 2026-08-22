@@ -13,6 +13,17 @@ export async function GET(req: Request) {
   const passwordExists = !!process.env.SHIPROCKET_API_PASSWORD;
 
   try {
+    const res = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({ email: process.env.SHIPROCKET_API_EMAIL, password: process.env.SHIPROCKET_API_PASSWORD })
+    });
+    const status = res.status;
+    const body = await res.text();
+
     const token = await getShiprocketToken(true);
     let locations = null;
     let locError = null;
@@ -29,14 +40,18 @@ export async function GET(req: Request) {
       auth: 'PASS',
       tokenReceived: !!token,
       locations,
-      locError
+      locError,
+      authStatus: status,
+      authBody: body
     });
   } catch (err: any) {
     return NextResponse.json({
       envEmail: emailExists,
       envPassword: passwordExists,
       auth: 'FAIL',
-      error: err.message
+      error: err.message,
+      // fallback if token error happened inside getShiprocketToken
+      stack: err.stack
     });
   }
 }
