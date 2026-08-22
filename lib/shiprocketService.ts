@@ -1,4 +1,4 @@
-﻿import { SHIPROCKET_CONFIG, shiprocketFetch, ShiprocketApiError } from './shiprocket';
+import { SHIPROCKET_CONFIG, shiprocketFetch, ShiprocketApiError } from './shiprocket';
 import { adminDb } from './firebaseAdmin';
 import { getShiprocketEligibility } from './shiprocketEligibility';
 import crypto from 'crypto';
@@ -226,8 +226,27 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
       throw apiError;
     }
     
-    if (!res || (!res.order_id && !res.status_code)) {
-       throw new Error("Shiprocket did not return an order_id");
+    if (!res || !res.order_id) {
+       const safeErrorMessage = res?.message || "Shiprocket response missing order_id";
+       if (typeof safeErrorMessage === 'string' && safeErrorMessage.toLowerCase().includes('order id already exists')) {
+         await adminDb!.runTransaction(async (t) => {
+           const snap = await t.get(orderRef);
+           if (snap.exists && snap.data()?.shiprocketCreationAttemptId === attemptId) {
+             t.update(orderRef, {
+               shiprocketCreationState: 'reconcile_required',
+               shiprocketLastError: "Order ID already exists in Shiprocket. Manual reconciliation required."
+             });
+           }
+         });
+         throw new Error("Order ID already exists in Shiprocket. Manual reconciliation required.");
+       }
+       const financials = {
+         payment_method: payload.payment_method,
+         sub_total: payload.sub_total,
+         advance_amount: payload.advance_amount,
+         cod_amount: payload.cod_amount
+       };
+       throw new Error("Shiprocket Application Error (HTTP 200): " + safeErrorMessage + " | Response: " + JSON.stringify(res || {}) + " | Payload Sent: " + JSON.stringify(financials));
     }
 
     await adminDb!.runTransaction(async (t) => {
@@ -267,4 +286,36 @@ export async function createShiprocketOrderForDbOrder(orderId: string): Promise<
     }
     throw new Error("Failed to create Shiprocket shipment: " + (error.message || "Unknown error"));
   }
+}
+
+
+export async function testableResponseValidation(res: any, payload: any, attemptId: string, orderData: any): Promise<any> {
+    if (!res || !res.order_id) {
+       const safeErrorMessage = res?.message || "Shiprocket response missing order_id";
+       if (typeof safeErrorMessage === 'string' && safeErrorMessage.toLowerCase().includes('order id already exists')) {
+         orderData.shiprocketCreationState = 'reconcile_required';
+         orderData.shiprocketLastError = "Order ID already exists in Shiprocket. Manual reconciliation required.";
+         throw new Error("Order ID already exists in Shiprocket. Manual reconciliation required.");
+       }
+       const financials = {
+         payment_method: payload?.payment_method,
+         sub_total: payload?.sub_total,
+         advance_amount: payload?.advance_amount,
+         cod_amount: payload?.cod_amount
+       };
+       throw new Error("Shiprocket Application Error (HTTP 200): " + safeErrorMessage + " | Response: " + JSON.stringify(res || {}) + " | Payload Sent: " + JSON.stringify(financials));
+    }
+
+    orderData.shiprocketOrderId = res.order_id;
+    orderData.shiprocketShipmentId = res.shipment_id || null;
+    orderData.shiprocketStatus = res.status || "NEW";
+    orderData.shiprocketCreationState = 'created';
+    orderData.shiprocketCreatedAt = new Date().toISOString();
+    
+    return {
+      success: true,
+      shiprocketOrderId: res.order_id,
+      shiprocketShipmentId: res.shipment_id || null,
+      status: res.status || "NEW"
+    };
 }
