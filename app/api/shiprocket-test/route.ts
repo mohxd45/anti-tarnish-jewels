@@ -9,21 +9,16 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const emailExists = !!process.env.SHIPROCKET_API_EMAIL;
-  const passwordExists = !!process.env.SHIPROCKET_API_PASSWORD;
-
+  const email = process.env.SHIPROCKET_API_EMAIL || "";
+  const password = process.env.SHIPROCKET_API_PASSWORD || "";
+  
+  const emailExists = !!email;
+  const passwordExists = !!password;
+  
+  const isSensitiveString = email === "[SENSITIVE]";
+  const hasAt = email.includes("@");
+  
   try {
-    const res = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({ email: process.env.SHIPROCKET_API_EMAIL, password: process.env.SHIPROCKET_API_PASSWORD })
-    });
-    const status = res.status;
-    const body = await res.text();
-
     const token = await getShiprocketToken(true);
     let locations = null;
     let locError = null;
@@ -37,21 +32,21 @@ export async function GET(req: Request) {
     return NextResponse.json({
       envEmail: emailExists,
       envPassword: passwordExists,
+      isSensitiveString,
+      hasAt,
       auth: 'PASS',
       tokenReceived: !!token,
       locations,
-      locError,
-      authStatus: status,
-      authBody: body
+      locError
     });
   } catch (err: any) {
     return NextResponse.json({
       envEmail: emailExists,
       envPassword: passwordExists,
+      isSensitiveString,
+      hasAt,
       auth: 'FAIL',
-      error: err.message,
-      // fallback if token error happened inside getShiprocketToken
-      stack: err.stack
+      error: err.message
     });
   }
 }
